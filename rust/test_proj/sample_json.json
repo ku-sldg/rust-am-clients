@@ -1,0 +1,16 @@
+{
+    "TYPE": "REQUEST",
+    "ACTION": "RUN",
+    "REQ_PLC": "TOP_PLC",
+    "TERM": {
+        "TERM_CONSTRUCTOR": "asp",
+        "TERM_BODY": {
+            "ASP_CONSTRUCTOR": "SIG"
+        }
+    },
+    "RAWEV": {
+        "RawEv": [
+            "anonce"
+        ]
+    }
+}
