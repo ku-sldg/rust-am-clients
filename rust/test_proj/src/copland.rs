@@ -16,7 +16,7 @@ type TARG_ID = String;
 type ASP_ARGS = HashMap<String, String>;
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct ASP_PARAMS {
     ASP_ID: ASP_ID,
     ASP_ARGS: ASP_ARGS,
@@ -24,7 +24,7 @@ struct ASP_PARAMS {
     ASP_TARG_ID: TARG_ID
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 enum FWD {
     COMP,
     ENCR,
@@ -40,13 +40,13 @@ enum Evidence {
     ss(Box<Evidence>, Box<Evidence>)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 enum SP {
     ALL,
     NONE
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "ASP_CONSTRUCTOR", content = "TERM_BODY")]
 pub enum ASP {
     NULL,
@@ -60,7 +60,7 @@ pub enum ASP {
 type Split = (SP, SP);
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "TERM_CONSTRUCTOR", content = "TERM_BODY")]
 pub enum Term {
     asp(ASP),
@@ -81,7 +81,7 @@ pub enum RawEv {
     RawEv(RawEvT)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ProtocolRunRequest {
     pub TYPE:  String,
     pub ACTION:  String,
