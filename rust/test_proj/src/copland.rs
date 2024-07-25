@@ -6,8 +6,8 @@ use std::collections::HashMap;
 use bytestring;
 
 
-use serde::{Deserialize, Serialize};
-use serde_json::Result;
+use serde::{Deserialize, Serialize, Serializer};
+
 
 type Plc = String;
 type N_ID = String;
@@ -17,18 +17,19 @@ type ASP_ARGS = HashMap<String, String>;
 
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ASP_PARAMS {
-    ASP_ID: ASP_ID,
-    ASP_ARGS: ASP_ARGS,
-    ASP_PLC: Plc,
-    ASP_TARG_ID: TARG_ID
+pub struct ASP_PARAMS {
+    pub ASP_ID: ASP_ID,
+    pub ASP_ARGS: ASP_ARGS,
+    pub ASP_PLC: Plc,
+    pub ASP_TARG_ID: TARG_ID
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-enum FWD {
+#[serde(tag = "FWD_CONSTRUCTOR", content = "FWD_BODY")]
+pub enum FWD {
     COMP,
     ENCR,
-    EXTD(u32),
+    EXTD(String),
     KILL,
     KEEP
 }
@@ -41,13 +42,14 @@ enum Evidence {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-enum SP {
+pub enum SP {
     ALL,
     NONE
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "ASP_CONSTRUCTOR", content = "TERM_BODY")]
+//#[derive(Debug)]
+#[serde(tag = "ASP_CONSTRUCTOR", content = "ASP_BODY")]
 pub enum ASP {
     NULL,
     CPY,
@@ -56,6 +58,27 @@ pub enum ASP {
     HSH,
     ENC(Plc)
 }
+
+
+/*
+impl Serialize for ASP {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+            match *self {
+                ASP::NULL => serializer.serialize_unit_variant("ASP", 0, "NULL"),
+                ASP::CPY =>  serializer.serialize_unit_variant("ASP", 1, "CPY"),
+                _ => serializer.serialize_unit_variant("ASP", 0, "NULL")
+            }
+     }
+    }
+
+
+impl Deserialize for ASP {
+
+}
+*/
 
 type Split = (SP, SP);
 
@@ -70,13 +93,13 @@ pub enum Term {
     bpar(Split, Box<Term>, Box<Term>)
 }
 
-type BS = bytestring::ByteString;
+//type BS = bytestring::ByteString;
 
 type RawEvT = Vec<String>;  //Vec<BS>;
 
 #[derive(Serialize, Deserialize, Debug)]
 //#[serde(untagged)]
-//#[serde(tag = "RawEv", content = "TERM_BODY")]
+//#[serde(tag = "RawEv_CONSTRUCTOR", content = "RawEv_BODY")]
 pub enum RawEv {
     RawEv(RawEvT)
 }

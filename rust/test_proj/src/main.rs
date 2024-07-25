@@ -1,15 +1,8 @@
-use openssl::sign::{Signer, Verifier};
-use openssl::rsa::Rsa;
-use openssl::pkey::PKey;
-use openssl::hash::MessageDigest;
 
-use serde::{Deserialize, Serialize};
-
-use bytestring::*;
 
 use std::io::prelude::*;
-use std::io::{ErrorKind};
 use std::net::TcpStream;
+use std::collections::HashMap;
 
 mod copland;
 mod test_json;
@@ -17,6 +10,10 @@ mod test_json;
 use crate::copland::copland::*;
 use crate::Term::*;
 use crate::ASP::*;
+use crate::SP::*;
+use crate::SP::*;
+use crate::FWD::*;
+//use crate::copland::copland::ASP_PARAMS;
 use crate::RawEv::RawEv;
 
 
@@ -26,11 +23,11 @@ fn connect_tcp_stream (s:String) -> std::io::Result<TcpStream> {
     stream
 }
 
-fn tcp_sendRec_str (s:String, mut stream:&TcpStream) -> std::io::Result<String> {
-    let mut s_out : String = "".to_string();
+fn tcp_sendRec_str (s:String, mut stream:&TcpStream, s_out: & mut String) -> std::io::Result<()> {
+    // let mut s_out : String = "hi".to_string(); // = "".to_string();
     stream.write_all(s.as_bytes());
-    stream.read_to_string(&mut s_out);
-    Ok (s_out)
+    stream.read_to_string(s_out);
+    Ok (())
 }
 
 fn encode_ProtocolRunRequest (v:&ProtocolRunRequest) -> std::result::Result<String, serde_json::Error> {
@@ -44,8 +41,12 @@ fn decode_ProtocolRunRequest (s:&String) -> std::result::Result<ProtocolRunRespo
 
 fn main() {
 
+    let v3 : Term = asp(ASPC(ALL, EXTD("1".to_string()), ASP_PARAMS{ ASP_ID:"hashfile_id".to_string(), ASP_ARGS:(HashMap::from([])), ASP_PLC:"P1".to_string(), ASP_TARG_ID:"hashfile_targ".to_string()}));
+    let v1 : Term = asp (SIG);
+    let v2 : Term = asp (SIG);
+    //let v4 : Term = lseq (Box::new(v3), Box::new(v2));  //lseq (Box v1, Box v2);
 
-    let v : Term = asp (SIG);
+    let v = v3;
     let rawev_vec = vec!["anonce".to_string()];
     let vreq : ProtocolRunRequest = 
         ProtocolRunRequest {
@@ -56,6 +57,10 @@ fn main() {
             RAWEV: RawEv(rawev_vec)};
 
     let server_uuid = "localhost:5001";
+
+    
+
+
 
     let maybe_json_req = encode_ProtocolRunRequest(&vreq);
 
@@ -69,10 +74,11 @@ fn main() {
                 Ok (stream) => {
                     println!("\nTrying to send ProtocolRunRequest JSON string: \n");
                     println!("\t{s}\n");
-                    let maybeRespString = tcp_sendRec_str(s,&stream);
-                    match maybeRespString {
+                    let mut respString = "".to_string();
+                    let maybeRespRes = tcp_sendRec_str(s,&stream, &mut respString);
+                    match maybeRespRes {
                         Err(e) => { println!("Error getting TCP Response String") }
-                        Ok(respString) => 
+                        Ok(u) => 
                         {
                             println!("Got a TCP Response String: \n");
                             println!("\t{respString}\n");
