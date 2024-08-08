@@ -1,5 +1,6 @@
 
 
+use std::fs;
 use std::io::prelude::*;
 use std::net::TcpStream;
 use std::collections::HashMap;
@@ -34,6 +35,12 @@ fn tcp_sendRec_str (s:String, mut stream:&TcpStream, s_out: & mut String) -> std
 }
 
 #[allow(non_snake_case)]
+fn decode_Term (s:&String) -> std::result::Result<Term, serde_json::Error> {
+    serde_json::from_str(s)
+}
+
+
+#[allow(non_snake_case)]
 fn encode_ProtocolRunRequest (v:&ProtocolRunRequest) -> std::result::Result<String, serde_json::Error> {
     serde_json::to_string(v)
 }
@@ -51,12 +58,46 @@ fn main() {
     let v2 : Term = asp (SIG);
     //let v4 : Term = lseq (Box::new(v3), Box::new(v2));  //lseq (Box v1, Box v2);
 
-    let v = v3;
+    let filehash_filepath = "filehash.json";
+    let cert_filepath = "cert.json";
+    let bg_filepath = "bg.json";
+    let parmut_filepath = "parmut.json";
+
+    let term_filepath = parmut_filepath;
+    // bg_filepath;
+    //cert_filepath;
+    //filehash_filepath;
+
+    let term_contents = fs::read_to_string(term_filepath).expect("Couldn't read Term JSON file");
+    println!("With text:\n{term_contents}");
+
+    #[allow(non_snake_case)]
+    let maybeTerm: Result<Term, serde_json::Error> = decode_Term(&term_contents);
+
+    let v = 
+    match maybeTerm {
+        Err(e) => { panic!("Error Decoding Term from file: {e:?}") }
+        Ok(t) =>{
+            println!("Decoded Term as: \n");
+            println!("\t{:?}\n", t); // :? formatter uses #[derive(..., Debug)] trait
+            t
+        }
+    };
+
+
+
+
+    //let v = v3;
     let my_nonce : String = hex::encode("anonce");
     let rawev_vec = vec![my_nonce];
-    let my_plcmap: HashMap<Plc, String> = HashMap::from([("P1".to_string(), "localhost:5001".to_string())]);
+    let my_plcmap: HashMap<Plc, String> = 
+        HashMap::from([("P0".to_string(), "localhost:5000".to_string()), 
+                       ("P1".to_string(), "localhost:5001".to_string()), 
+                       ("P2".to_string(), "localhost:5002".to_string())
+                       
+                       ]);
     let my_pubmap: HashMap<Plc, String> = HashMap::from([("P1".to_string(), "".to_string())]);
-    let my_att_session: Attestation_Session = Attestation_Session { Session_Plc: "P1".to_string(), Plc_Mapping: my_plcmap, PubKey_Mapping: my_pubmap };
+    let my_att_session: Attestation_Session = Attestation_Session { Session_Plc: "P0".to_string(), Plc_Mapping: my_plcmap, PubKey_Mapping: my_pubmap };
     let vreq : ProtocolRunRequest = 
         ProtocolRunRequest {
             TYPE: "REQUEST".to_string(), 
@@ -66,7 +107,7 @@ fn main() {
             RAWEV: RawEv(rawev_vec),
             ATTESTATION_SESSION: my_att_session};
 
-    let server_uuid = "localhost:5001";
+    let server_uuid = "localhost:5000";
 
     
 
