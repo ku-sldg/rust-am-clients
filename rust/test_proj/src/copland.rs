@@ -9,7 +9,7 @@ use bytestring;
 use serde::{Deserialize, Serialize, Serializer};
 
 
-type Plc = String;
+pub type Plc = String;
 type N_ID = String;
 type ASP_ID = String;
 type TARG_ID = String;
@@ -105,12 +105,22 @@ pub enum RawEv {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct Attestation_Session {
+    pub Session_Plc:  Plc,
+    pub Plc_Mapping:  HashMap<Plc, String>,
+    pub PubKey_Mapping:  HashMap<Plc, String>
+}
+
+
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ProtocolRunRequest {
     pub TYPE:  String,
     pub ACTION:  String,
     pub REQ_PLC:  Plc,
     pub TERM:  Term, 
-    pub RAWEV:  RawEv
+    pub RAWEV:  RawEv,
+    pub ATTESTATION_SESSION: Attestation_Session
 }
 
 #[derive(Serialize, Deserialize, Debug)]
