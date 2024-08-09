@@ -16,7 +16,7 @@ type TARG_ID = String;
 type ASP_ARGS = HashMap<String, String>;
 
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ASP_PARAMS {
     pub ASP_ID: ASP_ID,
     pub ASP_ARGS: ASP_ARGS,
@@ -24,7 +24,7 @@ pub struct ASP_PARAMS {
     pub ASP_TARG_ID: TARG_ID
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "FWD_CONSTRUCTOR", content = "FWD_BODY")]
 pub enum FWD {
     COMP,
@@ -34,20 +34,22 @@ pub enum FWD {
     KEEP
 }
 
-enum Evidence {
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "EVIDENCE_CONSTRUCTOR", content = "EVIDENCE_BODY")]
+pub enum Evidence {
     mt,
     nn(N_ID),
     uu(Plc, FWD, ASP_PARAMS, Box<Evidence>),
     ss(Box<Evidence>, Box<Evidence>)
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum SP {
     ALL,
     NONE
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 //#[derive(Debug)]
 #[serde(tag = "ASP_CONSTRUCTOR", content = "ASP_BODY")]
 pub enum ASP {
@@ -83,7 +85,7 @@ impl Deserialize for ASP {
 type Split = (SP, SP);
 
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "TERM_CONSTRUCTOR", content = "TERM_BODY")]
 pub enum Term {
     asp(ASP),
@@ -105,13 +107,24 @@ pub enum RawEv {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "AppResultC_CONSTRUCTOR", content = "AppresultC_BODY")]
+pub enum AppResultC {
+    mtc_app, 
+    nnc_app(N_ID, String),
+    ggc_app(Plc, ASP_PARAMS, RawEv, Box<AppResultC>),
+    hhc_app(Plc, ASP_PARAMS, String, Box<AppResultC>),
+    eecc_app(Plc, ASP_PARAMS, String, Box<AppResultC>),
+    ssc_app(Box<AppResultC>, Box<AppResultC>)
+}
+
+
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Attestation_Session {
     pub Session_Plc:  Plc,
     pub Plc_Mapping:  HashMap<Plc, String>,
     pub PubKey_Mapping:  HashMap<Plc, String>
 }
-
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProtocolRunRequest {
@@ -125,11 +138,33 @@ pub struct ProtocolRunRequest {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProtocolRunResponse {
-    TYPE:  String,
-    ACTION:  String,
-    SUCCESS:  bool,
-    PAYLOAD:  RawEv
+    pub TYPE:  String,
+    pub ACTION:  String,
+    pub SUCCESS:  bool,
+    pub PAYLOAD:  RawEv
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProtocolAppraiseRequest {
+    pub TYPE:  String,
+    pub ACTION:  String,
+    pub ATTESTATION_SESSION: Attestation_Session,
+    pub TERM:  Term,
+    pub REQ_PLC:  Plc, 
+    pub EVIDENCE:  Evidence,
+    pub RAWEV:  RawEv
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProtocolAppraiseResponse {
+    pub TYPE:  String,
+    pub ACTION:  String,
+    pub SUCCESS:  bool,
+    pub PAYLOAD:  AppResultC
+}
+
+
+
 
 }
 
