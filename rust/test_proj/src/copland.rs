@@ -107,7 +107,7 @@ pub enum RawEv {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "AppResultC_CONSTRUCTOR", content = "AppresultC_BODY")]
+#[serde(tag = "AppResultC_CONSTRUCTOR", content = "AppResultC_BODY")]
 pub enum AppResultC {
     mtc_app, 
     nnc_app(N_ID, String),

@@ -1,5 +1,6 @@
 
 
+use std::fmt::Debug;
 use std::fs;
 use std::io::prelude::*;
 use std::net::TcpStream;
@@ -29,11 +30,13 @@ fn connect_tcp_stream (s:String) -> std::io::Result<TcpStream> {
 }
 
 #[allow(non_snake_case)]
-fn tcp_sendRec_str (s:String, mut stream:&TcpStream, s_out: & mut String) -> std::io::Result<()> {
+fn tcp_sendRec_str (s:String, mut stream:&TcpStream /* , s_out: & mut String */ ) -> std::io::Result<String> {
     // let mut s_out : String = "hi".to_string(); // = "".to_string();
     stream.write_all(s.as_bytes())?;
-    stream.read_to_string(s_out)?;
-    Ok (())
+    let mut str_in : String = "".to_string();
+    stream.read_to_string(&mut str_in)?;
+    let str_out : String = str_in.clone();
+    Ok (str_out)
 }
 
 // std::result::Result<String, serde_json::Error>
@@ -60,6 +63,40 @@ fn decode_gen<'a, T>(s: &'a str) -> std::io::Result<T>
         }  
     }
 
+/*
+
+fn sendRec_reqResp_gen<'a, T, R>(vreq: &T, server_uuid: String) -> std::io::Result<R>
+    where T: ?Sized + Serialize,
+          R: de::Deserialize<'a>,
+          R: Debug
+{
+    let req_str = encode_gen(&vreq)?;
+
+    let stream = connect_tcp_stream(server_uuid)?;
+    println!("\nTrying to send Request JSON string: \n");
+    println!("\t{req_str}\n");
+    //let mut resp_str = "".to_string();
+
+    let resp_str = tcp_sendRec_str(req_str,&stream)?;
+    println!("Got a TCP Response String: \n");
+    println!("\t{resp_str}\n");
+
+    let resp_str_clone = resp_str.clone();
+
+    //drop(resp_str);
+
+    let resp : R = decode_gen (&resp_str)?;
+
+    //println!("Decoded Response as: \n");
+    // println!("\t{:?}\n", resp); // :? formatter uses #[derive(..., Debug)] trait
+    Ok (resp)
+}
+
+*/
+
+
+
+
 
 fn main() -> std::io::Result<()> {
 
@@ -72,6 +109,9 @@ fn main() -> std::io::Result<()> {
     let _cert_filepath = "cert.json";
     let _bg_filepath = "bg.json";
     let _parmut_filepath = "parmut.json";
+
+    let server_uuid =     "localhost:5000";
+    let app_server_uuid = "localhost:5003";
 
     let term_filepath = _cert_filepath;
     // _parmut_filepath;
@@ -108,24 +148,30 @@ fn main() -> std::io::Result<()> {
             RAWEV: RawEv(rawev_vec),
             ATTESTATION_SESSION: my_att_session.clone()};
 
-    let server_uuid = "localhost:5000";
+ 
 
-    let app_server_uuid = "localhost::5003";
+
+
 
     let req_str = encode_gen(&vreq)?;
 
     let stream = connect_tcp_stream(server_uuid.to_string())?;
     println!("\nTrying to send ProtocolRunRequest JSON string: \n");
     println!("\t{req_str}\n");
-    let mut resp_str = "".to_string();
+    //let mut resp_str = "".to_string();
 
-    let _u = tcp_sendRec_str(req_str,&stream, &mut resp_str)?;
+    let resp_str = tcp_sendRec_str(req_str,&stream /* , &mut resp_str */ )?;
     println!("Got a TCP Response String: \n");
     println!("\t{resp_str}\n");
 
     let resp : ProtocolRunResponse = decode_gen (&resp_str)?;
     println!("Decoded ProtocolRunResponse as: \n");
     println!("\t{:?}\n", resp); // :? formatter uses #[derive(..., Debug)] trait
+
+
+
+
+
 
     // TODO:  check for SUCCESS = true here...
     let res = resp.PAYLOAD;
@@ -136,7 +182,7 @@ fn main() -> std::io::Result<()> {
     let appreq =
             ProtocolAppraiseRequest {
             TYPE: "REQUEST".to_string(),
-            ACTION: "RUN".to_string(),
+            ACTION: "APPRAISE".to_string(),
             ATTESTATION_SESSION: sess, 
             TERM: t,
             REQ_PLC: "P0".to_string(),
@@ -144,13 +190,23 @@ fn main() -> std::io::Result<()> {
             RAWEV: res 
         };
 
-    let json_app_req_str = encode_gen(&appreq)?;
-    //match maybe_json_app_req {
-        // Err (e) => { println! ("{}{:?}", "Error encoding this ProtocolAppraiseRequest to JSON String:  ", appreq) }
-        //Ok (s) =>
-        {
-            Ok (())
-        }
+    let app_req_str = encode_gen(&appreq)?;
+
+    let app_stream = connect_tcp_stream(app_server_uuid.to_string())?;
+    println!("\nTrying to send ProtocolAppraiseRequest JSON string: \n");
+    println!("\t{app_req_str}\n");
+
+    let app_resp_str = tcp_sendRec_str(app_req_str,&app_stream)?;
+    println!("Got a TCP Response String: \n");
+    println!("\t{app_resp_str}\n");
+
+    let app_resp : ProtocolAppraiseResponse = decode_gen (&app_resp_str)?;
+    println!("Decoded ProtocolAppraiseResponse as: \n");
+    println!("\t{:?}\n", app_resp); // :? formatter uses #[derive(..., Debug)] trait
+
+    {
+        Ok (())
+    }
 
 
     }
