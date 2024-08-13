@@ -1,12 +1,5 @@
-
-
-pub mod copland {
-
 use std::collections::HashMap;
-use bytestring;
-
-
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 
 pub type Plc = String;
@@ -161,10 +154,5 @@ pub struct ProtocolAppraiseResponse {
     pub ACTION:  String,
     pub SUCCESS:  bool,
     pub PAYLOAD:  AppResultC
-}
-
-
-
-
 }
 
