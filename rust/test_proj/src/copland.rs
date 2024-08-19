@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 
 pub type Plc = String;
 type N_ID = String;
-type ASP_ID = String;
-type TARG_ID = String;
-type ASP_ARGS = HashMap<String, String>;
+pub type ASP_ID = String;
+pub type TARG_ID = String;
+pub type ASP_ARGS = HashMap<String, String>;
 
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -154,5 +154,24 @@ pub struct ProtocolAppraiseResponse {
     pub ACTION:  String,
     pub SUCCESS:  bool,
     pub PAYLOAD:  AppResultC
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ASPRunRequest {
+    pub TYPE:  String,
+    pub ACTION:  String,
+    pub ASP_ID: String, 
+    pub ASP_ARGS: ASP_ARGS,
+    pub ASP_PLC:  Plc,
+    pub ASP_TARGID: TARG_ID,
+    pub RAWEV:  RawEv
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ASPRunResponse {
+    pub TYPE:  String,
+    pub ACTION:  String,
+    pub SUCCESS:  bool,
+    pub PAYLOAD:  RawEv
 }
 
