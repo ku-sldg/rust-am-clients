@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::process::Command;
+use std::io::{self, Write};
 
 
 use test_proj::copland::*;
@@ -13,7 +14,7 @@ use test_proj::json::*;
 
 //use test_proj::json::encode_gen;
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let v : SP = NONE;
     //println!("Hello, world!");
 
@@ -31,12 +32,26 @@ fn main() {
             RAWEV: RawEv(vec![])
         };
 
-    let req_str = encode_gen(&aspreq);
+    let req_str = encode_gen(&aspreq)?;
 
-    Command::new("ls")
-            .arg("-a")
-            .spawn()
+    let prog_str = "echo".to_string();
+    // prog_str.push_str(&req_str);
+
+    let mut args_str = req_str;
+    args_str.push_str(" | echo");
+    //let args_str = ""; //"hihihihgi";
+
+    let output = Command::new(prog_str)
+            .arg(args_str)
+            //.spawn()
+            .output()
             .expect("failed to execute command");
+
+    io::stdout().write_all(&output.stdout).unwrap();
+
+
+
+        Ok (())
 
 
     /*
