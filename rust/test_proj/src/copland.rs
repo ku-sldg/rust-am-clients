@@ -1,3 +1,6 @@
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
@@ -163,7 +166,7 @@ pub struct ASPRunRequest {
     pub ASP_ID: String, 
     pub ASP_ARGS: ASP_ARGS,
     pub ASP_PLC:  Plc,
-    pub ASP_TARGID: TARG_ID,
+    pub ASP_TARG_ID: TARG_ID,
     pub RAWEV:  RawEv
 }
 

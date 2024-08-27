@@ -1,4 +1,6 @@
-
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
 
 const HELP: &str = "\
 App
@@ -24,7 +26,7 @@ pub struct ClientArgsOpt {
     opt_app_server_uuid: Option<String>,
 }
 
-struct ClientArgs {
+struct _ClientArgs {
     term_name: String,
     term_filename: String,
     att_server_uuid: String,
@@ -33,7 +35,7 @@ struct ClientArgs {
 
 pub fn get_client_args()-> std::io::Result<ClientArgsOpt> {
     match parse_args() {
-        Err (e) => panic!("hi"),
+        Err (_e) => panic!("hi"),
         Ok (optArgs) => 
         {
             Ok (optArgs)
