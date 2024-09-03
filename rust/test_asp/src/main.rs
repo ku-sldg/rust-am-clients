@@ -6,15 +6,8 @@ use std::collections::HashMap;
 use std::process::Command;
 use std::io::{self, Write};
 
-
-use test_proj::copland::*;
-use test_proj::copland::RawEv::*;
-use test_proj::copland::ASPRunRequest;
-
-//use test_proj::tcp::*;
-use test_proj::json::*;
-
-//use test_proj::json::encode_gen;
+use rust_am_lib::copland::*;
+use rust_am_lib::copland::RawEv::*;
 
 fn main() -> std::io::Result<()> {
 
@@ -32,7 +25,7 @@ fn main() -> std::io::Result<()> {
             RAWEV: RawEv(vec![])
         };
 
-    let req_str = encode_gen(&aspreq)?;
+    let req_str = serde_json::to_string(&aspreq)?;
 
     let _ = println!("{req_str}");
 
