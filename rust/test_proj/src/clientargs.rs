@@ -35,7 +35,7 @@ struct _ClientArgs {
 
 pub fn get_client_args()-> std::io::Result<ClientArgsOpt> {
     match parse_args() {
-        Err (_e) => panic!("hi"),
+        Err (_e) => panic!("Error getting ClientArgsOpt from command line args"),
         Ok (optArgs) => 
         {
             Ok (optArgs)

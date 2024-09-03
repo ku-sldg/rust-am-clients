@@ -2,25 +2,18 @@
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 
-mod copland;
+use rust_am_lib::copland::*;
+use rust_am_lib::copland::Evidence::*;
+use rust_am_lib::copland::RawEv::*;
+
 mod clientargs;
 mod tcp;
-mod json;
+use clientargs::*;
+use tcp::*;
 
-//use pico_args::*;
 use std::fs;
 use std::collections::HashMap;
-
 use hex;
-
-use crate::clientargs::*;
-use crate::tcp::*;
-use crate::json::*;
-
-use crate::copland::*;
-use crate::RawEv::RawEv;
-use crate::Evidence::*;
-use crate::ProtocolRunResponse;
 
 
 fn main() -> std::io::Result<()> {
@@ -37,7 +30,7 @@ fn main() -> std::io::Result<()> {
     println!("Term contents:\n{term_contents}");
 
     #[allow(non_snake_case)]
-    let t : Term = decode_gen(&term_contents)?;
+    let t : Term = serde_json::from_str(&term_contents)?;//decode_gen(&term_contents)?;
     println!("Decoded Term as: \n");
     println!("\t{:?}\n", t); // :? formatter uses #[derive(..., Debug)] trait
 
@@ -62,7 +55,7 @@ fn main() -> std::io::Result<()> {
             RAWEV: RawEv(rawev_vec),
             ATTESTATION_SESSION: my_att_session.clone()};
 
-    let req_str = encode_gen(&vreq)?;
+    let req_str = serde_json::to_string(&vreq)?;//encode_gen(&vreq)?;
 
     let stream = connect_tcp_stream(att_server_uuid_string)?;
     println!("\nTrying to send ProtocolRunRequest JSON string: \n");
@@ -73,7 +66,7 @@ fn main() -> std::io::Result<()> {
     println!("Got a TCP Response String: \n");
     println!("\t{resp_str}\n");
 
-    let resp : ProtocolRunResponse = decode_gen (&resp_str)?;
+    let resp : ProtocolRunResponse = serde_json::from_str(&resp_str)?; //decode_gen (&resp_str)?;
     println!("Decoded ProtocolRunResponse as: \n");
     println!("\t{:?}\n", resp); // :? formatter uses #[derive(..., Debug)] trait
 
@@ -95,7 +88,7 @@ fn main() -> std::io::Result<()> {
             RAWEV: res 
         };
 
-    let app_req_str = encode_gen(&appreq)?;
+    let app_req_str = serde_json::to_string(&appreq)?;//encode_gen(&appreq)?;
 
     let app_stream = connect_tcp_stream(app_server_uuid_string)?;
     println!("\nTrying to send ProtocolAppraiseRequest JSON string: \n");
@@ -105,7 +98,7 @@ fn main() -> std::io::Result<()> {
     println!("Got a TCP Response String: \n");
     println!("\t{app_resp_str}\n");
 
-    let app_resp : ProtocolAppraiseResponse = decode_gen (&app_resp_str)?;
+    let app_resp : ProtocolAppraiseResponse = serde_json::from_str(&app_resp_str)?;//decode_gen (&app_resp_str)?;
     println!("Decoded ProtocolAppraiseResponse as: \n");
     println!("\t{:?}\n", app_resp); // :? formatter uses #[derive(..., Debug)] trait
 
