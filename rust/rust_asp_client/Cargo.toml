@@ -1,5 +1,5 @@
 [package]
-name = "test_asp"
+name = "rust_asp_client"
 version = "0.1.0"
 edition = "2021"
 
