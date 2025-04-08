@@ -1,5 +1,7 @@
 use std::io::prelude::*;
 use std::net::TcpStream;
+use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+//use socket::*;
 
 pub fn connect_tcp_stream (s:String) -> std::io::Result<TcpStream> {
     println!("\n{}{}", "Trying to connect to server at:  ", s);
@@ -10,8 +12,20 @@ pub fn connect_tcp_stream (s:String) -> std::io::Result<TcpStream> {
 #[allow(non_snake_case)]
 pub fn tcp_sendRec_str (s:String, mut stream:&TcpStream /* , s_out: & mut String */ ) -> std::io::Result<String> {
     // let mut s_out : String = "hi".to_string(); // = "".to_string();
+    let sbytes = s.as_bytes();
+    let sbytes_len: u32 = sbytes.len().try_into().unwrap();
+
+    let mut wtr = vec![];
+    wtr.write_u32::<BigEndian>(sbytes_len).unwrap();
+    //wtr.write_u32::<LittleEndian>(768).unwrap();
+    //let sbytes_len_htonl = socket::htonl(sbytes_len);
+    stream.write_all(&wtr)?;
     stream.write_all(s.as_bytes())?;
     let mut str_in : String = "".to_string();
+
+    let mut x:[u8; 4] = [0u8;4];
+    stream.read_exact(&mut x);
+
     stream.read_to_string(&mut str_in)?;
     let str_out : String = str_in.clone();
     Ok (str_out)
