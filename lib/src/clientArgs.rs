@@ -6,6 +6,8 @@ const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plcmap_default.json";
 const DEFAULT_TYPE_ENV_PATH: &'static str = "/testing/glob_type_env_default.json";
 const DEFAULT_GLOB_COMPS_PATH: &'static str = "/testing/glob_comps_default.json";
 
+const DEFAULT_ENV_PATH: &'static str = "/testing/res_env_default.json";
+
 const AM_CLIENTS_ENV_VAR: &'static str = "AM_CLIENTS_ROOT";
 
 fn get_local_env_var(s:String) -> std::io::Result<String> {
@@ -72,5 +74,31 @@ pub struct AmClientArgs {
 
 pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
     let args: AmClientArgs = AmClientArgs::parse();
+    Ok(args)
+}
+
+// Adapted from:  https://docs.rs/clap/latest/clap/
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+pub struct ResoluteClientArgs {
+    /// Path pointing to (JSON) ResoluteClientRequest file
+    #[arg(short, long)]
+    pub req_filepath: String,
+
+    /// UUID string for AM server destination
+    #[arg(short, long , default_value_t = DEFAULT_SERVER_UUID.to_string())]
+    pub server_uuid: String,
+    
+    /// Path pointing to (JSON) ResoluteEnvironmentMap file
+    #[arg(short, long , default_value_t = 
+        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
+                                   DEFAULT_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of ResoluteClientArgs struct.  
+                                                                Check for missing Environment Variable?"))]
+    pub env_filepath: String
+
+}
+
+pub fn get_resolute_client_args () -> std::io::Result<ResoluteClientArgs> {
+    let args: ResoluteClientArgs = ResoluteClientArgs::parse();
     Ok(args)
 }
