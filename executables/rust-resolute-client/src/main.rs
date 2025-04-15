@@ -3,18 +3,9 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-//#![allow(non_camel_case_types)]
-//#![allow(non_snake_case)]
-
 // Custom package imports
 use rust_am_lib::copland::*;
 use rust_am_lib::copland::EvidenceT::*;
-//use rust_am_lib::copland::FWD::*;
-//use rust_am_lib::copland::EvInSig::*;
-//use rust_am_lib::copland::EvOutSig::*;
-//use rust_am_lib::copland::ASP::*;
-//use rust_am_lib::copland::Term::*;
-//use rust_am_lib::copland::SP::ALL;
 
 use lib::tcp::*;
 use lib::clientArgs::*;
@@ -49,9 +40,9 @@ pub struct ResoluteEnvironment {
 pub type ResoluteEnvironmentMap = HashMap<ASP_ID, ResoluteEnvironment>;
 
 
-fn resolute_to_am_request(res_req:ResoluteClientRequest, env:ResoluteEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
+fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidence:Evidence, env:ResoluteEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
 
-    let top_plc: Plc = "P0".to_string();
+    let top_plc: Plc = myPlc;
     
     let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id;
     let asp_args_in: ASP_ARGS = res_req.ResClientReq_attest_args;
@@ -62,11 +53,7 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, env:ResoluteEnvironment
     let my_term = term_add_args (my_term_noargs, asp_args_in);
     let my_session: Attestation_Session = my_env.ResClientEnv_session.clone();
 
-    let rawev_vec = vec![]; //vec![my_nonce];
-
-    let my_evidence : Evidence = 
-            Evidence { RAWEV: RawEv::RawEv (rawev_vec),
-                       EVIDENCET: mt_evt };
+    let my_evidence : Evidence = init_evidence;
 
     let vreq : ProtocolRunRequest = 
     ProtocolRunRequest {
@@ -103,7 +90,6 @@ fn main() -> std::io::Result<()> {
     let res_env_filepath : String = args.env_filepath;
     println!("res_env_filepath arg: {}", res_env_filepath);
 
-
     let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read ResoluteClientRequest JSON file");
     eprintln!("\nTerm contents:\n{res_req_contents}");
 
@@ -117,37 +103,10 @@ fn main() -> std::io::Result<()> {
     eprintln!("\nDecoded res_env as:");
     eprintln!("{:?}", my_res_env);
 
-    let vreq : ProtocolRunRequest = resolute_to_am_request(res_req, my_res_env)?;
+    let myPlc: Plc = "TOP_PLC".to_string();
+    let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
-
-    /*
-    let rawev_vec = vec![]; //vec![my_nonce];
-
-    let my_evidence : Evidence = 
-            Evidence { RAWEV: RawEv::RawEv (rawev_vec),
-                       EVIDENCET: mt_evt };
-
-    let my_res_env_val : &ResoluteEnvironment = my_res_env.get(&res_req.ResClientReq_attest_id).expect("hi");
-    let my_att_session: Attestation_Session = my_res_env_val.ResClientEnv_session.clone();
-
-    /*
-            Attestation_Session { Session_Plc: "P0".to_string(), 
-                                  Plc_Mapping: my_plcmap, 
-                                  PubKey_Mapping: my_pubmap, 
-                                  Session_Context: my_glob_context };
-                                  */
-
-    let my_term: Term = my_res_env_val.ResClientEnv_term.clone(); //t;  
-    let vreq : ProtocolRunRequest = 
-        ProtocolRunRequest {
-            TYPE: "REQUEST".to_string(), 
-            ACTION: "RUN".to_string(), 
-            REQ_PLC: "TOP_PLC".to_string(), 
-            TERM: my_term,
-            EVIDENCE: my_evidence,
-            ATTESTATION_SESSION: my_att_session};
-
-    */
+    let vreq : ProtocolRunRequest = resolute_to_am_request(res_req, myPlc, my_evidence, my_res_env)?;
 
     let req_str = serde_json::to_string(&vreq)?;
 

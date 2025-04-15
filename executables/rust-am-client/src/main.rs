@@ -1,17 +1,10 @@
 // main.rs (rust-am-client)
 
-//#![allow(non_camel_case_types)]
-//#![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
 
 // Custom package imports
 use rust_am_lib::copland::*;
-use rust_am_lib::copland::EvidenceT::*;
-//use rust_am_lib::copland::FWD::*;
-//use rust_am_lib::copland::EvInSig::*;
-//use rust_am_lib::copland::EvOutSig::*;
-//use rust_am_lib::copland::ASP::*;
-//use rust_am_lib::copland::Term::*;
-//use rust_am_lib::copland::SP::ALL;
 
 use lib::tcp::*;
 use lib::clientArgs::*;
@@ -73,11 +66,7 @@ fn main() -> std::io::Result<()> {
 
     let my_pubmap: HashMap<Plc, String> = HashMap::from([]);
 
-    let rawev_vec = vec![]; //vec![my_nonce];
-
-    let my_evidence : Evidence = 
-            Evidence { RAWEV: RawEv::RawEv (rawev_vec),
-                       EVIDENCET: mt_evt };
+    let my_evidence : Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
     let my_att_session: Attestation_Session = 
             Attestation_Session { Session_Plc: "P0".to_string(), 
