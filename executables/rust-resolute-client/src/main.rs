@@ -5,7 +5,6 @@
 
 // Custom package imports
 use rust_am_lib::copland::*;
-use rust_am_lib::copland::EvidenceT::*;
 
 use lib::tcp::*;
 use lib::clientArgs::*;
