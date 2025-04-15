@@ -66,10 +66,14 @@ fn main() -> std::io::Result<()> {
 
     let my_pubmap: HashMap<Plc, String> = HashMap::from([]);
 
-    let my_evidence : Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
+    let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
+
+    let my_session_plc: Plc = "P0".to_string();
+
+    let my_req_plc: Plc = "TOP_PLC".to_string();
 
     let my_att_session: Attestation_Session = 
-            Attestation_Session { Session_Plc: "P0".to_string(), 
+            Attestation_Session { Session_Plc: my_session_plc, 
                                   Plc_Mapping: my_plcmap, 
                                   PubKey_Mapping: my_pubmap, 
                                   Session_Context: my_glob_context };
@@ -79,7 +83,7 @@ fn main() -> std::io::Result<()> {
         ProtocolRunRequest {
             TYPE: "REQUEST".to_string(), 
             ACTION: "RUN".to_string(), 
-            REQ_PLC: "TOP_PLC".to_string(), 
+            REQ_PLC: my_req_plc, 
             TERM: my_term,
             EVIDENCE: my_evidence,
             ATTESTATION_SESSION: my_att_session};

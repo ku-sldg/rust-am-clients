@@ -46,7 +46,7 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidenc
     let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id;
     let asp_args_in: ASP_ARGS = res_req.ResClientReq_attest_args;
 
-    let my_env= env.get(&asp_id_in).expect("Term not found in ResoluteEnvironmentMap");
+    let my_env= env.get(&asp_id_in).expect(format!("Term not found in ResoluteEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_term_noargs = my_env.ResClientEnv_term.clone();
     let my_term = term_add_args (my_term_noargs, asp_args_in);

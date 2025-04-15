@@ -1,5 +1,5 @@
 {
-    "hi": {
+    "cert_appr_protocol": {
         "ResClientEnv_term": {
             "TERM_CONSTRUCTOR": "lseq",
             "TERM_BODY": [
