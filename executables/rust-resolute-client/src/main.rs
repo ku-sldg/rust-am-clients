@@ -43,13 +43,14 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidenc
 
     let top_plc: Plc = myPlc;
     
-    let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id;
+    let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id; //"hey".to_string();
     let asp_args_in: ASP_ARGS = res_req.ResClientReq_attest_args;
 
     let my_env= env.get(&asp_id_in).expect(format!("Term not found in ResoluteEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_term_noargs = my_env.ResClientEnv_term.clone();
-    let my_term = term_add_args (my_term_noargs, asp_args_in);
+    //let my_term = term_add_args (my_term_noargs, asp_args_in);
+    let my_term = my_term_noargs;
     let my_session: Attestation_Session = my_env.ResClientEnv_session.clone();
 
     let my_evidence : Evidence = init_evidence;
@@ -90,7 +91,7 @@ fn main() -> std::io::Result<()> {
     println!("res_env_filepath arg: {}", res_env_filepath);
 
     let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read ResoluteClientRequest JSON file");
-    eprintln!("\nTerm contents:\n{res_req_contents}");
+    eprintln!("\nResoluteClientRequest contents:\n{res_req_contents}");
 
     let res_req : ResoluteClientRequest = serde_json::from_str(&res_req_contents)?;
     println!("\nDecoded ResoluteClientRequest as:");
