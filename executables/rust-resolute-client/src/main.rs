@@ -132,8 +132,12 @@ fn main() -> std::io::Result<()> {
             ResClientResult_evidence: resp.PAYLOAD
         };
 
-    println!("ReslluteClientResponse: \n");
+    println!("ResoluteClientResponse: \n");
     println!("{:?}\n", res_resp);
+
+    println!("ResoluteClientResponse Success: \n");
+    println!("{:?}\n", res_resp.ResClientResult_success);
+    
 
     Ok (())
 }

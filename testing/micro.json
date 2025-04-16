@@ -7,10 +7,10 @@
                 {
                     "TERM_CONSTRUCTOR": "bseq",
                     "TERM_BODY": [
-                        {
-                            "split1": "ALL",
-                            "split2": "ALL"
-                        },
+                        [
+                            "ALL",
+                            "ALL"
+                        ],
                         {
                             "TERM_CONSTRUCTOR": "asp",
                             "TERM_BODY": {

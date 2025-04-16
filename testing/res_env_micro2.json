@@ -254,7 +254,81 @@
         }
     },
     "micro_protocol": {
-        "ResClientEnv_term": {},
+        "ResClientEnv_term": {
+          "TERM_CONSTRUCTOR": "lseq",
+          "TERM_BODY": [
+              {
+                  "TERM_CONSTRUCTOR": "lseq",
+                  "TERM_BODY": [
+                      {
+                          "TERM_CONSTRUCTOR": "bseq",
+                          "TERM_BODY": [
+                              [
+                                  "ALL",
+                                  "ALL"
+                              ],
+                              {
+                                  "TERM_CONSTRUCTOR": "asp",
+                                  "TERM_BODY": {
+                                      "ASP_CONSTRUCTOR": "ASPC",
+                                      "ASP_BODY": {
+                                          "ASP_ID": "hashdir",
+                                          "ASP_ARGS": {
+                                              "env_var": "INSPECTA_ROOT",
+                                              "paths": [
+                                                  "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                              ],
+                                              "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
+                                          },
+                                          "ASP_PLC": "cds_config_dir_plc",
+                                          "ASP_TARG_ID": "aadl_dir_targ"
+                                      }
+                                  }
+                              },
+                              {
+                                  "TERM_CONSTRUCTOR": "asp",
+                                  "TERM_BODY": {
+                                      "ASP_CONSTRUCTOR": "ASPC",
+                                      "ASP_BODY": {
+                                          "ASP_ID": "hashdir",
+                                          "ASP_ARGS": {
+                                              "env_var": "INSPECTA_ROOT",
+                                              "paths": [
+                                                  "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                              ],
+                                              "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
+                                          },
+                                          "ASP_PLC": "cds_config_dir_plc",
+                                          "ASP_TARG_ID": "microkit_dir_targ"
+                                      }
+                                  }
+                              }
+                          ]
+                      },
+                      {
+                          "TERM_CONSTRUCTOR": "asp",
+                          "TERM_BODY": {
+                              "ASP_CONSTRUCTOR": "ASPC",
+                              "ASP_BODY": {
+                                  "ASP_ID": "hashevidence",
+                                  "ASP_ARGS": {
+                                      "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+                                  },
+                                  "ASP_PLC": "cds_config_dir_plc",
+                                  "ASP_TARG_ID": "micro_hash_composite_targ"
+                              }
+                          }
+                      }
+                  ]
+              },
+              {
+                  "TERM_CONSTRUCTOR": "asp",
+                  "TERM_BODY": {
+                      "ASP_CONSTRUCTOR": "APPR"
+                  }
+              }
+          ]
+      },
         "ResClientEnv_session": {
             "Session_Plc": "P0",
             "Plc_Mapping": {
