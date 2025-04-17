@@ -19,6 +19,7 @@
                                     "ASP_ID": "hashdir",
                                     "ASP_ARGS": {
                                         "env_var": "INSPECTA_ROOT",
+                                        "env_var_golden": "AM_ROOT",
                                         "paths": [
                                             "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
                                         ],
@@ -37,6 +38,7 @@
                                     "ASP_ID": "hashdir",
                                     "ASP_ARGS": {
                                         "env_var": "INSPECTA_ROOT",
+                                        "env_var_golden": "AM_ROOT",
                                         "paths": [
                                             "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
                                         ],
@@ -56,7 +58,8 @@
                         "ASP_BODY": {
                             "ASP_ID": "hashevidence",
                             "ASP_ARGS": {
-                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt", 
+                                "env_var_golden": "AM_ROOT"
                             },
                             "ASP_PLC": "cds_config_dir_plc",
                             "ASP_TARG_ID": "micro_hash_composite_targ"
