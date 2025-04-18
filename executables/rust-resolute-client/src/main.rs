@@ -13,7 +13,7 @@ use lib::clientArgs::*;
 use std::fs;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value};
+use serde_json::Value;
 //use hex;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -44,7 +44,7 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidenc
     let top_plc: Plc = myPlc;
     
     let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id; //"hey".to_string();
-    let asp_args_in: ASP_ARGS = res_req.ResClientReq_attest_args;
+    //let asp_args_in: ASP_ARGS = res_req.ResClientReq_attest_args;
 
     let my_env= env.get(&asp_id_in).expect(format!("Term not found in ResoluteEnvironmentMap with key: '{}'", asp_id_in).as_str());
 

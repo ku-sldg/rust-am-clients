@@ -32,6 +32,9 @@ am_client_cert_appr:
 am_client_micro:
 	cargo run --release --bin rust-am-client -- -t testing/protocol_micro.json -e testing/glob_type_env_micro.json -g testing/glob_comps_micro.json
 
+am_client_micro_session:
+	cargo run --release --bin rust-am-client -- -t testing/protocol_micro.json -a testing/session_micro.json
+
 resolute_client_help:
 	cargo run --release --bin rust-resolute-client -- --help
 

@@ -3,8 +3,9 @@ use clap::Parser;
 const DEFAULT_TERM_PATH: &'static str = "/testing/protocol_cert_appr.json";
 const DEFAULT_SERVER_UUID: &'static str = "localhost:5000";
 const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plcmap_default.json";
-const DEFAULT_TYPE_ENV_PATH: &'static str = "/testing/glob_type_env_default.json";
-const DEFAULT_GLOB_COMPS_PATH: &'static str = "/testing/glob_comps_default.json";
+//const DEFAULT_TYPE_ENV_PATH: &'static str = "/testing/glob_type_env_default.json";
+//const DEFAULT_GLOB_COMPS_PATH: &'static str = "/testing/glob_comps_default.json";
+const DEFAULT_SESSION_PATH: &'static str = "/testing/session_cert_appr.json";
 
 const DEFAULT_ENV_PATH: &'static str = "/testing/env_resolute_cert_appr.json";
 
@@ -36,7 +37,7 @@ fn get_local_env_var_w_suffix (env_var_string:String, suffix:&str) -> std::io::R
 }
 
 // Adapted from:  https://docs.rs/clap/latest/clap/
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 pub struct AmClientArgs {
     /// Path pointing to (JSON) protocol term file
@@ -58,22 +59,43 @@ pub struct AmClientArgs {
     pub plcmap_filepath: String,
 
     /// Path pointing to (JSON) ASP GLOBAL TYPE ENVIRONMENT file
-    #[arg(short, long , default_value_t =
+    #[arg(short, long /*, default_value_t = Some (
         get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
                                    DEFAULT_TYPE_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of AmClientArgs struct.  
-                                                                  Check for missing Environment Variable?"))]
-    pub env_filepath: String,
+                                                                  Check for missing Environment Variable?"))*/)]
+    pub env_filepath: Option<String>,
 
      /// Path pointing to (JSON) ASP GLOBAL ASP COMPAT MAP file
-     #[arg(short, long , default_value_t =
+     #[arg(short, long /*, default_value_t =
         get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
                                    DEFAULT_GLOB_COMPS_PATH).expect("Couldn't initialize default value for glob_comps_filepath field of AmClientArgs struct.  
-                                                                    Check for missing Environment Variable?"))]
-     pub glob_comps_filepath: String
+                                                                    Check for missing Environment Variable?")*/)]
+     pub glob_comps_filepath: Option<String>,
+
+    /// Path pointing to (JSON) Attestation Session file
+    #[arg(short, long , default_value_t = 
+        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
+                                   DEFAULT_SESSION_PATH).expect("Couldn't initialize default value for term_filepath field of AmClientArgs struct.  
+                                                              Check for missing Environment Variable?"))]
+    pub attestation_session_filepath: String,
+}
+
+fn validate_am_client_args (args:&AmClientArgs) -> () {
+
+    let maybe_env_filepath = args.env_filepath.clone(); 
+    let maybe_glob_comps_filepath = args.glob_comps_filepath.clone();
+    let warning_message: String = 
+        "NOTE:  One of env_filepath or glob_comps_filepath NOT provided as an arg.  Using the Attestation Session provided (or the DEFAULT if no session provided...)! ".to_string();
+
+    match (maybe_env_filepath, maybe_glob_comps_filepath) {
+        (Some (_), Some (_)) => {println!("NOTE:  Overriding Attestation Session with provided env_filepath and glob_comps_filepath args");}
+        _ => {println!("{warning_message}");}
+    }
 }
 
 pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
     let args: AmClientArgs = AmClientArgs::parse();
+    validate_am_client_args(&args);
     Ok(args)
 }
 
