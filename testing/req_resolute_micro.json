@@ -1,4 +1,9 @@
 {
     "ResClientReq_attest_id": "micro_protocol",
-    "ResClientReq_attest_args": {"arg1":"argval1"}
+    "ResClientReq_attest_args": {
+        "hashevidence": {
+            "env_var_golden": "AM_ROOT", 
+            "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+        }
+    }
 }

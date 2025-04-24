@@ -12,6 +12,7 @@ use lib::clientArgs::*;
 // Other packages required to perform specific ASP action.
 use std::fs;
 use std::collections::HashMap;
+use tokio::runtime::Runtime;
 //use hex;
 
 fn get_session_from_am_client_args (args:&AmClientArgs) -> std::io::Result<Attestation_Session> {
@@ -123,17 +124,29 @@ fn main() -> std::io::Result<()> {
 
     let req_str = serde_json::to_string(&vreq)?;
 
-    let stream = connect_tcp_stream(att_server_uuid_string)?;
+    let val = async {
+
+    let stream = connect_tcp_stream(att_server_uuid_string).await?;
     println!("\nTrying to send ProtocolRunRequest: \n");
     println!("{req_str}\n");
 
-    let resp_str = am_sendRec_string(req_str,&stream)?;
+    let resp_str = am_sendRec_string(req_str,stream).await?;
     eprintln!("Got a TCP Response String: \n");
     eprintln!("{resp_str}\n");
 
     let resp : ProtocolRunResponse = serde_json::from_str(&resp_str)?;
     println!("Decoded ProtocolRunResponse: \n");
     println!("{:?}\n", resp);
+
+    Ok::<(), std::io::Error> (())
+    };
+
+    let runtime: Runtime = tokio::runtime::Runtime::new().unwrap();
+
+    match runtime.block_on(val) {
+        Ok(x) => x,
+        Err(_) => println!("Runtime failure in rust-am-client main.rs"),
+    };
 
     Ok (())
 }

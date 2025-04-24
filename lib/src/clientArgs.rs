@@ -1,7 +1,7 @@
 use clap::Parser;
 
 const DEFAULT_TERM_PATH: &'static str = "/testing/protocol_cert_appr.json";
-const DEFAULT_SERVER_UUID: &'static str = "localhost:5000";
+const DEFAULT_SERVER_UUID: &'static str = "127.0.0.1:5000";
 const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plcmap_default.json";
 //const DEFAULT_TYPE_ENV_PATH: &'static str = "/testing/glob_type_env_default.json";
 //const DEFAULT_GLOB_COMPS_PATH: &'static str = "/testing/glob_comps_default.json";

@@ -3,6 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+use anyhow::Error;
 // Custom package imports
 use rust_am_lib::copland::*;
 
@@ -14,12 +15,13 @@ use std::fs;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::runtime::Runtime;
 //use hex;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ResoluteClientRequest {
-    pub ResClientReq_attest_id: ASP_ID,
-    pub ResClientReq_attest_args: Value
+    pub ResClientReq_attest_id: String,
+    pub ResClientReq_attest_args: HashMap<ASP_ID, Value>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -38,19 +40,86 @@ pub struct ResoluteEnvironment {
 
 pub type ResoluteEnvironmentMap = HashMap<ASP_ID, ResoluteEnvironment>;
 
+fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, Value>, keep_orig:bool) -> ASP_PARAMS {
+
+    let id : ASP_ID = params.ASP_ID.clone();
+    let new_args: Value = 
+      match args_map.get(&id) {
+        Some (val) => {
+            val.clone()
+        }
+        None => {
+            if keep_orig 
+                {params.ASP_ARGS} 
+            else 
+                {serde_json::json!(null)}
+        }
+        
+      };
+      
+    ASP_PARAMS { 
+        ASP_ARGS: new_args,
+        ASP_ID: params.ASP_ID,
+        ASP_PLC: params.ASP_PLC,
+        ASP_TARG_ID: params.ASP_TARG_ID,
+    }
+
+}
+
+fn term_swap_args(t:Term, args_map:HashMap<ASP_ID,Value>, keep_orig:bool) -> Term {
+    match t {
+
+        Term::asp(ref a) => {
+            match a {
+                ASP::ASPC(params) => {Term::asp(ASP::ASPC(aspc_args_swap(params.clone(), args_map, keep_orig)))}
+                _ => {t}
+            }
+        }
+
+        Term::att(q,t1) => {
+            let t1: Term = term_swap_args(*t1, args_map, keep_orig);
+            Term::att(q, Box::new(t1)) 
+        }
+
+        Term::lseq(t1,t2) => 
+            { 
+                let t1: Term = term_swap_args(*t1, args_map.clone(), keep_orig);
+                let t2: Term = term_swap_args(*t2, args_map.clone(), keep_orig);
+
+                Term::lseq(Box::new(t1), Box::new(t2))
+            }
+
+        Term::bseq(sp, t1,t2) => 
+        { 
+            let t1: Term = term_swap_args(*t1, args_map.clone(), keep_orig);
+            let t2: Term = term_swap_args(*t2, args_map.clone(), keep_orig);
+
+            Term::bseq(sp, Box::new(t1), Box::new(t2))
+        }
+
+        Term::bpar(sp, t1,t2) => 
+        { 
+            let t1: Term = term_swap_args(*t1, args_map.clone(), keep_orig);
+            let t2: Term = term_swap_args(*t2, args_map.clone(), keep_orig);
+
+            Term::bpar(sp, Box::new(t1), Box::new(t2))
+        }
+    }
+}
+
 
 fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidence:Evidence, env:ResoluteEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
 
     let top_plc: Plc = myPlc;
     
     let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id; //"hey".to_string();
-    //let asp_args_in: ASP_ARGS = res_req.ResClientReq_attest_args;
+    let asp_args_map_in: HashMap<ASP_ID, Value> = res_req.ResClientReq_attest_args;
 
     let my_env= env.get(&asp_id_in).expect(format!("Term not found in ResoluteEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_term_noargs = my_env.ResClientEnv_term.clone();
-    //let my_term = term_add_args (my_term_noargs, asp_args_in);
-    let my_term = my_term_noargs;
+    let my_term = term_swap_args (my_term_noargs, asp_args_map_in, true);
+    //let my_term = my_term_noargs;
     let my_session: Attestation_Session = my_env.ResClientEnv_session.clone();
 
     let my_evidence : Evidence = init_evidence;
@@ -110,11 +179,13 @@ fn main() -> std::io::Result<()> {
 
     let req_str = serde_json::to_string(&vreq)?;
 
-    let stream = connect_tcp_stream(att_server_uuid_string)?;
+    let val = async {
+    let stream = connect_tcp_stream(att_server_uuid_string).await?;
+    
     println!("\nTrying to send ProtocolRunRequest: \n");
     println!("{req_str}\n");
 
-    let resp_str = am_sendRec_string(req_str,&stream)?;
+    let resp_str = am_sendRec_string(req_str,stream).await?;
     eprintln!("Got a TCP Response String: \n");
     eprintln!("{resp_str}\n");
 
@@ -137,8 +208,17 @@ fn main() -> std::io::Result<()> {
 
     println!("ResoluteClientResponse Success: \n");
     println!("{:?}\n", res_resp.ResClientResult_success);
-    
 
+    Ok::<(), Error> (())
+
+    };
+
+    let runtime: Runtime = tokio::runtime::Runtime::new().unwrap();
+
+    match runtime.block_on(val) {
+        Ok(x) => x,
+        Err(_) => println!("Runtime failure in rust-resolute-client main.rs"),
+    };
     Ok (())
 }
 
