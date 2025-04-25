@@ -99,6 +99,9 @@ fn main() -> std::io::Result<()> {
     let att_server_uuid_string : String = args.server_uuid.clone();
     println!("server_uuid arg: {}", att_server_uuid_string);
 
+    let client_uuid_string : String = args.client_uuid.clone();
+    println!("client_uuid arg: {}", client_uuid_string);
+
     let term_contents = fs::read_to_string(term_filepath).expect("Couldn't read Term JSON file");
     eprintln!("\nTerm contents:\n{term_contents}");
 
@@ -126,7 +129,7 @@ fn main() -> std::io::Result<()> {
 
     let val = async {
 
-    let stream = connect_tcp_stream(att_server_uuid_string).await?;
+    let stream = connect_tcp_stream(att_server_uuid_string, client_uuid_string).await?;
     println!("\nTrying to send ProtocolRunRequest: \n");
     println!("{req_str}\n");
 

@@ -1,33 +1,22 @@
-//use std::io::prelude::*;
-//use std::net::TcpStream;
+// tcp.rs (tcp utilities)
 use tokio::net::TcpSocket;
 use tokio::net::TcpStream;
-//use std::net::ToSocketAddrs;
 use std::net::SocketAddr;
 use tokio::io::{AsyncWriteExt, AsyncReadExt};
 
-//use anyhow::Error;
-//use byteorder::{BigEndian, WriteBytesExt};
-
-pub async fn connect_tcp_stream (s:String) -> std::io::Result<tokio::net::TcpStream> {
-
-    /*
-    for addr in tokio::net::lookup_host("127.0.0.1:5000").await? {
-        println!("socket address isssssss {}", addr);
-    }
-
-    let mut addrs = s.to_socket_addrs()?;
-    //let _ = addrs.next();
-
-    */
+pub async fn connect_tcp_stream (server_uuid_string:String, client_uuid_string:String) -> std::io::Result<tokio::net::TcpStream> {
 
     let socket: TcpSocket = TcpSocket::new_v4()?;
 
-    let server_addr: SocketAddr = s.parse().unwrap();
+    let server_addr: SocketAddr = server_uuid_string.parse().unwrap();
 
-    let maybe_client_addr_string: Option<String> = None;  //Some ("127.0.0.1:5025".to_string());
-
-
+    let maybe_client_addr_string: Option<String> =
+        if client_uuid_string == "".to_string()
+        { None }
+        else 
+        {
+            Some (client_uuid_string)
+        };
 
     match maybe_client_addr_string {
         Some (client_addr_string) => {
@@ -47,50 +36,7 @@ pub async fn connect_tcp_stream (s:String) -> std::io::Result<tokio::net::TcpStr
             Ok(stream)
 
         }
-
     }
-
-    /*
-    let client_addr: SocketAddr = "127.0.0.1:5025".parse().unwrap();
-
-    let server_addr: SocketAddr = s.parse().unwrap();
-
-    let socket = TcpSocket::new_v4()?;
-    socket.set_reuseport(true)?; 
-    socket.bind(client_addr)?;
-
-    //println!("\n{}{}", "Server ADDR:  ", server_addr);
-    println!("\n{}{}{}{}", "Trying to connect to server at address:  ", server_addr, " from client address: ", client_addr);
-    let stream = socket.connect(server_addr).await?;
-    Ok(stream)
-    */
-
-    /*
-
-    let maybe_server_addr  = addrs.next(); //"127.0.0.1:5000".parse().unwrap(); //s.parse().unwrap();
-    match maybe_server_addr {    
-        Some (server_addr) => { 
-            println!("\n{}{}", "Server ADDR:  ", server_addr);
-            let stream = socket.connect(server_addr).await?;
-            Ok(stream)
-        }
-        None => {panic!("Could not parse server UUID");}
-    }
-    */
-    /*
-    let stream = TcpStream::connect(s);
-    stream
-    */
-
-
-    /*
-    let addr = "127.0.0.1:8080".parse().unwrap();
-
-    let socket = TcpSocket::new_v4()?;
-    socket.set_reuseaddr(true)?;
-    assert!(socket.reuseaddr().unwrap());
-    socket.bind(addr)?;
-    */
 }
 
 #[allow(non_snake_case)]
@@ -106,8 +52,6 @@ pub async fn am_sendRec_string (s:String, mut stream:TcpStream) -> std::io::Resu
     // Write the string as bytes
     stream.try_write(s.as_bytes())?;
 
-
-    
     // This is a hack to read 4 bytes from the stream (peeling off the response buffer size)
     // TODO:  We should probably use/decode this value in the future if we keep this approach
     let mut x:[u8; 4] = [0u8;4];

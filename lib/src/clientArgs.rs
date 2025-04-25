@@ -2,9 +2,8 @@ use clap::Parser;
 
 const DEFAULT_TERM_PATH: &'static str = "/testing/protocol_cert_appr.json";
 const DEFAULT_SERVER_UUID: &'static str = "127.0.0.1:5000";
+const DEFAULT_CLIENT_UUID: &'static str = "";
 const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plcmap_default.json";
-//const DEFAULT_TYPE_ENV_PATH: &'static str = "/testing/glob_type_env_default.json";
-//const DEFAULT_GLOB_COMPS_PATH: &'static str = "/testing/glob_comps_default.json";
 const DEFAULT_SESSION_PATH: &'static str = "/testing/session_cert_appr.json";
 
 const DEFAULT_ENV_PATH: &'static str = "/testing/env_resolute_cert_appr.json";
@@ -59,17 +58,11 @@ pub struct AmClientArgs {
     pub plcmap_filepath: String,
 
     /// Path pointing to (JSON) ASP GLOBAL TYPE ENVIRONMENT file
-    #[arg(short, long /*, default_value_t = Some (
-        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
-                                   DEFAULT_TYPE_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of AmClientArgs struct.  
-                                                                  Check for missing Environment Variable?"))*/)]
+    #[arg(short, long)]
     pub env_filepath: Option<String>,
 
      /// Path pointing to (JSON) ASP GLOBAL ASP COMPAT MAP file
-     #[arg(short, long /*, default_value_t =
-        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
-                                   DEFAULT_GLOB_COMPS_PATH).expect("Couldn't initialize default value for glob_comps_filepath field of AmClientArgs struct.  
-                                                                    Check for missing Environment Variable?")*/)]
+     #[arg(short, long)]
      pub glob_comps_filepath: Option<String>,
 
     /// Path pointing to (JSON) Attestation Session file
@@ -78,6 +71,10 @@ pub struct AmClientArgs {
                                    DEFAULT_SESSION_PATH).expect("Couldn't initialize default value for term_filepath field of AmClientArgs struct.  
                                                               Check for missing Environment Variable?"))]
     pub attestation_session_filepath: String,
+
+    /// UUID string for AM client (default value = "" specifies OS-assigned ephemeral port)
+    #[arg(short, long, default_value_t = DEFAULT_CLIENT_UUID.to_string())]
+    pub client_uuid: String
 }
 
 fn validate_am_client_args (args:&AmClientArgs) -> () {
@@ -116,7 +113,11 @@ pub struct ResoluteClientArgs {
         get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
                                    DEFAULT_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of ResoluteClientArgs struct.  
                                                                 Check for missing Environment Variable?"))]
-    pub env_filepath: String
+    pub env_filepath: String,
+
+    /// UUID string for AM client (default value = "" specifies OS-assigned ephemeral port)
+    #[arg(short, long, default_value_t = DEFAULT_CLIENT_UUID.to_string())]
+    pub client_uuid: String
 
 }
 

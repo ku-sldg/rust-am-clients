@@ -26,8 +26,14 @@ am_client:
 am_client_cert:
 	cargo run --release --bin rust-am-client -- -t testing/protocol_cert.json
 
+am_client_cert_fixed:
+	cargo run --release --bin rust-am-client -- -t testing/protocol_cert.json -c 127.0.0.1:5042
+
 am_client_cert_appr:
 	cargo run --release --bin rust-am-client -- -t testing/protocol_cert_appr.json -e testing/glob_type_env_cert_appr.json -g testing/glob_comps_cert_appr.json
+
+am_client_cert_appr_fixed:
+	cargo run --release --bin rust-am-client -- -t testing/protocol_cert_appr.json -e testing/glob_type_env_cert_appr.json -g testing/glob_comps_cert_appr.json -c 127.0.0.1:5043
 
 am_client_micro:
 	cargo run --release --bin rust-am-client -- -t testing/protocol_micro.json -e testing/glob_type_env_micro.json -g testing/glob_comps_micro.json
@@ -41,8 +47,14 @@ resolute_client_help:
 resolute_client_cert_appr:
 	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_cert_appr.json -e testing/env_resolute_cert_appr.json
 
+resolute_client_cert_appr_fixed:
+	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_cert_appr.json -e testing/env_resolute_cert_appr.json -c 127.0.0.1:5044
+
 resolute_client_micro:
 	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_micro.json -e testing/env_resolute_micro.json
+
+resolute_client_micro_fixed:
+	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_micro.json -e testing/env_resolute_micro.json -c 127.0.0.1:5045
 
 clean:
 	rm -rf $(BIN)
