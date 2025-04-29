@@ -25,13 +25,13 @@ pub async fn connect_tcp_stream (server_uuid_string:String, client_uuid_string:S
             socket.set_reuseaddr(true)?;
             socket.bind(client_addr)?;
 
-            println!("\n{}{}{}{}", "Trying to connect to server at address:  ", server_addr, " from FIXED client address: ", client_addr);
+            eprintln!("\n{}{}{}{}", "Trying to connect to server at address:  ", server_addr, " from FIXED client address: ", client_addr);
             let stream = socket.connect(server_addr).await?;
             Ok(stream)
 
         }
         None => {
-            println!("\n{}{}{}", "Trying to connect to server at address:  ", server_addr, " from EPHEMERAL (OS-chosen) client address");
+            eprintln!("\n{}{}{}", "Trying to connect to server at address:  ", server_addr, " from EPHEMERAL (OS-chosen) client address");
             let stream = socket.connect(server_addr).await?;
             Ok(stream)
 

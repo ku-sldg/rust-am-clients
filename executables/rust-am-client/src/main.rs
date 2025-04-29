@@ -112,6 +112,7 @@ fn main() -> std::io::Result<()> {
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
     let my_req_plc: Plc = "TOP_PLC".to_string();
+    let my_to_plc: Plc = "P0".to_string();
 
     let my_att_session = get_session_from_am_client_args(&args)?;
 
@@ -121,6 +122,7 @@ fn main() -> std::io::Result<()> {
             TYPE: "REQUEST".to_string(), 
             ACTION: "RUN".to_string(), 
             REQ_PLC: my_req_plc, 
+            TO_PLC: my_to_plc,
             TERM: my_term,
             EVIDENCE: my_evidence,
             ATTESTATION_SESSION: my_att_session};

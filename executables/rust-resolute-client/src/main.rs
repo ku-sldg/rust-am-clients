@@ -111,6 +111,7 @@ fn term_swap_args(t:Term, args_map:HashMap<ASP_ID,Value>, keep_orig:bool) -> Ter
 fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidence:Evidence, env:ResoluteEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
 
     let top_plc: Plc = myPlc;
+    let to_plc: Plc = "P0".to_string();
     
     let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id; //"hey".to_string();
     let asp_args_map_in: HashMap<ASP_ID, Value> = res_req.ResClientReq_attest_args;
@@ -129,6 +130,7 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidenc
         TYPE: "REQUEST".to_string(), 
         ACTION: "RUN".to_string(), 
         REQ_PLC: top_plc,
+        TO_PLC: to_plc,
         TERM: my_term,
         EVIDENCE: my_evidence,
         ATTESTATION_SESSION: my_session};
