@@ -125,7 +125,7 @@ fn main() -> std::io::Result<()> {
             TO_PLC: my_to_plc,
             TERM: my_term,
             EVIDENCE: my_evidence,
-            ATTESTATION_SESSION: my_att_session};
+            ATTESTATION_SESSION: my_att_session.clone()};
 
     let req_str = serde_json::to_string(&vreq)?;
 
@@ -142,6 +142,33 @@ fn main() -> std::io::Result<()> {
     let resp : ProtocolRunResponse = serde_json::from_str(&resp_str)?;
     println!("Decoded ProtocolRunResponse: \n");
     println!("{:?}\n", resp);
+
+
+    let appsumm_req : AppraisalSummaryRequest = 
+        AppraisalSummaryRequest {
+            TYPE: "REQUEST".to_string(), 
+            ACTION: "APPSUMM".to_string(), 
+            ATTESTATION_SESSION: my_att_session.clone(),
+            EVIDENCE: resp.PAYLOAD
+        };
+
+    let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
+
+    let appsumm_stream = connect_tcp_stream(args.server_uuid.clone(), args.client_uuid.clone()).await?;
+    println!("\nTrying to send AppraisalSummaryRequest: \n");
+    println!("{appsumm_req_str}\n");
+
+    let appsumm_resp_str = am_sendRec_string(appsumm_req_str,appsumm_stream).await?;
+    eprintln!("Got a TCP Response String: \n");
+    eprintln!("{appsumm_resp_str}\n");
+
+    let appsumm_resp : AppraisalSummaryResponse = serde_json::from_str(&appsumm_resp_str)?;
+    println!("Decoded AppraisalSummaryResponse: \n");
+    println!("{:?}\n", appsumm_resp);
+
+
+    print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
+
 
     Ok::<(), std::io::Error> (())
     };
