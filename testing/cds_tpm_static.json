@@ -131,7 +131,7 @@
                                                                 "filepath_golden": "/tests/DemoFiles/goldenFiles/filter_one_config.json"
                                                             },
                                                             "ASP_PLC": "cds_config_dir_plc",
-                                                            "ASP_TARG_ID": "cds_filter_config_2_targ"
+                                                            "ASP_TARG_ID": "cds_filter_config_targ"
                                                         }
                                                     }
                                                 }
