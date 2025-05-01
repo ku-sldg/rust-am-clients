@@ -47,6 +47,9 @@ am_client_cds_dynamic:
 am_client_cds_static:
 	cargo run --release --bin rust-am-client -- -t testing/cds_tpm_static.json 2>/dev/null
 
+am_client_cds_bad_key:
+	cargo run --release --bin rust-am-client -- -t testing/protocol_cds_badkey.json -a testing/session_cds_tpm_bad_sig.json 2>/dev/null
+
 resolute_client_help:
 	cargo run --release --bin rust-resolute-client -- --help
 
