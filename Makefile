@@ -41,11 +41,11 @@ am_client_micro:
 am_client_micro_session:
 	cargo run --release --bin rust-am-client -- -t testing/protocol_micro.json -a testing/session_micro.json
 
-am_client_tpm_dynamic:
-	cargo run --release --bin rust-am-client -- -t testing/cds_tpm.json
+am_client_cds_dynamic:
+	cargo run --release --bin rust-am-client -- -t testing/cds_tpm.json 2>/dev/null
 
-am_client_tpm_static:
-	cargo run --release --bin rust-am-client -- -t testing/cds_tpm_static.json
+am_client_cds_static:
+	cargo run --release --bin rust-am-client -- -t testing/cds_tpm_static.json 2>/dev/null
 
 resolute_client_help:
 	cargo run --release --bin rust-resolute-client -- --help
