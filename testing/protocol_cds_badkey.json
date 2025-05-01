@@ -1,1 +1,174 @@
-{"TERM_CONSTRUCTOR":"lseq","TERM_BODY":[{"TERM_CONSTRUCTOR":"bseq","TERM_BODY":[["ALL","ALL"],{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"invary_get_measurement","ASP_ARGS":{"dynamic":"false","env_var":"AM_ROOT","appraisal_dir":"/tests/DemoFiles/staticAppraisalFiles/"},"ASP_PLC":"cds_query_kim_plc","ASP_TARG_ID":"kernal_module_targ"}}},{"TERM_CONSTRUCTOR":"bseq","TERM_BODY":[["ALL","ALL"],{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"selinux_pol_dump","ASP_ARGS":{"env_var_golden":"AM_ROOT","filepath_golden":"/tests/DemoFiles/goldenFiles/demo_pipeline_golden.cil"},"ASP_PLC":"cds_config_dir_plc","ASP_TARG_ID":"selinux_policy_targ"}}},{"TERM_CONSTRUCTOR":"bseq","TERM_BODY":[["ALL","ALL"],{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"hashfile","ASP_ARGS":{"env_var":"DEMO_ROOT","filepath":"/installed_dir/bin/rewrite_one","env_var_golden":"AM_ROOT","filepath_golden":"/tests/DemoFiles/goldenFiles/rewrite_one"},"ASP_PLC":"cds_config_dir_plc","ASP_TARG_ID":"cds_rewrite_img_targ"}}},{"TERM_CONSTRUCTOR":"bseq","TERM_BODY":[["ALL","ALL"],{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"hashfile","ASP_ARGS":{"env_var":"DEMO_ROOT","filepath":"/installed_dir/bin/filter_one","env_var_golden":"AM_ROOT","filepath_golden":"/tests/DemoFiles/goldenFiles/filter_one"},"ASP_PLC":"cds_config_dir_plc","ASP_TARG_ID":"cds_filter_img_targ"}}},{"TERM_CONSTRUCTOR":"bseq","TERM_BODY":[["ALL","ALL"],{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"readfile","ASP_ARGS":{"env_var":"DEMO_ROOT","filepath":"/cds_config/rewrite_one_config.json","env_var_golden":"AM_ROOT","filepath_golden":"/tests/DemoFiles/goldenFiles/rewrite_one_config.json"},"ASP_PLC":"cds_config_dir_plc","ASP_TARG_ID":"cds_rewrite_config_targ"}}},{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"readfile","ASP_ARGS":{"env_var":"DEMO_ROOT","filepath":"/cds_config/filter_one_config.json","env_var_golden":"AM_ROOT","filepath_golden":"/tests/DemoFiles/goldenFiles/filter_one_config.json"},"ASP_PLC":"cds_config_dir_plc","ASP_TARG_ID":"cds_filter_config_targ"}}}]}]}]}]}]},{"TERM_CONSTRUCTOR":"lseq","TERM_BODY":[{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"ASPC","ASP_BODY":{"ASP_ID":"sig","ASP_ARGS":{},"ASP_PLC":"cds_query_kim_plc","ASP_TARG_ID":"ssl_sig_targ"}}},{"TERM_CONSTRUCTOR":"asp","TERM_BODY":{"ASP_CONSTRUCTOR":"APPR"}}]}]}
+{
+    "TERM_CONSTRUCTOR": "lseq",
+    "TERM_BODY": [
+        {
+            "TERM_CONSTRUCTOR": "bseq",
+            "TERM_BODY": [
+                [
+                    "ALL",
+                    "ALL"
+                ],
+                {
+                    "TERM_CONSTRUCTOR": "asp",
+                    "TERM_BODY": {
+                        "ASP_CONSTRUCTOR": "ASPC",
+                        "ASP_BODY": {
+                            "ASP_ID": "invary_get_measurement",
+                            "ASP_ARGS": {
+                                "dynamic": "false",
+                                "env_var": "AM_ROOT",
+                                "appraisal_dir": "/tests/DemoFiles/staticAppraisalFiles/"
+                            },
+                            "ASP_PLC": "cds_query_kim_plc",
+                            "ASP_TARG_ID": "kernal_module_targ"
+                        }
+                    }
+                },
+                {
+                    "TERM_CONSTRUCTOR": "bseq",
+                    "TERM_BODY": [
+                        [
+                            "ALL",
+                            "ALL"
+                        ],
+                        {
+                            "TERM_CONSTRUCTOR": "asp",
+                            "TERM_BODY": {
+                                "ASP_CONSTRUCTOR": "ASPC",
+                                "ASP_BODY": {
+                                    "ASP_ID": "selinux_pol_dump",
+                                    "ASP_ARGS": {
+                                        "env_var_golden": "AM_ROOT",
+                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/demo_pipeline_golden.cil"
+                                    },
+                                    "ASP_PLC": "cds_config_dir_plc",
+                                    "ASP_TARG_ID": "selinux_policy_targ"
+                                }
+                            }
+                        },
+                        {
+                            "TERM_CONSTRUCTOR": "bseq",
+                            "TERM_BODY": [
+                                [
+                                    "ALL",
+                                    "ALL"
+                                ],
+                                {
+                                    "TERM_CONSTRUCTOR": "asp",
+                                    "TERM_BODY": {
+                                        "ASP_CONSTRUCTOR": "ASPC",
+                                        "ASP_BODY": {
+                                            "ASP_ID": "hashfile",
+                                            "ASP_ARGS": {
+                                                "env_var": "DEMO_ROOT",
+                                                "filepath": "/installed_dir/bin/rewrite_one",
+                                                "env_var_golden": "AM_ROOT",
+                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/rewrite_one"
+                                            },
+                                            "ASP_PLC": "cds_config_dir_plc",
+                                            "ASP_TARG_ID": "cds_rewrite_img_targ"
+                                        }
+                                    }
+                                },
+                                {
+                                    "TERM_CONSTRUCTOR": "bseq",
+                                    "TERM_BODY": [
+                                        [
+                                            "ALL",
+                                            "ALL"
+                                        ],
+                                        {
+                                            "TERM_CONSTRUCTOR": "asp",
+                                            "TERM_BODY": {
+                                                "ASP_CONSTRUCTOR": "ASPC",
+                                                "ASP_BODY": {
+                                                    "ASP_ID": "hashfile",
+                                                    "ASP_ARGS": {
+                                                        "env_var": "DEMO_ROOT",
+                                                        "filepath": "/installed_dir/bin/filter_one",
+                                                        "env_var_golden": "AM_ROOT",
+                                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/filter_one"
+                                                    },
+                                                    "ASP_PLC": "cds_config_dir_plc",
+                                                    "ASP_TARG_ID": "cds_filter_img_targ"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "TERM_CONSTRUCTOR": "bseq",
+                                            "TERM_BODY": [
+                                                [
+                                                    "ALL",
+                                                    "ALL"
+                                                ],
+                                                {
+                                                    "TERM_CONSTRUCTOR": "asp",
+                                                    "TERM_BODY": {
+                                                        "ASP_CONSTRUCTOR": "ASPC",
+                                                        "ASP_BODY": {
+                                                            "ASP_ID": "readfile",
+                                                            "ASP_ARGS": {
+                                                                "env_var": "DEMO_ROOT",
+                                                                "filepath": "/cds_config/rewrite_one_config.json",
+                                                                "env_var_golden": "AM_ROOT",
+                                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/rewrite_one_config.json"
+                                                            },
+                                                            "ASP_PLC": "cds_config_dir_plc",
+                                                            "ASP_TARG_ID": "cds_rewrite_config_targ"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "TERM_CONSTRUCTOR": "asp",
+                                                    "TERM_BODY": {
+                                                        "ASP_CONSTRUCTOR": "ASPC",
+                                                        "ASP_BODY": {
+                                                            "ASP_ID": "readfile",
+                                                            "ASP_ARGS": {
+                                                                "env_var": "DEMO_ROOT",
+                                                                "filepath": "/cds_config/filter_one_config.json",
+                                                                "env_var_golden": "AM_ROOT",
+                                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/filter_one_config.json"
+                                                            },
+                                                            "ASP_PLC": "cds_config_dir_plc",
+                                                            "ASP_TARG_ID": "cds_filter_config_targ"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TERM_CONSTRUCTOR": "lseq",
+            "TERM_BODY": [
+                {
+                    "TERM_CONSTRUCTOR": "asp",
+                    "TERM_BODY": {
+                        "ASP_CONSTRUCTOR": "ASPC",
+                        "ASP_BODY": {
+                            "ASP_ID": "sig",
+                            "ASP_ARGS": {
+                                "tpm_folder": "$AM_TPM_DIR"
+                            },
+                            "ASP_PLC": "cds_query_kim_plc",
+                            "ASP_TARG_ID": "tpm_sig_targ"
+                        }
+                    }
+                },
+                {
+                    "TERM_CONSTRUCTOR": "asp",
+                    "TERM_BODY": {
+                        "ASP_CONSTRUCTOR": "APPR"
+                    }
+                }
+            ]
+        }
+    ]
+}
