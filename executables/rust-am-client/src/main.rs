@@ -106,8 +106,8 @@ fn main() -> std::io::Result<()> {
     eprintln!("\nTerm contents:\n{term_contents}");
 
     let t : Term = serde_json::from_str(&term_contents)?;
-    println!("\nDecoded Term as:");
-    println!("{:?}", t); // :? notation since formatter uses #[derive(..., Debug)] trait
+    eprintln!("\nDecoded Term as:");
+    eprintln!("{:?}", t); // :? notation since formatter uses #[derive(..., Debug)] trait
 
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
@@ -159,12 +159,12 @@ fn main() -> std::io::Result<()> {
     println!("{appsumm_req_str}\n");
 
     let appsumm_resp_str = am_sendRec_string(appsumm_req_str,appsumm_stream).await?;
-    eprintln!("Got a TCP Response String: \n");
-    eprintln!("{appsumm_resp_str}\n");
+    println!("Got a TCP Response String: \n");
+    println!("{appsumm_resp_str}\n");
 
     let appsumm_resp : AppraisalSummaryResponse = serde_json::from_str(&appsumm_resp_str)?;
-    println!("Decoded AppraisalSummaryResponse: \n");
-    println!("{:?}\n", appsumm_resp);
+    eprintln!("Decoded AppraisalSummaryResponse: \n");
+    eprintln!("{:?}\n", appsumm_resp);
 
 
     print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
