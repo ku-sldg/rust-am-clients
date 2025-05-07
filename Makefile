@@ -50,6 +50,12 @@ am_client_cds_static:
 am_client_cds_bad_key:
 	cargo run --release --bin rust-am-client -- -t testing/protocol_cds_badkey.json -a testing/session_cds_tpm_bad_sig.json 2>/dev/null
 
+am_client_run_theorem_test:
+	cargo run --release --bin rust-am-client -- -t testing/run_coq_all_appr.json -a testing/session_run_theorem_test.json
+
+am_client_run_theorem_test_provision:
+	cargo run --release --bin rust-am-client -- -t testing/coq_provision_all.json -a testing/session_run_theorem_test.json
+
 resolute_client_help:
 	cargo run --release --bin rust-resolute-client -- --help
 
@@ -61,6 +67,9 @@ resolute_client_cert_appr_fixed:
 
 resolute_client_micro:
 	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_micro.json -e testing/env_resolute_micro.json
+
+resolute_client_run_theorem_test:
+	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_run_theorem_test.json -e testing/env_resolute_run_theorem_test.json
 
 resolute_client_micro_fixed:
 	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_micro.json -e testing/env_resolute_micro.json -c 127.0.0.1:5045
