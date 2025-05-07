@@ -273,15 +273,8 @@
                                         "ASP_CONSTRUCTOR": "ASPC",
                                         "ASP_BODY": {
                                             "ASP_ID": "hashdir",
-                                            "ASP_ARGS": {
-                                                "env_var": "INSPECTA_ROOT",
-                                                "env_var_golden": "AM_ROOT",
-                                                "paths": [
-                                                    "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
-                                                ],
-                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
-                                            },
-                                            "ASP_PLC": "cds_config_dir_plc",
+                                            "ASP_ARGS": {},
+                                            "ASP_PLC": "micro_demo_Plc",
                                             "ASP_TARG_ID": "aadl_dir_targ"
                                         }
                                     }
@@ -292,15 +285,8 @@
                                         "ASP_CONSTRUCTOR": "ASPC",
                                         "ASP_BODY": {
                                             "ASP_ID": "hashdir",
-                                            "ASP_ARGS": {
-                                                "env_var": "INSPECTA_ROOT",
-                                                "env_var_golden": "AM_ROOT",
-                                                "paths": [
-                                                    "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
-                                                ],
-                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
-                                            },
-                                            "ASP_PLC": "cds_config_dir_plc",
+                                            "ASP_ARGS": {},
+                                            "ASP_PLC": "micro_demo_Plc",
                                             "ASP_TARG_ID": "microkit_dir_targ"
                                         }
                                     }
@@ -313,11 +299,8 @@
                                 "ASP_CONSTRUCTOR": "ASPC",
                                 "ASP_BODY": {
                                     "ASP_ID": "hashevidence",
-                                    "ASP_ARGS": {
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt", 
-                                        "env_var_golden": "AM_ROOT"
-                                    },
-                                    "ASP_PLC": "cds_config_dir_plc",
+                                    "ASP_ARGS": {},
+                                    "ASP_PLC": "micro_demo_Plc",
                                     "ASP_TARG_ID": "micro_hash_composite_targ"
                                 }
                             }

@@ -21,7 +21,7 @@ use tokio::runtime::Runtime;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ResoluteClientRequest {
     pub ResClientReq_attest_id: String,
-    pub ResClientReq_attest_args: HashMap<ASP_ID, Value>
+    pub ResClientReq_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, Value>>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -40,13 +40,27 @@ pub struct ResoluteEnvironment {
 
 pub type ResoluteEnvironmentMap = HashMap<ASP_ID, ResoluteEnvironment>;
 
-fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, Value>, keep_orig:bool) -> ASP_PARAMS {
+fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> ASP_PARAMS {
 
     let id : ASP_ID = params.ASP_ID.clone();
+    let targid : TARG_ID = params.ASP_TARG_ID.clone();
     let new_args: Value = 
       match args_map.get(&id) {
-        Some (val) => {
-            val.clone()
+        Some (targs_map) => {
+
+            match targs_map.get(&targid) {
+                Some (val) => {
+                    val.clone()
+                }
+
+                None => {
+                    if keep_orig 
+                    {params.ASP_ARGS} 
+                else 
+                    {serde_json::json!(null)}
+
+                }
+            }
         }
         None => {
             if keep_orig 
@@ -66,7 +80,7 @@ fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, Value>, keep_orig:
 
 }
 
-fn term_swap_args(t:Term, args_map:HashMap<ASP_ID,Value>, keep_orig:bool) -> Term {
+fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> Term {
     match t {
 
         Term::asp(ref a) => {
@@ -114,7 +128,7 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidenc
     let to_plc: Plc = "P0".to_string();
     
     let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id; //"hey".to_string();
-    let asp_args_map_in: HashMap<ASP_ID, Value> = res_req.ResClientReq_attest_args;
+    let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, Value>> = res_req.ResClientReq_attest_args;
 
     let my_env= env.get(&asp_id_in).expect(format!("Term not found in ResoluteEnvironmentMap with key: '{}'", asp_id_in).as_str());
 

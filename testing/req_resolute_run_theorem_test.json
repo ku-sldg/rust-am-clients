@@ -1,4 +1,39 @@
 {
     "ResClientReq_attest_id": "run_theorem_test_protocol",
-    "ResClientReq_attest_args": {}
+    "ResClientReq_attest_args": {
+        "hashdir": {
+            "coq_env_dir_targ": {
+                "env_var": "",
+                "env_var_golden": "", 
+                "paths": ["/Users/adampetz/Documents/Fall_2024/my_theorems_env/"],
+                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorems_env_dir_golden.txt"
+            }
+        },
+
+        "run_command": {
+            "run_coq_theorem_targ": {
+                "exe_path": "/Users/adampetz/Documents/Fall_2024/my_theorems_env/coqc",
+                "exe_args": [
+                    "-R",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems/",
+                    "ImportantModule",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems/ImportantTheorem.v"
+                ],
+                "env_var_golden": "",
+                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_output_golden.txt"
+            },
+
+            "run_coq_theorem_test_targ": {
+                "exe_path": "/Users/adampetz/Documents/Fall_2024/my_theorems_env/coqc",
+                "exe_args": [
+                    "-R",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems/",
+                    "ImportantModule",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems_env/ImportantTheoremTest.v"
+                ],
+                "env_var_golden": "",
+                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_test_output_golden.txt"
+            }
+        }
+    }
 }
