@@ -23,6 +23,8 @@
                                         "paths": [
                                             "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
                                         ],
+                                        "omit_file_suffixes": [],
+                                        "recursive": false,
                                         "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
                                     },
                                     "ASP_PLC": "cds_config_dir_plc",
@@ -42,6 +44,8 @@
                                         "paths": [
                                             "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
                                         ],
+                                        "omit_file_suffixes": [],
+                                        "recursive": false,
                                         "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
                                     },
                                     "ASP_PLC": "cds_config_dir_plc",

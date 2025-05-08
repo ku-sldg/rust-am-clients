@@ -20,6 +20,8 @@
                                 "paths": [
                                     "/my_theorems_env/"
                                 ],
+                                "omit_file_suffixes": [".glob", ".vo", ".vok", ".vos", ".aux"],
+                                "recursive": true,
                                 "filepath_golden": "/tests/DemoFiles/goldenFiles/theorems_env_dir_golden.txt"
                             },
                             "ASP_PLC": "coq_demo_Plc",

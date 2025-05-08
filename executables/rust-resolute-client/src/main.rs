@@ -152,6 +152,7 @@ fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidenc
     Ok (vreq)
 }
 
+/*
 fn do_response_app_summary(resp:ProtocolRunResponse) -> bool {
     let resp_evidence: Evidence = resp.PAYLOAD;
     let resp_rawev_wrapped: RawEv = resp_evidence.RAWEV;
@@ -161,6 +162,7 @@ fn do_response_app_summary(resp:ProtocolRunResponse) -> bool {
     let v = resp_rawev.iter().all(|x| *x == "".to_string());
     v
 }
+    */
 
 fn main() -> std::io::Result<()> {
 
@@ -169,10 +171,10 @@ fn main() -> std::io::Result<()> {
     let res_req_filepath : String = args.req_filepath;
     println!("\nres_req_filepath arg: {}", res_req_filepath);
 
-    let att_server_uuid_string : String = args.server_uuid;
+    let att_server_uuid_string : String = args.server_uuid.clone();
     println!("server_uuid arg: {}", att_server_uuid_string);
 
-    let client_uuid_string : String = args.client_uuid;
+    let client_uuid_string : String = args.client_uuid.clone();
     println!("client_uuid arg: {}", client_uuid_string);
 
     let res_env_filepath : String = args.env_filepath;
@@ -212,7 +214,33 @@ fn main() -> std::io::Result<()> {
     println!("Decoded ProtocolRunResponse: \n");
     println!("{:?}\n", resp);
 
-    let success_bool: bool = do_response_app_summary(resp.clone());
+
+    let appsumm_req : AppraisalSummaryRequest = 
+    AppraisalSummaryRequest {
+        TYPE: "REQUEST".to_string(), 
+        ACTION: "APPSUMM".to_string(), 
+        ATTESTATION_SESSION: vreq.ATTESTATION_SESSION.clone(), /* my_att_session.clone(), */
+        EVIDENCE: resp.PAYLOAD.clone()
+    };
+
+    let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
+
+    let appsumm_stream = connect_tcp_stream(args.server_uuid.clone(), args.client_uuid.clone()).await?;
+    println!("\nTrying to send AppraisalSummaryRequest: \n");
+    println!("{appsumm_req_str}\n");
+
+    let appsumm_resp_str = am_sendRec_string(appsumm_req_str,appsumm_stream).await?;
+    println!("Got a TCP Response String: \n");
+    println!("{appsumm_resp_str}\n");
+
+    let appsumm_resp : AppraisalSummaryResponse = serde_json::from_str(&appsumm_resp_str)?;
+    eprintln!("Decoded AppraisalSummaryResponse: \n");
+    eprintln!("{:?}\n", appsumm_resp);
+
+
+    print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
+
+    let success_bool: bool = appsumm_resp.SUCCESS; //do_response_app_summary(resp.clone());
 
     let res_resp: ResoluteClientResponse = 
         ResoluteClientResponse {
@@ -222,10 +250,10 @@ fn main() -> std::io::Result<()> {
             ResClientResult_evidence: resp.PAYLOAD
         };
 
-    println!("ResoluteClientResponse: \n");
-    println!("{:?}\n", res_resp);
+    //println!("ResoluteClientResponse: \n");
+    //println!("{:?}\n", res_resp);
 
-    println!("ResoluteClientResponse Success: \n");
+    println!("ResoluteClientResponse (Overall Appraisal Success): \n");
     println!("{:?}\n", res_resp.ResClientResult_success);
 
     Ok::<(), Error> (())

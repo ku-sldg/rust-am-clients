@@ -6,12 +6,16 @@
                 "env_var": "",
                 "env_var_golden": "", 
                 "paths": ["/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"],
+                "omit_file_suffixes": [],
+                "recursive": false,
                 "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
             },
             "microkit_dir_targ": {
                 "env_var": "",
                 "env_var_golden": "", 
                 "paths": ["/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"],
+                "omit_file_suffixes": [],
+                "recursive": false,
                 "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
             }
         }, 
