@@ -1,12 +1,12 @@
 use clap::Parser;
 
-const DEFAULT_TERM_PATH: &'static str = "/testing/protocol_cert_appr.json";
+const DEFAULT_TERM_PATH: &'static str = "/testing/protocols/protocol_cert_appr.json";
 const DEFAULT_SERVER_UUID: &'static str = "127.0.0.1:5000";
 const DEFAULT_CLIENT_UUID: &'static str = "";
-const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plcmap_default.json";
-const DEFAULT_SESSION_PATH: &'static str = "/testing/session_cert_appr.json";
+const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plc_maps/plcmap_default.json";
+const DEFAULT_SESSION_PATH: &'static str = "/testing/attestation_sessions/session_cert_appr.json";
 
-const DEFAULT_ENV_PATH: &'static str = "/testing/env_resolute_cert_appr.json";
+const DEFAULT_ENV_PATH: &'static str = "/testing/rodeo_envs/env_resolute_cert_appr.json";
 
 const AM_CLIENTS_ENV_VAR: &'static str = "AM_CLIENTS_ROOT";
 

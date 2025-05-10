@@ -1,11 +1,14 @@
 BIN := target
 
-# list of targets to not build by default
-#DEFAULT_EXCLUDES ?= sig_tpm sig_tpm_appr
-#COMPUTED_EXCLUDES = $(foreach exclude,$(DEFAULT_EXCLUDES),--exclude $(exclude))
+# Variables used in make targets to configure various clients
+PROTOCOLS_DIR=testing/protocols/
+GLOBS_DIR=testing/globals/
+SESSIONS_DIR=testing/attestation_sessions/
+RODEO_REQUESTS_DIR=testing/rodeo_requests/
+RODEO_ENVS_DIR=testing/rodeo_envs/
 
 default:
-	cargo build --release --workspace #$(COMPUTED_EXCLUDES)
+	cargo build --release --workspace
 
 all: 
 	cargo build --release
@@ -15,7 +18,7 @@ debug:
 
 test:
 	make default
-	cargo test --workspace #$(COMPUTED_EXCLUDES)
+	cargo test --workspace
 
 am_client_help:
 	cargo run --release --bin rust-am-client -- --help
@@ -24,55 +27,55 @@ am_client:
 	cargo run --release --bin rust-am-client
 
 am_client_cert:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_cert.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert.json
 
 am_client_cert_fixed:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_cert.json -c 127.0.0.1:5042
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert.json -c 127.0.0.1:5042
 
 am_client_cert_appr:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_cert_appr.json -e testing/glob_type_env_cert_appr.json -g testing/glob_comps_cert_appr.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr.json -e $(GLOBS_DIR)glob_type_env_cert_appr.json -g $(GLOBS_DIR)glob_comps_cert_appr.json
 
 am_client_cert_appr_fixed:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_cert_appr.json -e testing/glob_type_env_cert_appr.json -g testing/glob_comps_cert_appr.json -c 127.0.0.1:5043
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr.json -e $(GLOBS_DIR)glob_type_env_cert_appr.json -g $(GLOBS_DIR)glob_comps_cert_appr.json -c 127.0.0.1:5043
 
 am_client_micro:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_micro.json -e testing/glob_type_env_micro.json -g testing/glob_comps_micro.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro.json -e $(GLOBS_DIR)glob_type_env_micro.json -g $(GLOBS_DIR)glob_comps_micro.json
 
 am_client_micro_session:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_micro.json -a testing/session_micro.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro.json -a $(SESSIONS_DIR)session_micro.json
 
 am_client_cds_dynamic:
-	cargo run --release --bin rust-am-client -- -t testing/cds_tpm.json 2>/dev/null
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)cds_tpm.json 2>/dev/null
 
 am_client_cds_static:
-	cargo run --release --bin rust-am-client -- -t testing/cds_tpm_static.json 2>/dev/null
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)cds_tpm_static.json 2>/dev/null
 
 am_client_cds_bad_key:
-	cargo run --release --bin rust-am-client -- -t testing/protocol_cds_badkey.json -a testing/session_cds_tpm_bad_sig.json 2>/dev/null
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cds_badkey.json -a $(SESSIONS_DIR)session_cds_tpm_bad_sig.json 2>/dev/null
 
 am_client_run_theorem_test:
-	cargo run --release --bin rust-am-client -- -t testing/run_coq_all_appr.json -a testing/session_run_theorem_test.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)run_coq_all_appr.json -a $(SESSIONS_DIR)session_run_theorem_test.json
 
 am_client_run_theorem_test_provision:
-	cargo run --release --bin rust-am-client -- -t testing/coq_provision_all.json -a testing/session_run_theorem_test.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)coq_provision_all.json -a $(SESSIONS_DIR)session_run_theorem_test.json
 
 resolute_client_help:
 	cargo run --release --bin rust-resolute-client -- --help
 
 resolute_client_cert_appr:
-	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_cert_appr.json -e testing/env_resolute_cert_appr.json
+	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_resolute_cert_appr.json -e $(RODEO_ENVS_DIR)env_resolute_cert_appr.json
 
 resolute_client_cert_appr_fixed:
-	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_cert_appr.json -e testing/env_resolute_cert_appr.json -c 127.0.0.1:5044
+	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_resolute_cert_appr.json -e $(RODEO_ENVS_DIR)env_resolute_cert_appr.json -c 127.0.0.1:5044
 
 resolute_client_micro:
-	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_micro.json -e testing/env_resolute_micro.json
-
-resolute_client_run_theorem_test:
-	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_run_theorem_test.json -e testing/env_resolute_run_theorem_test.json
+	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_resolute_micro.json -e $(RODEO_ENVS_DIR)env_resolute_micro.json
 
 resolute_client_micro_fixed:
-	cargo run --release --bin rust-resolute-client -- -r testing/req_resolute_micro.json -e testing/env_resolute_micro.json -c 127.0.0.1:5045
+	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_resolute_micro.json -e $(RODEO_ENVS_DIR)env_resolute_micro.json -c 127.0.0.1:5045
+
+resolute_client_run_theorem_test:
+	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_resolute_run_theorem_test.json -e $(RODEO_ENVS_DIR)env_resolute_run_theorem_test.json
 
 clean:
 	rm -rf $(BIN)
