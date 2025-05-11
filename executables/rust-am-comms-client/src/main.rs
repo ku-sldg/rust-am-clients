@@ -5,7 +5,7 @@
 
 // Custom package imports
 use rust_am_lib::copland::*;
-use lib::tcp::*;
+use rust_am_lib::tcp::*;
 
 // Other packages required to perform specific ASP action.
 use std::collections::HashMap;
