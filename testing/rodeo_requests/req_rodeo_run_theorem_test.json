@@ -1,6 +1,6 @@
 {
-    "ResClientReq_attest_id": "run_theorem_test_protocol",
-    "ResClientReq_attest_args": {
+    "RodeoClientReq_attest_id": "run_theorem_test_protocol",
+    "RodeoClientReq_attest_args": {
         "hashdir": {
             "coq_env_dir_targ": {
                 "env_var": "",

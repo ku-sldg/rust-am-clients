@@ -59,23 +59,23 @@ am_client_run_theorem_test:
 am_client_run_theorem_test_provision:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_run_coq_all_appr_provision.json -a $(SESSIONS_DIR)session_run_theorem_test.json
 
-resolute_client_help:
-	cargo run --release --bin rust-resolute-client -- --help
+rodeo_client_help:
+	cargo run --release --bin rust-rodeo-client -- --help
 
-resolute_client_cert_appr:
-	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_cert_appr.json -e $(RODEO_ENVS_DIR)env_resolute_cert_appr.json
+rodeo_client_cert_appr:
+	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_cert_appr.json -e $(RODEO_ENVS_DIR)env_rodeo_cert_appr.json
 
-resolute_client_cert_appr_fixed:
-	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_cert_appr.json -e $(RODEO_ENVS_DIR)env_resolute_cert_appr.json -c 127.0.0.1:5044
+rodeo_client_cert_appr_fixed:
+	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_cert_appr.json -e $(RODEO_ENVS_DIR)env_rodeo_cert_appr.json -c 127.0.0.1:5044
 
-resolute_client_micro:
-	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_micro.json -e $(RODEO_ENVS_DIR)env_resolute_micro.json
+rodeo_client_micro:
+	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_micro.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json
 
-resolute_client_micro_fixed:
-	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_micro.json -e $(RODEO_ENVS_DIR)env_resolute_micro.json -c 127.0.0.1:5045
+rodeo_client_micro_fixed:
+	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_micro.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json -c 127.0.0.1:5045
 
-resolute_client_run_theorem_test:
-	cargo run --release --bin rust-resolute-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_run_theorem_test.json -e $(RODEO_ENVS_DIR)env_resolute_run_theorem_test.json
+rodeo_client_run_theorem_test:
+	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_run_theorem_test.json -e $(RODEO_ENVS_DIR)env_rodeo_run_theorem_test.json
 
 clean:
 	rm -rf $(BIN)

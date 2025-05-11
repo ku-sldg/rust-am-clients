@@ -1,57 +1,61 @@
 {
-    "run_theorem_test_protocol": {
-        "ResClientEnv_term": {
+    "cert_appr_protocol": {
+        "RodeoClientEnv_term": {
             "TERM_CONSTRUCTOR": "lseq",
             "TERM_BODY": [
                 {
-                    "TERM_CONSTRUCTOR": "bseq",
+                    "TERM_CONSTRUCTOR": "att",
                     "TERM_BODY": [
-                        [
-                            "ALL",
-                            "ALL"
-                        ],
+                        "P1",
                         {
-                            "TERM_CONSTRUCTOR": "asp",
-                            "TERM_BODY": {
-                                "ASP_CONSTRUCTOR": "ASPC",
-                                "ASP_BODY": {
-                                    "ASP_ID": "hashdir",
-                                    "ASP_ARGS": {},
-                                    "ASP_PLC": "coq_demo_Plc",
-                                    "ASP_TARG_ID": "coq_env_dir_targ"
-                                }
-                            }
-                        },
-                        {
-                            "TERM_CONSTRUCTOR": "bseq",
+                            "TERM_CONSTRUCTOR": "lseq",
                             "TERM_BODY": [
-                                [
-                                    "ALL",
-                                    "ALL"
-                                ],
                                 {
                                     "TERM_CONSTRUCTOR": "asp",
                                     "TERM_BODY": {
                                         "ASP_CONSTRUCTOR": "ASPC",
                                         "ASP_BODY": {
-                                            "ASP_ID": "run_command",
+                                            "ASP_ID": "attest",
                                             "ASP_ARGS": {},
-                                            "ASP_PLC": "coq_demo_Plc",
-                                            "ASP_TARG_ID": "run_coq_theorem_targ"
+                                            "ASP_PLC": "P1",
+                                            "ASP_TARG_ID": "sys_targ"
                                         }
                                     }
                                 },
                                 {
-                                    "TERM_CONSTRUCTOR": "asp",
-                                    "TERM_BODY": {
-                                        "ASP_CONSTRUCTOR": "ASPC",
-                                        "ASP_BODY": {
-                                            "ASP_ID": "run_command",
-                                            "ASP_ARGS": {},
-                                            "ASP_PLC": "coq_demo_Plc",
-                                            "ASP_TARG_ID": "run_coq_theorem_test_targ"
+                                    "TERM_CONSTRUCTOR": "att",
+                                    "TERM_BODY": [
+                                        "P2",
+                                        {
+                                            "TERM_CONSTRUCTOR": "lseq",
+                                            "TERM_BODY": [
+                                                {
+                                                    "TERM_CONSTRUCTOR": "asp",
+                                                    "TERM_BODY": {
+                                                        "ASP_CONSTRUCTOR": "ASPC",
+                                                        "ASP_BODY": {
+                                                            "ASP_ID": "appraise",
+                                                            "ASP_ARGS": {},
+                                                            "ASP_PLC": "P2",
+                                                            "ASP_TARG_ID": "sys_targ"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "TERM_CONSTRUCTOR": "asp",
+                                                    "TERM_BODY": {
+                                                        "ASP_CONSTRUCTOR": "ASPC",
+                                                        "ASP_BODY": {
+                                                            "ASP_ID": "certificate",
+                                                            "ASP_ARGS": {},
+                                                            "ASP_PLC": "P2",
+                                                            "ASP_TARG_ID": "sys_targ"
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
-                                    }
+                                    ]
                                 }
                             ]
                         }
@@ -65,7 +69,7 @@
                 }
             ]
         },
-        "ResClientEnv_session": {
+        "RodeoClientEnv_session": {
             "Session_Plc": "P0",
             "Plc_Mapping": {
                 "P0": "127.0.0.1:5000",
@@ -120,7 +124,7 @@
                         }
                     },
                     "hashevidence": {
-                        "FWD": "EXTEND",
+                        "FWD": "REPLACE",
                         "EvInSig": "ALL",
                         "EvOutSig": {
                             "EvOutSig_CONSTRUCTOR": "OutN",
@@ -137,14 +141,6 @@
                     },
                     "hashfile_appr": {
                         "FWD": "REPLACE",
-                        "EvInSig": "ALL",
-                        "EvOutSig": {
-                            "EvOutSig_CONSTRUCTOR": "OutN",
-                            "EvOutSig_BODY": "1"
-                        }
-                    },
-                    "hashdir": {
-                        "FWD": "EXTEND",
                         "EvInSig": "ALL",
                         "EvOutSig": {
                             "EvOutSig_CONSTRUCTOR": "OutN",
@@ -172,18 +168,10 @@
                         "EvInSig": "ALL",
                         "EvOutSig": {
                             "EvOutSig_CONSTRUCTOR": "OutN",
-                            "EvOutSig_BODY": "0"
-                        }
-                    },
-                    "readfile": {
-                        "FWD": "EXTEND",
-                        "EvInSig": "ALL",
-                        "EvOutSig": {
-                            "EvOutSig_CONSTRUCTOR": "OutN",
                             "EvOutSig_BODY": "1"
                         }
                     },
-                    "run_command": {
+                    "readfile": {
                         "FWD": "EXTEND",
                         "EvInSig": "ALL",
                         "EvOutSig": {
@@ -252,17 +240,15 @@
                     "attest": "magic_appr",
                     "certificate": "magic_appr",
                     "appraise": "magic_appr",
-                    "hashevidence": "hashfile_appr",
+                    "hashevidence": "NULL",
                     "hashfile": "hashfile_appr",
-                    "hashdir": "hashfile_appr",
                     "invary_get_measurement": "invary_get_measurement_appr",
                     "provision": "NULL",
                     "readfile": "readfile_appr",
                     "selinux_pol_dump": "hashfile_appr",
                     "sig": "sig_appr",
                     "sig_tpm": "sig_tpm_appr",
-                    "uptime": "NULL",
-                    "run_command": "hashfile_appr"
+                    "uptime": "NULL"
                 }
             }
         }

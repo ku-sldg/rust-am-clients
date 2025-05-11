@@ -1,6 +1,6 @@
 {
-    "ResClientReq_attest_id": "micro_protocol",
-    "ResClientReq_attest_args": {
+    "RodeoClientReq_attest_id": "micro_protocol",
+    "RodeoClientReq_attest_args": {
         "hashdir": {
             "aadl_dir_targ": {
                 "env_var": "",

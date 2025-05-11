@@ -1,4 +1,4 @@
-// main.rs (rust-resolute-client)
+// main.rs (rust-rodeo-client)
 
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -19,26 +19,26 @@ use tokio::runtime::Runtime;
 //use hex;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ResoluteClientRequest {
-    pub ResClientReq_attest_id: String,
-    pub ResClientReq_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, Value>>
+pub struct RodeoClientRequest {
+    pub RodeoClientReq_attest_id: String,
+    pub RodeoClientReq_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, Value>>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ResoluteClientResponse {
-    pub ResClientResult_success: bool,
-    pub ResClientResult_error: String,
-    pub ResClientResult_term: Term, 
-    pub ResClientResult_evidence: Evidence
+pub struct RodeoClientResponse {
+    pub RodeoClientResult_success: bool,
+    pub RodeoClientResult_error: String,
+    pub RodeoClientResult_term: Term, 
+    pub RodeoClientResult_evidence: Evidence
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ResoluteEnvironment {
-    pub ResClientEnv_term: Term,
-    pub ResClientEnv_session: Attestation_Session
+pub struct RodeoEnvironment {
+    pub RodeoClientEnv_term: Term,
+    pub RodeoClientEnv_session: Attestation_Session
 }
 
-pub type ResoluteEnvironmentMap = HashMap<ASP_ID, ResoluteEnvironment>;
+pub type RodeoEnvironmentMap = HashMap<ASP_ID, RodeoEnvironment>;
 
 fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> ASP_PARAMS {
 
@@ -122,20 +122,20 @@ fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, kee
 }
 
 
-fn resolute_to_am_request(res_req:ResoluteClientRequest, myPlc:Plc, init_evidence:Evidence, env:ResoluteEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
+fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evidence, env:RodeoEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
 
     let top_plc: Plc = myPlc;
     let to_plc: Plc = "P0".to_string();
     
-    let asp_id_in: ASP_ID = res_req.ResClientReq_attest_id; //"hey".to_string();
-    let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, Value>> = res_req.ResClientReq_attest_args;
+    let asp_id_in: ASP_ID = res_req.RodeoClientReq_attest_id; //"hey".to_string();
+    let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, Value>> = res_req.RodeoClientReq_attest_args;
 
-    let my_env= env.get(&asp_id_in).expect(format!("Term not found in ResoluteEnvironmentMap with key: '{}'", asp_id_in).as_str());
+    let my_env= env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
-    let my_term_orig = my_env.ResClientEnv_term.clone();
+    let my_term_orig = my_env.RodeoClientEnv_term.clone();
     let my_term = term_swap_args (my_term_orig, asp_args_map_in, true);
     //let my_term = my_term_noargs;
-    let my_session: Attestation_Session = my_env.ResClientEnv_session.clone();
+    let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
 
     let my_evidence : Evidence = init_evidence;
 
@@ -166,7 +166,7 @@ fn do_response_app_summary(resp:ProtocolRunResponse) -> bool {
 
 fn main() -> std::io::Result<()> {
 
-    let args = get_resolute_client_args()?;
+    let args = get_rodeo_client_args()?;
 
     let res_req_filepath : String = args.req_filepath;
     println!("\nres_req_filepath arg: {}", res_req_filepath);
@@ -180,23 +180,23 @@ fn main() -> std::io::Result<()> {
     let res_env_filepath : String = args.env_filepath;
     println!("res_env_filepath arg: {}", res_env_filepath);
 
-    let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read ResoluteClientRequest JSON file");
-    eprintln!("\nResoluteClientRequest contents:\n{res_req_contents}");
+    let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
+    eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");
 
-    let res_req : ResoluteClientRequest = serde_json::from_str(&res_req_contents)?;
-    println!("\nDecoded ResoluteClientRequest as:");
+    let res_req : RodeoClientRequest = serde_json::from_str(&res_req_contents)?;
+    println!("\nDecoded RodeoClientRequest as:");
     println!("{:?}", res_req); // :? notation since formatter uses #[derive(..., Debug)] trait
 
     let res_env_contents = fs::read_to_string(res_env_filepath).expect("Couldn't read res_env JSON file");
 
-    let my_res_env: ResoluteEnvironmentMap = serde_json::from_str(&res_env_contents)?;
+    let my_res_env: RodeoEnvironmentMap = serde_json::from_str(&res_env_contents)?;
     eprintln!("\nDecoded res_env as:");
     eprintln!("{:?}", my_res_env);
 
     let myPlc: Plc = "TOP_PLC".to_string();
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
-    let vreq : ProtocolRunRequest = resolute_to_am_request(res_req, myPlc, my_evidence, my_res_env)?;
+    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req, myPlc, my_evidence, my_res_env)?;
 
     let req_str = serde_json::to_string(&vreq)?;
 
@@ -242,19 +242,16 @@ fn main() -> std::io::Result<()> {
 
     let success_bool: bool = appsumm_resp.SUCCESS; //do_response_app_summary(resp.clone());
 
-    let res_resp: ResoluteClientResponse = 
-        ResoluteClientResponse {
-            ResClientResult_success: success_bool,
-            ResClientResult_error: "".to_string(),
-            ResClientResult_term: vreq.TERM,
-            ResClientResult_evidence: resp.PAYLOAD
+    let res_resp: RodeoClientResponse = 
+        RodeoClientResponse {
+            RodeoClientResult_success: success_bool,
+            RodeoClientResult_error: "".to_string(),
+            RodeoClientResult_term: vreq.TERM,
+            RodeoClientResult_evidence: resp.PAYLOAD
         };
 
-    //println!("ResoluteClientResponse: \n");
-    //println!("{:?}\n", res_resp);
-
-    println!("ResoluteClientResponse (Overall Appraisal Success): \n");
-    println!("{:?}\n", res_resp.ResClientResult_success);
+    println!("RodeoClientResponse (Overall Appraisal Success): \n");
+    println!("{:?}\n", res_resp.RodeoClientResult_success);
 
     Ok::<(), Error> (())
 
@@ -264,7 +261,7 @@ fn main() -> std::io::Result<()> {
 
     match runtime.block_on(val) {
         Ok(x) => x,
-        Err(_) => println!("Runtime failure in rust-resolute-client main.rs"),
+        Err(_) => println!("Runtime failure in rust-rodeo-client main.rs"),
     };
     Ok (())
 }

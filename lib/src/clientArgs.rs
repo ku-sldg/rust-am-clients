@@ -6,7 +6,7 @@ const DEFAULT_CLIENT_UUID: &'static str = "";
 const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plc_maps/plcmap_default.json";
 const DEFAULT_SESSION_PATH: &'static str = "/testing/attestation_sessions/session_cert_appr.json";
 
-const DEFAULT_ENV_PATH: &'static str = "/testing/rodeo_envs/env_resolute_cert_appr.json";
+const DEFAULT_ENV_PATH: &'static str = "/testing/rodeo_envs/env_rodeo_cert_appr.json";
 
 const AM_CLIENTS_ENV_VAR: &'static str = "AM_CLIENTS_ROOT";
 
@@ -99,8 +99,8 @@ pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
 // Adapted from:  https://docs.rs/clap/latest/clap/
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-pub struct ResoluteClientArgs {
-    /// Path pointing to (JSON) ResoluteClientRequest file
+pub struct RodeoClientArgs {
+    /// Path pointing to (JSON) RodeoClientRequest file
     #[arg(short, long)]
     pub req_filepath: String,
 
@@ -108,10 +108,10 @@ pub struct ResoluteClientArgs {
     #[arg(short, long , default_value_t = DEFAULT_SERVER_UUID.to_string())]
     pub server_uuid: String,
     
-    /// Path pointing to (JSON) ResoluteEnvironmentMap file
+    /// Path pointing to (JSON) RodeoEnvironmentMap file
     #[arg(short, long , default_value_t = 
         get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
-                                   DEFAULT_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of ResoluteClientArgs struct.  
+                                   DEFAULT_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of RodeoClientArgs struct.  
                                                                 Check for missing Environment Variable?"))]
     pub env_filepath: String,
 
@@ -121,7 +121,7 @@ pub struct ResoluteClientArgs {
 
 }
 
-pub fn get_resolute_client_args () -> std::io::Result<ResoluteClientArgs> {
-    let args: ResoluteClientArgs = ResoluteClientArgs::parse();
+pub fn get_rodeo_client_args () -> std::io::Result<RodeoClientArgs> {
+    let args: RodeoClientArgs = RodeoClientArgs::parse();
     Ok(args)
 }
