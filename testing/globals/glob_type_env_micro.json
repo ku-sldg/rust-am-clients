@@ -111,6 +111,14 @@
         "EvOutSig_BODY": "1"
       }
     },
+    "goldenevidence_appr": {
+            "FWD": "REPLACE",
+            "EvInSig": "ALL",
+            "EvOutSig": {
+            "EvOutSig_CONSTRUCTOR": "OutN",
+            "EvOutSig_BODY": "1"
+            }
+    },
     "selinux_pol_dump": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",

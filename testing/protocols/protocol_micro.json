@@ -25,7 +25,9 @@
                                         ],
                                         "omit_file_suffixes": [],
                                         "recursive": false,
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
+                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt",
+                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                                        "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                                     },
                                     "ASP_PLC": "cds_config_dir_plc",
                                     "ASP_TARG_ID": "aadl_dir_targ"
@@ -46,7 +48,9 @@
                                         ],
                                         "omit_file_suffixes": [],
                                         "recursive": false,
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
+                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt", 
+                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                                        "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                                     },
                                     "ASP_PLC": "cds_config_dir_plc",
                                     "ASP_TARG_ID": "microkit_dir_targ"
@@ -62,8 +66,10 @@
                         "ASP_BODY": {
                             "ASP_ID": "hashevidence",
                             "ASP_ARGS": {
-                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt", 
-                                "env_var_golden": "AM_ROOT"
+                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt", 
+                                "env_var_golden": "AM_ROOT",
+                                "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                                "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                             },
                             "ASP_PLC": "cds_config_dir_plc",
                             "ASP_TARG_ID": "micro_hash_composite_targ"

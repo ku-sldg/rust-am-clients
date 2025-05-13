@@ -143,6 +143,14 @@
                             "EvOutSig_BODY": "1"
                         }
                     },
+                    "goldenevidence_appr": {
+                        "FWD": "REPLACE",
+                        "EvInSig": "ALL",
+                        "EvOutSig": {
+                        "EvOutSig_CONSTRUCTOR": "OutN",
+                        "EvOutSig_BODY": "1"
+                        }
+                    },
                     "hashdir": {
                         "FWD": "EXTEND",
                         "EvInSig": "ALL",
@@ -254,7 +262,7 @@
                     "appraise": "magic_appr",
                     "hashevidence": "hashfile_appr",
                     "hashfile": "hashfile_appr",
-                    "hashdir": "hashfile_appr",
+                    "hashdir": "goldenevidence_appr",
                     "invary_get_measurement": "invary_get_measurement_appr",
                     "provision": "NULL",
                     "readfile": "readfile_appr",
@@ -262,7 +270,7 @@
                     "sig": "sig_appr",
                     "sig_tpm": "sig_tpm_appr",
                     "uptime": "NULL",
-                    "run_command": "hashfile_appr"
+                    "run_command": "goldenevidence_appr"
                 }
             }
         }

@@ -441,6 +441,14 @@
                       "EvOutSig_BODY": "1"
                     }
                   },
+                  "goldenevidence_appr": {
+                        "FWD": "REPLACE",
+                        "EvInSig": "ALL",
+                        "EvOutSig": {
+                        "EvOutSig_CONSTRUCTOR": "OutN",
+                        "EvOutSig_BODY": "1"
+                        }
+                    },
                   "selinux_pol_dump": {
                     "FWD": "EXTEND",
                     "EvInSig": "ALL",
@@ -494,9 +502,9 @@
                   "attest": "magic_appr",
                   "certificate": "magic_appr",
                   "appraise": "magic_appr",
-                  "hashevidence": "hashfile_appr",
+                  "hashevidence": "goldenevidence_appr",
                   "hashfile": "hashfile_appr",
-                  "hashdir": "hashfile_appr",
+                  "hashdir": "goldenevidence_appr",
                   "invary_get_measurement": "invary_get_measurement_appr",
                   "provision": "NULL",
                   "readfile": "readfile_appr",
