@@ -3,7 +3,6 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use anyhow::Error;
 // Custom package imports
 use rust_am_lib::copland::*;
 
@@ -15,8 +14,6 @@ use std::fs;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::runtime::Runtime;
-//use hex;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RodeoClientRequest {
@@ -152,18 +149,6 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
     Ok (vreq)
 }
 
-/*
-fn do_response_app_summary(resp:ProtocolRunResponse) -> bool {
-    let resp_evidence: Evidence = resp.PAYLOAD;
-    let resp_rawev_wrapped: RawEv = resp_evidence.RAWEV;
-    let resp_rawev: Vec<String> = match resp_rawev_wrapped {
-        RawEv::RawEv(rawevt) => rawevt
-    };
-    let v = resp_rawev.iter().all(|x| *x == "".to_string());
-    v
-}
-    */
-
 fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_client_args()?;
@@ -199,6 +184,65 @@ fn main() -> std::io::Result<()> {
     let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req, myPlc, my_evidence, my_res_env)?;
 
     let req_str = serde_json::to_string(&vreq)?;
+
+    println!("\nTrying to send ProtocolRunRequest: \n");
+    println!("{req_str}\n");
+
+    let resp_str = am_sendRec_string_all(att_server_uuid_string, client_uuid_string, req_str)?;
+    eprintln!("Got a TCP Response String: \n");
+    eprintln!("{resp_str}\n");
+
+    let resp : ProtocolRunResponse = serde_json::from_str(&resp_str)?;
+    println!("Decoded ProtocolRunResponse: \n");
+    println!("{:?}\n", resp);
+
+
+    let appsumm_req : AppraisalSummaryRequest = 
+    AppraisalSummaryRequest {
+        TYPE: "REQUEST".to_string(), 
+        ACTION: "APPSUMM".to_string(), 
+        ATTESTATION_SESSION: vreq.ATTESTATION_SESSION.clone(), /* my_att_session.clone(), */
+        EVIDENCE: resp.PAYLOAD.clone()
+    };
+
+    let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
+
+    let appsumm_resp_str = am_sendRec_string_all(args.server_uuid.clone(), args.client_uuid.clone(), appsumm_req_str)?;
+    println!("Got a TCP Response String: \n");
+    println!("{appsumm_resp_str}\n");
+
+    let appsumm_resp : AppraisalSummaryResponse = serde_json::from_str(&appsumm_resp_str)?;
+    eprintln!("Decoded AppraisalSummaryResponse: \n");
+    eprintln!("{:?}\n", appsumm_resp);
+
+
+    print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
+
+    let success_bool: bool = appsumm_resp.SUCCESS; //do_response_app_summary(resp.clone());
+
+    let res_resp: RodeoClientResponse = 
+        RodeoClientResponse {
+            RodeoClientResult_success: success_bool,
+            RodeoClientResult_error: "".to_string(),
+            RodeoClientResult_term: vreq.TERM,
+            RodeoClientResult_evidence: resp.PAYLOAD
+        };
+
+    println!("RodeoClientResponse (Overall Appraisal Success): \n");
+    println!("{:?}\n", res_resp.RodeoClientResult_success);
+
+    Ok (())
+
+}
+
+
+
+
+
+
+
+/*
+
 
     let val = async {
     let stream = connect_tcp_stream(att_server_uuid_string, client_uuid_string).await?;
@@ -255,7 +299,7 @@ fn main() -> std::io::Result<()> {
 
     Ok::<(), Error> (())
 
-    };
+    }; // end let val = async
 
     let runtime: Runtime = tokio::runtime::Runtime::new().unwrap();
 
@@ -266,4 +310,17 @@ fn main() -> std::io::Result<()> {
     Ok (())
 }
 
+*/
 
+
+/*
+fn do_response_app_summary(resp:ProtocolRunResponse) -> bool {
+    let resp_evidence: Evidence = resp.PAYLOAD;
+    let resp_rawev_wrapped: RawEv = resp_evidence.RAWEV;
+    let resp_rawev: Vec<String> = match resp_rawev_wrapped {
+        RawEv::RawEv(rawevt) => rawevt
+    };
+    let v = resp_rawev.iter().all(|x| *x == "".to_string());
+    v
+}
+    */
