@@ -22,8 +22,8 @@
                                 ],
                                 "omit_file_suffixes": [".glob", ".vo", ".vok", ".vos", ".aux"],
                                 "recursive": true,
-                                "filepath_golden": "/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt",
-                                "filepath_et_golden": "/tests/DemoFiles/goldenFiles/theorem-Evidence.json",
+                                "filepath_rawev_golden": "/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                                "filepath_et_golden": "/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
                                 "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                             },
                             "ASP_PLC": "coq_demo_Plc",
@@ -53,8 +53,8 @@
                                             "/Users/adampetz/Documents/Fall_2024/my_theorems/ImportantTheorem.v"
                                         ],
                                         "env_var_golden": "AM_ROOT",
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt",
-                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/theorem-Evidence.json",
+                                        "filepath_rawev_golden": "/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
                                         "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                                     },
                                     "ASP_PLC": "coq_demo_Plc",
@@ -77,8 +77,8 @@
                                             "/Users/adampetz/Documents/Fall_2024/my_theorems_env/ImportantTheoremTest.v"
                                         ],
                                         "env_var_golden": "AM_ROOT",
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt",
-                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/theorem-Evidence.json",
+                                        "filepath_rawev_golden": "/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
                                         "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                                     },
                                     "ASP_PLC": "coq_demo_Plc",

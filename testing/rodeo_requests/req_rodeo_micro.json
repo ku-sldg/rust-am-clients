@@ -8,8 +8,8 @@
                 "paths": ["/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"],
                 "omit_file_suffixes": [],
                 "recursive": false,
-                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_all.txt",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
+                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
                 "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
             },
             "microkit_dir_targ": {
@@ -18,16 +18,16 @@
                 "paths": ["/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"],
                 "omit_file_suffixes": [],
                 "recursive": false,
-                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_all.txt",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
+                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
                 "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
             }
         }, 
         "hashevidence": {
             "micro_hash_composite_targ": {
                 "env_var_golden": "", 
-                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_all.txt",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
+                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
                 "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
             }
         }

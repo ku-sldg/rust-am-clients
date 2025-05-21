@@ -8,8 +8,8 @@
                 "paths": ["/Users/adampetz/Documents/Fall_2024/my_theorems_env/"],
                 "omit_file_suffixes": [".glob", ".vo", ".vok", ".vos", ".aux"],
                 "recursive": true,
-                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem-Evidence.json",
+                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
                 "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
             }
         },
@@ -24,8 +24,8 @@
                     "/Users/adampetz/Documents/Fall_2024/my_theorems/ImportantTheorem.v"
                 ],
                 "env_var_golden": "",
-                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem-Evidence.json",
+                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
                 "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
             },
 
@@ -38,8 +38,8 @@
                     "/Users/adampetz/Documents/Fall_2024/my_theorems_env/ImportantTheoremTest.v"
                 ],
                 "env_var_golden": "",
-                "filepath_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem-Evidence.json",
+                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
                 "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
             }
         }

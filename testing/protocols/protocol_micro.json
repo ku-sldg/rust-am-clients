@@ -25,8 +25,8 @@
                                         ],
                                         "omit_file_suffixes": [],
                                         "recursive": false,
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt",
-                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                                        "filepath_rawev_golden": "/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
+                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
                                         "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                                     },
                                     "ASP_PLC": "cds_config_dir_plc",
@@ -48,8 +48,8 @@
                                         ],
                                         "omit_file_suffixes": [],
                                         "recursive": false,
-                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt", 
-                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                                        "filepath_rawev_golden": "/tests/DemoFiles/goldenFiles/micro_raw_evidence.json", 
+                                        "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
                                         "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                                     },
                                     "ASP_PLC": "cds_config_dir_plc",
@@ -66,9 +66,9 @@
                         "ASP_BODY": {
                             "ASP_ID": "hashevidence",
                             "ASP_ARGS": {
-                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt", 
+                                "filepath_rawev_golden": "/tests/DemoFiles/goldenFiles/micro_raw_evidence.json", 
                                 "env_var_golden": "AM_ROOT",
-                                "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro-Evidence.json",
+                                "filepath_et_golden": "/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
                                 "filepath_glob_golden": "/tests/DemoFiles/Test_Global_Context.json"
                             },
                             "ASP_PLC": "cds_config_dir_plc",
