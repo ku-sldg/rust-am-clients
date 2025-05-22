@@ -5,6 +5,8 @@
 
 // Custom package imports
 use rust_am_lib::copland::*;
+use rust_am_lib::copland::Term::asp;
+use rust_am_lib::copland::ASP::APPR;
 
 use rust_am_lib::tcp::*;
 use lib::clientArgs::*;
@@ -15,10 +17,11 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RodeoClientRequest {
     pub RodeoClientReq_attest_id: String,
-    pub RodeoClientReq_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, Value>>
+    pub RodeoClientReq_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, Value>>,
+    pub RodeoClientReq_appraise_args: HashMap<ASP_ID, HashMap<TARG_ID, Value>>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -29,7 +32,7 @@ pub struct RodeoClientResponse {
     pub RodeoClientResult_evidence: Evidence
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RodeoEnvironment {
     pub RodeoClientEnv_term: Term,
     pub RodeoClientEnv_session: Attestation_Session
@@ -149,6 +152,88 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
     Ok (vreq)
 }
 
+fn extend_asp_params_w_appraisal_args (app_args_map:HashMap<ASP_ID, HashMap<TARG_ID, ASP_ARGS>>, attestation_params:ASP_PARAMS) -> ASP_PARAMS {
+
+    let attestation_aspid = attestation_params.ASP_ID;
+    let attestation_args = attestation_params.ASP_ARGS; 
+    let attestation_plc = attestation_params.ASP_PLC;
+    let attestation_targid = attestation_params.ASP_TARG_ID; 
+
+    let x = app_args_map.get(&attestation_aspid);
+    let y : Option<serde_json::Value> = 
+    match x {
+        Some (m) => 
+        {
+            m.get(&attestation_targid).cloned()
+        }
+        _ => 
+        {
+            let v = serde_json::Value::Object(serde_json::Map::new());
+            Some(v)
+        }
+
+    };
+
+    let z = 
+        match y {
+            Some (v) => {v}
+            _ => {serde_json::Value::Object(serde_json::Map::new())}
+        };
+
+
+    let app_args_object: &serde_json::Map<String, serde_json::Value>= z.as_object()
+                                                .expect("app_args NOT a JSON Object in fn `extend_asp_params_w_appraisal_args` ");
+
+    let attestation_asp_args_key = "attestation_asp_args".to_string();
+    let blah: &mut serde_json::Map<String, serde_json::Value> = &mut app_args_object.clone();
+    let _ = blah.entry(attestation_asp_args_key).or_insert(attestation_args); //.expect("failed blah.insert");
+
+    let new_args_object = serde_json::Value::Object(blah.clone());
+
+
+    let res : ASP_PARAMS = 
+        ASP_PARAMS { ASP_ID: attestation_aspid, ASP_ARGS: new_args_object, ASP_PLC: attestation_plc, ASP_TARG_ID: attestation_targid };
+
+    res
+
+}
+
+
+fn extend_w_appraisal_args_et (app_args_map:HashMap<ASP_ID, HashMap<TARG_ID, ASP_ARGS>>, et:EvidenceT) -> EvidenceT {
+
+    
+    match et {
+        rust_am_lib::copland::EvidenceT::mt_evt => et,
+        rust_am_lib::copland::EvidenceT::nonce_evt(_) => et,
+        rust_am_lib::copland::EvidenceT::left_evt(et1) =>  
+            {let inner = extend_w_appraisal_args_et(app_args_map, *et1);
+                rust_am_lib::copland::EvidenceT::left_evt(Box::new(inner))},
+        rust_am_lib::copland::EvidenceT::right_evt(et2) =>  
+            {let inner = extend_w_appraisal_args_et(app_args_map, *et2);
+                rust_am_lib::copland::EvidenceT::right_evt(Box::new(inner))},
+        rust_am_lib::copland::EvidenceT::split_evt(et1, et2) =>  
+            {let inner1 = extend_w_appraisal_args_et(app_args_map.clone(), *et1);
+             let inner2 = extend_w_appraisal_args_et(app_args_map.clone(), *et2);
+                rust_am_lib::copland::EvidenceT::split_evt(Box::new(inner1), Box::new(inner2))}, 
+
+        rust_am_lib::copland::EvidenceT::asp_evt(p, params, et1) =>  
+                {let inner1 = extend_w_appraisal_args_et(app_args_map.clone(), *et1);
+                    rust_am_lib::copland::EvidenceT::asp_evt(p, extend_asp_params_w_appraisal_args(app_args_map, params), Box::new(inner1))}
+
+    }
+}
+fn extend_w_appraisal_args (app_args_map:HashMap<ASP_ID, HashMap<TARG_ID, ASP_ARGS>>, e:Evidence) -> Evidence {
+
+    let old_et = e.EVIDENCET;
+
+    let new_et = extend_w_appraisal_args_et(app_args_map, old_et);
+
+    Evidence {
+        RAWEV: e.RAWEV,
+        EVIDENCET: new_et 
+    }
+}
+
 fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_client_args()?;
@@ -181,7 +266,7 @@ fn main() -> std::io::Result<()> {
     let myPlc: Plc = "TOP_PLC".to_string();
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
-    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req, myPlc, my_evidence, my_res_env)?;
+    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone())?;
 
     let req_str = serde_json::to_string(&vreq)?;
 
@@ -196,13 +281,66 @@ fn main() -> std::io::Result<()> {
     println!("Decoded ProtocolRunResponse: \n");
     println!("{:?}\n", resp);
 
+    let asp_id_in: ASP_ID = res_req.RodeoClientReq_attest_id; //"hey".to_string();
+    //let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, Value>> = res_req.RodeoClientReq_attest_args.clone();
+
+    let my_res_env2 = my_res_env.clone();
+    let my_env= my_res_env2.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+
+    let my_att_session = my_env.RodeoClientEnv_session.clone();
+    let app_bool = true;
+    let app_server = "127.0.0.1:5000".to_string();
+    let app_asp_args = res_req.RodeoClientReq_appraise_args.clone();
+
+    let a_resp = 
+    if app_bool {
+        let app_term: Term = asp(APPR);  
+        let app_evidence: Evidence = extend_w_appraisal_args(app_asp_args, resp.PAYLOAD.clone());
+        let app_req : ProtocolRunRequest = 
+            ProtocolRunRequest {
+            TYPE: "REQUEST".to_string(), 
+            ACTION: "RUN".to_string(), 
+            REQ_PLC: "TOP_PLC".to_string(), 
+            TO_PLC: "P0".to_string(),
+            TERM: app_term,
+            EVIDENCE: app_evidence,
+            ATTESTATION_SESSION: my_att_session.clone()};
+
+        let app_req_str = serde_json::to_string(&app_req)?;
+
+        let app_resp_str = am_sendRec_string_all(app_server, "".to_string(), app_req_str)?;
+        eprintln!("Got a TCP Response String: \n");
+        eprintln!("{resp_str}\n");
+
+        let app_resp : ProtocolRunResponse = serde_json::from_str(&app_resp_str)?;
+        println!("Decoded ProtocolRunResponse: \n");
+        println!("{:?}\n", app_resp);
+
+        app_resp
+
+    }
+    else { resp.clone() };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     let appsumm_req : AppraisalSummaryRequest = 
     AppraisalSummaryRequest {
         TYPE: "REQUEST".to_string(), 
         ACTION: "APPSUMM".to_string(), 
         ATTESTATION_SESSION: vreq.ATTESTATION_SESSION.clone(), /* my_att_session.clone(), */
-        EVIDENCE: resp.PAYLOAD.clone()
+        EVIDENCE: a_resp.PAYLOAD.clone()
     };
 
     let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
@@ -225,7 +363,7 @@ fn main() -> std::io::Result<()> {
             RodeoClientResult_success: success_bool,
             RodeoClientResult_error: "".to_string(),
             RodeoClientResult_term: vreq.TERM,
-            RodeoClientResult_evidence: resp.PAYLOAD
+            RodeoClientResult_evidence: resp.PAYLOAD.clone()
         };
 
     println!("RodeoClientResponse (Overall Appraisal Success): \n");

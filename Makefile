@@ -41,6 +41,9 @@ am_client_cert_appr_fixed:
 am_client_micro:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro.json -e $(GLOBS_DIR)glob_type_env_micro.json -g $(GLOBS_DIR)glob_comps_micro.json
 
+am_client_micro_appr:
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro_noappr.json -a $(SESSIONS_DIR)session_micro.json
+
 am_client_micro_session:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro.json -a $(SESSIONS_DIR)session_micro.json
 
