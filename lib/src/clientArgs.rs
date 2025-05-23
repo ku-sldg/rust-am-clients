@@ -74,7 +74,15 @@ pub struct AmClientArgs {
 
     /// UUID string for AM client (default value = "" specifies OS-assigned ephemeral port)
     #[arg(short, long, default_value_t = DEFAULT_CLIENT_UUID.to_string())]
-    pub client_uuid: String
+    pub client_uuid: String, 
+
+      /// Path pointing to (JSON) attestation ASP_ARGS file
+     #[arg(short, long)]
+     pub b_attestation_asp_args_filepath: Option<String>,
+
+     /// Path pointing to (JSON) appraisal ASP_ARGS file
+     #[arg(short, long)]
+     pub d_appraisal_asp_args_filepath: Option<String>
 }
 
 fn validate_am_client_args (args:&AmClientArgs) -> () {
@@ -117,7 +125,11 @@ pub struct RodeoClientArgs {
 
     /// UUID string for AM client (default value = "" specifies OS-assigned ephemeral port)
     #[arg(short, long, default_value_t = DEFAULT_CLIENT_UUID.to_string())]
-    pub client_uuid: String
+    pub client_uuid: String,
+
+    /// UUID string for appraisal AM server
+     #[arg(short, long)]
+     pub d_appraisal_server_uuid: Option<String>
 
 }
 

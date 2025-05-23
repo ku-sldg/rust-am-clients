@@ -288,52 +288,43 @@ fn main() -> std::io::Result<()> {
     let my_env= my_res_env2.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_att_session = my_env.RodeoClientEnv_session.clone();
-    let app_bool = true;
-    let app_server = "127.0.0.1:5000".to_string();
-    let app_asp_args = res_req.RodeoClientReq_appraise_args.clone();
+    //let app_bool = true;
+    let maybe_app_server = args.d_appraisal_server_uuid; //"127.0.0.1:5000".to_string();
+
 
     let a_resp = 
-    if app_bool {
-        let app_term: Term = asp(APPR);  
-        let app_evidence: Evidence = extend_w_appraisal_args(app_asp_args, resp.PAYLOAD.clone());
-        let app_req : ProtocolRunRequest = 
-            ProtocolRunRequest {
-            TYPE: "REQUEST".to_string(), 
-            ACTION: "RUN".to_string(), 
-            REQ_PLC: "TOP_PLC".to_string(), 
-            TO_PLC: "P0".to_string(),
-            TERM: app_term,
-            EVIDENCE: app_evidence,
-            ATTESTATION_SESSION: my_att_session.clone()};
+        match maybe_app_server {
+    //if app_bool {
+            Some(app_server) => 
+            {
+                let app_asp_args = res_req.RodeoClientReq_appraise_args.clone();
+                let app_term: Term = asp(APPR);  
+                let app_evidence: Evidence = extend_w_appraisal_args(app_asp_args, resp.PAYLOAD.clone());
+                let app_req : ProtocolRunRequest = 
+                    ProtocolRunRequest {
+                    TYPE: "REQUEST".to_string(), 
+                    ACTION: "RUN".to_string(), 
+                    REQ_PLC: "TOP_PLC".to_string(), 
+                    TO_PLC: "P0".to_string(),
+                    TERM: app_term,
+                    EVIDENCE: app_evidence,
+                    ATTESTATION_SESSION: my_att_session.clone()};
 
-        let app_req_str = serde_json::to_string(&app_req)?;
+                let app_req_str = serde_json::to_string(&app_req)?;
 
-        let app_resp_str = am_sendRec_string_all(app_server, "".to_string(), app_req_str)?;
-        eprintln!("Got a TCP Response String: \n");
-        eprintln!("{resp_str}\n");
+                let app_resp_str = am_sendRec_string_all(app_server, "".to_string(), app_req_str)?;
+                eprintln!("Got a TCP Response String: \n");
+                eprintln!("{resp_str}\n");
 
-        let app_resp : ProtocolRunResponse = serde_json::from_str(&app_resp_str)?;
-        println!("Decoded ProtocolRunResponse: \n");
-        println!("{:?}\n", app_resp);
+                let app_resp : ProtocolRunResponse = serde_json::from_str(&app_resp_str)?;
+                println!("Decoded ProtocolRunResponse: \n");
+                println!("{:?}\n", app_resp);
 
-        app_resp
-
-    }
-    else { resp.clone() };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                app_resp
+             }
+        _ => {resp.clone()}
+    };
+    //else { resp.clone() };
 
     let appsumm_req : AppraisalSummaryRequest = 
     AppraisalSummaryRequest {
