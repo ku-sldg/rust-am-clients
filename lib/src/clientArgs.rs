@@ -82,7 +82,11 @@ pub struct AmClientArgs {
 
      /// Path pointing to (JSON) appraisal ASP_ARGS file
      #[arg(short, long)]
-     pub d_appraisal_asp_args_filepath: Option<String>
+     pub d_appraisal_asp_args_filepath: Option<String>,
+
+     /// UUID string for appraisal AM server
+     #[arg(short, long)]
+     pub r_appraisal_server_uuid: Option<String>
 }
 
 fn validate_am_client_args (args:&AmClientArgs) -> () {
@@ -110,7 +114,7 @@ pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
 pub struct RodeoClientArgs {
     /// Path pointing to (JSON) RodeoClientRequest file
     #[arg(short, long)]
-    pub req_filepath: String,
+    pub q_req_filepath: String,
 
     /// UUID string for AM server destination
     #[arg(short, long , default_value_t = DEFAULT_SERVER_UUID.to_string())]
@@ -129,7 +133,7 @@ pub struct RodeoClientArgs {
 
     /// UUID string for appraisal AM server
      #[arg(short, long)]
-     pub d_appraisal_server_uuid: Option<String>
+     pub r_appraisal_server_uuid: Option<String>
 
 }
 

@@ -1,4 +1,5 @@
 {
     "RodeoClientReq_attest_id": "cert_appr_protocol",
-    "RodeoClientReq_attest_args": {}
+    "RodeoClientReq_attest_args": {},
+    "RodeoClientReq_appraise_args":{}
 }

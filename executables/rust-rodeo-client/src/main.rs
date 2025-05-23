@@ -238,7 +238,7 @@ fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_client_args()?;
 
-    let res_req_filepath : String = args.req_filepath;
+    let res_req_filepath : String = args.q_req_filepath;
     println!("\nres_req_filepath arg: {}", res_req_filepath);
 
     let att_server_uuid_string : String = args.server_uuid.clone();
@@ -281,20 +281,16 @@ fn main() -> std::io::Result<()> {
     println!("Decoded ProtocolRunResponse: \n");
     println!("{:?}\n", resp);
 
-    let asp_id_in: ASP_ID = res_req.RodeoClientReq_attest_id; //"hey".to_string();
-    //let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, Value>> = res_req.RodeoClientReq_attest_args.clone();
+    let asp_id_in: ASP_ID = res_req.RodeoClientReq_attest_id;
 
     let my_res_env2 = my_res_env.clone();
     let my_env= my_res_env2.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_att_session = my_env.RodeoClientEnv_session.clone();
-    //let app_bool = true;
-    let maybe_app_server = args.d_appraisal_server_uuid; //"127.0.0.1:5000".to_string();
-
+    let maybe_app_server = args.r_appraisal_server_uuid;
 
     let a_resp = 
         match maybe_app_server {
-    //if app_bool {
             Some(app_server) => 
             {
                 let app_asp_args = res_req.RodeoClientReq_appraise_args.clone();
@@ -324,13 +320,12 @@ fn main() -> std::io::Result<()> {
              }
         _ => {resp.clone()}
     };
-    //else { resp.clone() };
 
     let appsumm_req : AppraisalSummaryRequest = 
     AppraisalSummaryRequest {
         TYPE: "REQUEST".to_string(), 
         ACTION: "APPSUMM".to_string(), 
-        ATTESTATION_SESSION: vreq.ATTESTATION_SESSION.clone(), /* my_att_session.clone(), */
+        ATTESTATION_SESSION: vreq.ATTESTATION_SESSION.clone(),
         EVIDENCE: a_resp.PAYLOAD.clone()
     };
 
@@ -363,93 +358,3 @@ fn main() -> std::io::Result<()> {
     Ok (())
 
 }
-
-
-
-
-
-
-
-/*
-
-
-    let val = async {
-    let stream = connect_tcp_stream(att_server_uuid_string, client_uuid_string).await?;
-    
-    println!("\nTrying to send ProtocolRunRequest: \n");
-    println!("{req_str}\n");
-
-    let resp_str = am_sendRec_string(req_str,stream).await?;
-    eprintln!("Got a TCP Response String: \n");
-    eprintln!("{resp_str}\n");
-
-    let resp : ProtocolRunResponse = serde_json::from_str(&resp_str)?;
-    println!("Decoded ProtocolRunResponse: \n");
-    println!("{:?}\n", resp);
-
-
-    let appsumm_req : AppraisalSummaryRequest = 
-    AppraisalSummaryRequest {
-        TYPE: "REQUEST".to_string(), 
-        ACTION: "APPSUMM".to_string(), 
-        ATTESTATION_SESSION: vreq.ATTESTATION_SESSION.clone(), /* my_att_session.clone(), */
-        EVIDENCE: resp.PAYLOAD.clone()
-    };
-
-    let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
-
-    let appsumm_stream = connect_tcp_stream(args.server_uuid.clone(), args.client_uuid.clone()).await?;
-    println!("\nTrying to send AppraisalSummaryRequest: \n");
-    println!("{appsumm_req_str}\n");
-
-    let appsumm_resp_str = am_sendRec_string(appsumm_req_str,appsumm_stream).await?;
-    println!("Got a TCP Response String: \n");
-    println!("{appsumm_resp_str}\n");
-
-    let appsumm_resp : AppraisalSummaryResponse = serde_json::from_str(&appsumm_resp_str)?;
-    eprintln!("Decoded AppraisalSummaryResponse: \n");
-    eprintln!("{:?}\n", appsumm_resp);
-
-
-    print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
-
-    let success_bool: bool = appsumm_resp.SUCCESS; //do_response_app_summary(resp.clone());
-
-    let res_resp: RodeoClientResponse = 
-        RodeoClientResponse {
-            RodeoClientResult_success: success_bool,
-            RodeoClientResult_error: "".to_string(),
-            RodeoClientResult_term: vreq.TERM,
-            RodeoClientResult_evidence: resp.PAYLOAD
-        };
-
-    println!("RodeoClientResponse (Overall Appraisal Success): \n");
-    println!("{:?}\n", res_resp.RodeoClientResult_success);
-
-    Ok::<(), Error> (())
-
-    }; // end let val = async
-
-    let runtime: Runtime = tokio::runtime::Runtime::new().unwrap();
-
-    match runtime.block_on(val) {
-        Ok(x) => x,
-        Err(_) => println!("Runtime failure in rust-rodeo-client main.rs"),
-    };
-    Ok (())
-}
-
-*/
-
-
-/*
-fn do_response_app_summary(resp:ProtocolRunResponse) -> bool {
-    let resp_evidence: Evidence = resp.PAYLOAD;
-    let resp_rawev_wrapped: RawEv = resp_evidence.RAWEV;
-    let resp_rawev: Vec<String> = match resp_rawev_wrapped {
-        RawEv::RawEv(rawevt) => rawevt
-    };
-    let v = resp_rawev.iter().all(|x| *x == "".to_string());
-    v
-}
-    */
