@@ -1,0 +1,26 @@
+{
+        "hashdir": {
+            "coq_env_dir_targ": {
+                "env_var_golden": "", 
+                "filepath_rawev_golden": "$$x$$am-cakeml/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                "filepath_et_golden": "$$x$$am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
+                "filepath_glob_golden": "$$x$$am-cakeml/tests/DemoFiles/Test_Global_Context.json"
+            }
+        },
+
+        "run_command": {
+            "run_coq_theorem_targ": {
+                "env_var_golden": "",
+                "filepath_rawev_golden": "$$x$$am-cakeml/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                "filepath_et_golden": "$$x$$am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
+                "filepath_glob_golden": "$$x$$am-cakeml/tests/DemoFiles/Test_Global_Context.json"
+            },
+
+            "run_coq_theorem_test_targ": {
+                "env_var_golden": "",
+                "filepath_rawev_golden": "$$x$$am-cakeml/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
+                "filepath_et_golden": "$$x$$am-cakeml/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
+                "filepath_glob_golden": "$$x$$am-cakeml/tests/DemoFiles/Test_Global_Context.json"
+            }
+        }
+    }

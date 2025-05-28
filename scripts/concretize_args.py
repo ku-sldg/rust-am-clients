@@ -55,11 +55,11 @@ if __name__ == "__main__":
     
     parser.add_argument(
     '--infile',
-    help='hi')
+    help='Path to input file')
 
     parser.add_argument(
     '--outfile',
-    help='hi')
+    help='Path to (new) output file')
 
     args = parser.parse_args()
 
