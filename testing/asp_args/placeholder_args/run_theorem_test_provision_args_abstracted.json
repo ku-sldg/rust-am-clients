@@ -1,0 +1,38 @@
+{
+        "hashdir": {
+            "coq_env_dir_targ": {
+                "env_var": "",
+                "paths": ["$$x$$my_theorems_env/"],
+                "omit_file_suffixes": [".glob", ".vo", ".vok", ".vos", ".aux"],
+                "recursive": true
+            }
+        },
+
+        "run_command": {
+            "run_coq_theorem_targ": {
+                "exe_path": "$$x$$my_theorems_env/coqc",
+                "exe_args": [
+                    "-R",
+                    "$$x$$my_theorems/",
+                    "ImportantModule",
+                    "$$x$$my_theorems/ImportantTheorem.v"
+                ]
+            },
+
+            "run_coq_theorem_test_targ": {
+                "exe_path": "$$x$$my_theorems_env/coqc",
+                "exe_args": [
+                    "-R",
+                    "$$x$$my_theorems/",
+                    "ImportantModule",
+                    "$$x$$my_theorems_env/ImportantTheoremTest.v"
+                ]
+            }
+        }, 
+        "provision_goldenevidence": {
+            "micro_demo_targ": {
+             "env_var_golden": "AM_ROOT",
+             "filepath_golden": "/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json"
+            }
+        }
+    }
