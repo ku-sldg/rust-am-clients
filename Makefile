@@ -27,14 +27,20 @@ am_client_help:
 am_client:
 	cargo run --release --bin rust-am-client
 
+am_client_attest:
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_attest_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000
+
 am_client_cert:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_noargs.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000
 
 am_client_cert_fixed:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_noargs.json -c 127.0.0.1:5042
 
 am_client_cert_appr:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr_noargs.json -e $(GLOBS_DIR)glob_type_env_cert_appr.json -g $(GLOBS_DIR)glob_comps_cert_appr.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000
+
+am_client_cert_appr_appsumm:
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000 -m
 
 am_client_cert_appr_fixed:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr.json -e $(GLOBS_DIR)glob_type_env_cert_appr.json -g $(GLOBS_DIR)glob_comps_cert_appr.json -c 127.0.0.1:5043

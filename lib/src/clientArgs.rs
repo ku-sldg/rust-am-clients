@@ -86,7 +86,11 @@ pub struct AmClientArgs {
 
      /// UUID string for appraisal AM server
      #[arg(short, long)]
-     pub r_appraisal_server_uuid: Option<String>
+     pub r_appraisal_server_uuid: Option<String>,
+
+     /// Boolean to indicate Appraisal Summary
+     #[arg(short, long, default_value_t = false)]
+     pub m_appraisal_summary: bool
 }
 
 fn validate_am_client_args (args:&AmClientArgs) -> () {

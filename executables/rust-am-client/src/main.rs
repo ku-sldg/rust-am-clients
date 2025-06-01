@@ -363,6 +363,7 @@ fn main() -> std::io::Result<()> {
     | _ => {resp}
     };
 
+    if args.m_appraisal_summary {
 
     let appsumm_req : AppraisalSummaryRequest = 
         AppraisalSummaryRequest {
@@ -383,6 +384,8 @@ fn main() -> std::io::Result<()> {
     eprintln!("{:?}\n", appsumm_resp);
 
     print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
+
+    }
 
      Ok (())
 
