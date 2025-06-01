@@ -5,6 +5,7 @@ PROTOCOLS_DIR=testing/protocols/noargs/
 GLOBS_DIR=testing/globals/
 SESSIONS_DIR=testing/attestation_sessions/
 ASP_ARGS_DIR=testing/asp_args/concretized_args/
+ASP_ARGS_DUMMY_DIR=testing/asp_args/
 RODEO_REQUESTS_DIR=testing/rodeo_requests/
 RODEO_ENVS_DIR=testing/rodeo_envs/
 
@@ -38,6 +39,9 @@ am_client_cert_fixed:
 
 am_client_cert_appr:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000
+
+am_client_cert_appr_delegated:
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000 -r 127.0.0.1:5000 -d $(ASP_ARGS_DUMMY_DIR)cert_appr_args.json -m
 
 am_client_cert_appr_appsumm:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000 -m
