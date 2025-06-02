@@ -71,7 +71,7 @@ am_client_cds_bad_key:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cds_badkey.json -a $(SESSIONS_DIR)session_cds_tpm_bad_sig.json 2>/dev/null
 
 am_client_run_theorem_test:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_run_coq_all_noargs.json -a $(SESSIONS_DIR)session_run_theorem_test.json -r 127.0.0.1:5000 -b $(ASP_ARGS_DIR)run_theorem_test_args_concretized.json -d $(ASP_ARGS_DIR)run_theorem_test_args_appr_concretized.json
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_run_coq_all_noargs.json -a $(SESSIONS_DIR)session_run_theorem_test.json -r 127.0.0.1:5000 -b $(ASP_ARGS_DIR)run_theorem_test_args_concretized.json -d $(ASP_ARGS_DIR)run_theorem_test_args_appr_concretized.json -m
 
 am_client_run_theorem_test_provision:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_theorem_provision_evidence_noargs.json -a $(SESSIONS_DIR)session_run_theorem_test_provision.json -b $(ASP_ARGS_DIR)run_theorem_test_provision_args_concretized.json 
