@@ -31,6 +31,12 @@ am_client:
 am_client_attest:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_attest_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000
 
+am_client_attest_remote:
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_attest_remote_noargs.json -a $(SESSIONS_DIR)session_attest_remote.json -s 127.0.0.1:5000
+
+am_client_attest_remote_multinode:
+	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_attest_remote_multinode_noargs.json -a $(SESSIONS_DIR)session_attest_remote_multinode.json -s 127.0.0.1:5000
+
 am_client_cert:
 	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_noargs.json -a $(SESSIONS_DIR)session_cert_appr.json -s 127.0.0.1:5000
 
