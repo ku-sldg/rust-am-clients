@@ -38,6 +38,25 @@ fn get_local_env_var_w_suffix (env_var_string:String, suffix:&str) -> std::io::R
 // Adapted from:  https://docs.rs/clap/latest/clap/
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
+pub struct AspClientArgs {
+    /// Path pointing to (JSON) ASP_ARGS file
+    #[arg(short, long)]
+    pub asp_args_filepath: String,
+
+    /// Path pointing to ASP executable file
+    #[arg(short, long)]
+    pub exe_filepath: String
+
+}
+
+pub fn get_asp_client_args () -> std::io::Result<AspClientArgs> {
+    let args: AspClientArgs = AspClientArgs::parse();
+    Ok(args)
+}
+
+// Adapted from:  https://docs.rs/clap/latest/clap/
+#[derive(Parser, Debug, Clone)]
+#[command(version, about, long_about = None)]
 pub struct AmClientArgs {
     /// Path pointing to (JSON) protocol term file
     #[arg(short, long , default_value_t = 

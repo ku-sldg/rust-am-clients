@@ -5,9 +5,11 @@ PROTOCOLS_DIR=testing/protocols/noargs/
 GLOBS_DIR=testing/globals/
 SESSIONS_DIR=testing/attestation_sessions/
 ASP_ARGS_DIR=testing/asp_args/concretized_args/
+ASP_ARGS_DIR_STATIC=testing/asp_args/
 ASP_ARGS_DUMMY_DIR=testing/asp_args/
 RODEO_REQUESTS_DIR=testing/rodeo_requests/
 RODEO_ENVS_DIR=testing/rodeo_envs/
+ASP_EXES=../asp-libs/target/release/
 
 default:
 	cargo build --release --workspace
@@ -21,6 +23,15 @@ debug:
 test:
 	make default
 	cargo test --workspace
+
+asp_client_help: 
+	cargo run --release --bin rust-asp-client -- --help
+
+asp_client_filehash: 
+	cargo run --release --bin rust-asp-client -- -a $(ASP_ARGS_DIR_STATIC)filehash_args.json -e $(ASP_EXES)hashfile
+
+asp_client_filehash_concretized: 
+	cargo run --release --bin rust-asp-client -- -a $(ASP_ARGS_DIR)filehash_args_concretized.json -e $(ASP_EXES)hashfile
 
 am_client_help:
 	cargo run --release --bin rust-am-client -- --help
