@@ -27,10 +27,10 @@ test:
 asp_client_help: 
 	cargo run --release --bin rust-asp-client -- --help
 
-asp_client_filehash: 
-	cargo run --release --bin rust-asp-client -- -a $(ASP_ARGS_DIR_STATIC)filehash_args.json -e $(ASP_EXES)hashfile
+asp_client_hashfile: 
+	cargo run --release --bin rust-asp-client -- -a $(ASP_ARGS_DIR_STATIC)hashfile_args.json -e $(ASP_EXES)hashfile
 
-asp_client_filehash_concretized: 
+asp_client_hashfile_concretized: 
 	cargo run --release --bin rust-asp-client -- -a $(ASP_ARGS_DIR)filehash_args_concretized.json -e $(ASP_EXES)hashfile
 
 am_client_help:
