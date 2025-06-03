@@ -164,3 +164,33 @@ pub fn get_rodeo_client_args () -> std::io::Result<RodeoClientArgs> {
     let args: RodeoClientArgs = RodeoClientArgs::parse();
     Ok(args)
 }
+
+// Adapted from:  https://docs.rs/clap/latest/clap/
+#[derive(Parser, Debug, Clone)]
+#[command(version, about, long_about = None)]
+pub struct AmServerArgs {
+    /// Path pointing to (JSON) protocol term file
+    #[arg(short, long)]
+    pub manifest_filepath: String,
+
+    /// Path pointing to (JSON) protocol term file
+    #[arg(short, long)]
+    pub asbbin_filepath: String,
+
+    /// Path pointing to (JSON) protocol term file
+    #[arg(short, long)]
+    pub commsbin_filepath: String, 
+
+    /// Path pointing to (JSON) protocol term file
+    #[arg(short, long)]
+    pub server_am_filepath: String
+
+
+
+}
+
+pub fn get_am_server_args () -> std::io::Result<AmServerArgs> {
+    let args: AmServerArgs = AmServerArgs::parse();
+    //validate_am_client_args(&args);
+    Ok(args)
+}

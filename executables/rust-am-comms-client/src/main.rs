@@ -51,7 +51,7 @@ fn handle_passthrough_am_req_resp_body() -> std::io::Result<()> {
     eprintln!("{req_str}\n");
 
     let resp_str = am_sendRec_string(req_str,stream).await?;
-    eprintln!("Got a TCP Response String: \n");
+    eprintln!("Got a TCP Response String in rust-am-comms-client: \n");
     eprintln!("{resp_str}\n");
 
     println!("{resp_str}");
