@@ -183,7 +183,13 @@ pub struct AmServerArgs {
 
     /// Path pointing to (JSON) protocol term file
     #[arg(short, long)]
-    pub server_am_filepath: String
+    pub server_am_filepath: String,
+
+      /// Path pointing to (JSON) protocol term file
+    #[arg(short, long)]
+    pub u_server_uuid: String
+
+
 
 
 

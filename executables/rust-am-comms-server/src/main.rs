@@ -93,11 +93,14 @@ fn handle_am_req() -> std::io::Result<()> {
 
 fn main() -> std::io::Result<()> {
 
+    let args = get_am_server_args()?;
+    let server_uuid = args.u_server_uuid.as_str();
+
 
     let val = async {
 
 
-        let listener = TcpListener::bind("127.0.0.1:5001").await?;
+        let listener = TcpListener::bind(server_uuid).await?;
 
         loop {
             let (mut socket, _) = listener.accept().await?;
@@ -127,26 +130,23 @@ fn main() -> std::io::Result<()> {
             let req_str = serde_json::to_string(&v)?;
 
 
-            let args = get_am_server_args()?;
-
-
 
             eprintln!("\nTrying to send ProtocolRunRequest via FS: \n");
             eprintln!("{req_str}\n");
 
             let fs_path = args.server_am_filepath.as_str(); //"/Users/adampetz/Documents/Spring_2023/am-cakeml/build/bin/server_am";
 
-            let manfile = args.manifest_filepath; //"/Users/adampetz/Documents/Spring_2023/am-cakeml/am_configs/attest_remote_multinode/Manifest_P0.json";
+            let manfile = args.manifest_filepath.as_str(); //"/Users/adampetz/Documents/Spring_2023/am-cakeml/am_configs/attest_remote_multinode/Manifest_P0.json";
 
-            let aspbin_file = args.asbbin_filepath; //"/Users/adampetz/Documents/Spring_2025/my_am_repos/asp-libs/target/release";
+            let aspbin_file = args.asbbin_filepath.as_str(); //"/Users/adampetz/Documents/Spring_2025/my_am_repos/asp-libs/target/release";
 
-            let comms_file = args.commsbin_filepath; //"/Users/adampetz/Documents/Spring_2025/my_am_repos/rust-am-clients/target/release/rust-am-comms-client-copy";
+            let comms_file = args.commsbin_filepath.as_str(); //"/Users/adampetz/Documents/Spring_2025/my_am_repos/rust-am-clients/target/release/rust-am-comms-client-copy";
 
 
             let mut child = Command::new(fs_path)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .args(["-m", &manfile, "-b", &aspbin_file, "--comms", &comms_file, "-u", "127.0.0.1:5001"])
+            .args(["-m", manfile, "-b", aspbin_file, "--comms", comms_file, "-u", server_uuid])
             .spawn()
             .expect(format!("Failed to spawn child proces: {}", fs_path).as_str());
 
