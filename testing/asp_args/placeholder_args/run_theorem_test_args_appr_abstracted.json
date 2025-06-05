@@ -4,7 +4,8 @@
                 "env_var_golden": "", 
                 "filepath_rawev_golden": "$$x$$/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
                 "filepath_et_golden": "$$x$$/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
-                "filepath_glob_golden": "$$x$$/tests/DemoFiles/Test_Global_Context.json"
+                "filepath_glob_golden": "$$x$$/tests/DemoFiles/Test_Global_Context.json",
+                "evslice_exe": "$$x$$/build/bin/json_handler"
             }
         },
 
@@ -13,14 +14,16 @@
                 "env_var_golden": "",
                 "filepath_rawev_golden": "$$x$$/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
                 "filepath_et_golden": "$$x$$/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
-                "filepath_glob_golden": "$$x$$/tests/DemoFiles/Test_Global_Context.json"
+                "filepath_glob_golden": "$$x$$/tests/DemoFiles/Test_Global_Context.json",
+                "evslice_exe": "$$x$$/build/bin/json_handler"
             },
 
             "run_coq_theorem_test_targ": {
                 "env_var_golden": "",
                 "filepath_rawev_golden": "$$x$$/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json",
                 "filepath_et_golden": "$$x$$/tests/DemoFiles/goldenFiles/theorem_evidence_type.json",
-                "filepath_glob_golden": "$$x$$/tests/DemoFiles/Test_Global_Context.json"
+                "filepath_glob_golden": "$$x$$/tests/DemoFiles/Test_Global_Context.json",
+                "evslice_exe": "$$x$$/build/bin/json_handler"
             }
         }
     }
