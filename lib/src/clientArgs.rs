@@ -1,14 +1,14 @@
 use clap::Parser;
 
-const DEFAULT_TERM_PATH: &'static str = "/testing/protocols/protocol_cert_appr.json";
+const DEFAULT_TERM_PATH: &'static str = "/rust-am-clients/testing/protocols/protocol_cert_appr.json";
 const DEFAULT_SERVER_UUID: &'static str = "127.0.0.1:5000";
 const DEFAULT_CLIENT_UUID: &'static str = "";
-const DEFAULT_PLCMAP_PATH: &'static str = "/testing/plc_maps/plcmap_default.json";
-const DEFAULT_SESSION_PATH: &'static str = "/testing/attestation_sessions/session_cert_appr.json";
+const DEFAULT_PLCMAP_PATH: &'static str = "/rust-am-clients/testing/plc_maps/plcmap_default.json";
+const DEFAULT_SESSION_PATH: &'static str = "/rust-am-clients/testing/attestation_sessions/session_cert_appr.json";
 
-const DEFAULT_ENV_PATH: &'static str = "/testing/rodeo_envs/env_rodeo_cert_appr.json";
+const DEFAULT_ENV_PATH: &'static str = "/rust-am-clients/testing/rodeo_envs/env_rodeo_cert_appr.json";
 
-const AM_CLIENTS_ENV_VAR: &'static str = "AM_CLIENTS_ROOT";
+pub const AM_REPOS_ROOT_ENV_VAR: &'static str = "AM_REPOS_ROOT";
 
 fn get_local_env_var(s:String) -> std::io::Result<String> {
 
@@ -23,7 +23,7 @@ fn get_local_env_var(s:String) -> std::io::Result<String> {
 
 }
 
-fn get_local_env_var_w_suffix (env_var_string:String, suffix:&str) -> std::io::Result<String> {
+pub fn get_local_env_var_w_suffix (env_var_string:String, suffix:&str) -> std::io::Result<String> {
 
     let env_var_val = get_local_env_var(env_var_string)?;
 
@@ -60,7 +60,7 @@ pub fn get_asp_client_args () -> std::io::Result<AspClientArgs> {
 pub struct AmClientArgs {
     /// Path pointing to (JSON) protocol term file
     #[arg(short, long , default_value_t = 
-        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
+        get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
                                    DEFAULT_TERM_PATH).expect("Couldn't initialize default value for term_filepath field of AmClientArgs struct.  
                                                               Check for missing Environment Variable?"))]
     pub term_filepath: String,
@@ -71,7 +71,7 @@ pub struct AmClientArgs {
     
     /// Path pointing to (JSON) Placemap file
     #[arg(short, long , default_value_t = 
-        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
+        get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
                                    DEFAULT_PLCMAP_PATH).expect("Couldn't initialize default value for plcmap_filepath field of AmClientArgs struct.  
                                                                 Check for missing Environment Variable?"))]
     pub plcmap_filepath: String,
@@ -86,7 +86,7 @@ pub struct AmClientArgs {
 
     /// Path pointing to (JSON) Attestation Session file
     #[arg(short, long , default_value_t = 
-        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
+        get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
                                    DEFAULT_SESSION_PATH).expect("Couldn't initialize default value for term_filepath field of AmClientArgs struct.  
                                                               Check for missing Environment Variable?"))]
     pub attestation_session_filepath: String,
@@ -137,26 +137,18 @@ pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
 pub struct RodeoClientArgs {
     /// Path pointing to (JSON) RodeoClientRequest file
     #[arg(short, long)]
-    pub q_req_filepath: String,
+    pub req_filepath: String,
 
-    /// UUID string for AM server destination
-    #[arg(short, long , default_value_t = DEFAULT_SERVER_UUID.to_string())]
-    pub server_uuid: String,
+    /// Path pointing to local cvm executable
+    #[arg(short, long)]
+    pub cvm_filepath: String,
     
     /// Path pointing to (JSON) RodeoEnvironmentMap file
     #[arg(short, long , default_value_t = 
-        get_local_env_var_w_suffix(AM_CLIENTS_ENV_VAR.to_string(), 
-                                   DEFAULT_ENV_PATH).expect("Couldn't initialize default value for env_filepath field of RodeoClientArgs struct.  
-                                                                Check for missing Environment Variable?"))]
-    pub env_filepath: String,
-
-    /// UUID string for AM client (default value = "" specifies OS-assigned ephemeral port)
-    #[arg(short, long, default_value_t = DEFAULT_CLIENT_UUID.to_string())]
-    pub client_uuid: String,
-
-    /// UUID string for appraisal AM server
-     #[arg(short, long)]
-     pub r_appraisal_server_uuid: Option<String>
+        get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
+                                   DEFAULT_ENV_PATH).expect(&format!("Couldn't initialize default value for env_filepath field of RodeoClientArgs struct.  
+                                                                Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR)))]
+    pub env_filepath: String
 
 }
 

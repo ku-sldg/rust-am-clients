@@ -1,46 +1,28 @@
 {
-    "RodeoClientReq_attest_id": "micro_protocol",
-    "RodeoClientReq_attest_args": {
+    "RodeoClientRequest_attest_id": "micro_protocol",
+    "RodeoClientRequest_attest_args": {
         "hashdir": {
             "aadl_dir_targ": {
                 "env_var": "",
                 "paths": ["/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"],
                 "omit_file_suffixes": [],
-                "recursive": false
+                "recursive": false, 
+                "env_var_golden": "",
+                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
             },
             "microkit_dir_targ": {
                 "env_var": "",
                 "paths": ["/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"],
                 "omit_file_suffixes": [],
-                "recursive": false
-            }
-        }, 
-        "hashevidence": {
-            "micro_hash_composite_targ": {
-            }
-        }
-    },
-    "RodeoClientReq_appraise_args":{
-        "hashdir": {
-            "aadl_dir_targ": {
+                "recursive": false,
                 "env_var_golden": "",
-                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
-                "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
-            },
-            "microkit_dir_targ": {
-                "env_var_golden": "", 
-                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
-                "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
+                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
             }
         }, 
         "hashevidence": {
             "micro_hash_composite_targ": {
-                "env_var_golden": "", 
-                "filepath_rawev_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_raw_evidence.json",
-                "filepath_et_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/goldenFiles/micro_evidence_type.json",
-                "filepath_glob_golden": "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/Test_Global_Context.json"
+                "env_var_golden": "",
+                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/am-cakeml/tests/DemoFiles/goldenFiles/micro_composite.txt"
             }
         }
     }

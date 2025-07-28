@@ -159,6 +159,7 @@ fn extend_w_appraisal_args_et (app_args_map:HashMap<ASP_ID, HashMap<TARG_ID, ASP
 
     }
 }
+/*
 fn extend_w_appraisal_args (app_args_map:HashMap<ASP_ID, HashMap<TARG_ID, ASP_ARGS>>, e:Evidence) -> Evidence {
 
     let old_et = e.EVIDENCET;
@@ -170,6 +171,7 @@ fn extend_w_appraisal_args (app_args_map:HashMap<ASP_ID, HashMap<TARG_ID, ASP_AR
         EVIDENCET: new_et 
     }
 }
+    */
 
 fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> ASP_PARAMS {
 
@@ -336,7 +338,7 @@ fn main() -> std::io::Result<()> {
             eprintln!("{:?}", app_asp_args);
 
             let app_term: Term = asp(APPR);  
-            let app_evidence: Evidence = extend_w_appraisal_args(app_asp_args, resp.PAYLOAD.clone());
+            let app_evidence: Evidence = resp.PAYLOAD.clone(); //extend_w_appraisal_args(app_asp_args, resp.PAYLOAD.clone());
             let app_req : ProtocolRunRequest = 
                 ProtocolRunRequest {
                 TYPE: "REQUEST".to_string(), 

@@ -1,48 +1,16 @@
 {
-    "micro_protocol": {
+    "attest_protocol": {
         "RodeoClientEnv_term": {
-            "TERM_CONSTRUCTOR": "lseq",
-            "TERM_BODY": [
-                {
-                    "TERM_CONSTRUCTOR": "bseq",
-                    "TERM_BODY": [
-                        {
-                            "split1": "ALL",
-                            "split2": "ALL"
-                        },
-                        {
-                            "TERM_CONSTRUCTOR": "asp",
-                            "TERM_BODY": {
-                                "ASP_CONSTRUCTOR": "ASPC",
-                                "ASP_BODY": {
-                                    "ASP_ID": "hashdir",
-                                    "ASP_ARGS": {},
-                                    "ASP_PLC": "micro_demo_Plc",
-                                    "ASP_TARG_ID": "aadl_dir_targ"
-                                }
-                            }
-                        },
-                        {
-                            "TERM_CONSTRUCTOR": "asp",
-                            "TERM_BODY": {
-                                "ASP_CONSTRUCTOR": "ASPC",
-                                "ASP_BODY": {
-                                    "ASP_ID": "hashdir",
-                                    "ASP_ARGS": {},
-                                    "ASP_PLC": "micro_demo_Plc",
-                                    "ASP_TARG_ID": "microkit_dir_targ"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "TERM_CONSTRUCTOR": "asp",
-                    "TERM_BODY": {
-                        "ASP_CONSTRUCTOR": "APPR"
-                    }
+            "TERM_CONSTRUCTOR": "asp",
+            "TERM_BODY": {
+                "ASP_CONSTRUCTOR": "ASPC",
+                "ASP_BODY": {
+                    "ASP_ID": "attest",
+                    "ASP_ARGS": {},
+                    "ASP_PLC": "P0",
+                    "ASP_TARG_ID": "sys_targ"
                 }
-            ]
+            }
         },
         "RodeoClientEnv_session": {
             "Session_Plc": "P0",
@@ -99,7 +67,7 @@
                         }
                     },
                     "hashevidence": {
-                        "FWD": "EXTEND",
+                        "FWD": "REPLACE",
                         "EvInSig": "ALL",
                         "EvOutSig": {
                             "EvOutSig_CONSTRUCTOR": "OutN",
@@ -116,14 +84,6 @@
                     },
                     "hashfile_appr": {
                         "FWD": "REPLACE",
-                        "EvInSig": "ALL",
-                        "EvOutSig": {
-                            "EvOutSig_CONSTRUCTOR": "OutN",
-                            "EvOutSig_BODY": 1
-                        }
-                    },
-                    "hashdir": {
-                        "FWD": "EXTEND",
                         "EvInSig": "ALL",
                         "EvOutSig": {
                             "EvOutSig_CONSTRUCTOR": "OutN",
@@ -151,7 +111,7 @@
                         "EvInSig": "ALL",
                         "EvOutSig": {
                             "EvOutSig_CONSTRUCTOR": "OutN",
-                            "EvOutSig_BODY": 0
+                            "EvOutSig_BODY": 1
                         }
                     },
                     "readfile": {
@@ -223,9 +183,8 @@
                     "attest": "magic_appr",
                     "certificate": "magic_appr",
                     "appraise": "magic_appr",
-                    "hashevidence": "hashfile_appr",
+                    "hashevidence": "NULL",
                     "hashfile": "hashfile_appr",
-                    "hashdir": "hashfile_appr",
                     "invary_get_measurement": "invary_get_measurement_appr",
                     "provision": "NULL",
                     "readfile": "readfile_appr",
