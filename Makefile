@@ -7,7 +7,6 @@ $(error "ERROR:  AM_REPOS_ROOT environment variable not set!")
 endif
 
 # Variables used in make targets to configure various clients
-#CVM_DIR=/Users/adampetz/Documents/Summer_2025/cvm/_build/install/default/bin/cvm
 RODEO_REQUESTS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/rodeo_requests/
 RODEO_ENVS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/rodeo_envs/
 

@@ -18,12 +18,6 @@
                 "env_var_golden": "",
                 "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
             }
-        }, 
-        "hashevidence": {
-            "micro_hash_composite_targ": {
-                "env_var_golden": "",
-                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/am-cakeml/tests/DemoFiles/goldenFiles/micro_composite.txt"
-            }
         }
     }
 }

@@ -149,7 +149,6 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
 
 fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
-    //const AM_REPOS_ROOT_ENV_VAR: &'static str = "AM_REPOS_ROOT";
     const DEFAULT_ASP_BIN_PATH: &'static str = "/asp-libs/target/release/";
     const DEFAULT_MANIFEST_PATH: &'static str = "/rust-am-clients/testing/manifests/Manifest_P0.json";
 
@@ -201,8 +200,6 @@ fn run_appsumm_request (evtools_path:String, appsumm_req:AppraisalSummaryRequest
 
     let appsumm_req_string = serde_json::to_string(&appsumm_req)?;
 
-    //eprintln!("\n\n\n\n\n\n\n\n\n\n\n\nappsumm request: {:?}\n\n\n\n\n\n\n\n\n\n\n\n", appsumm_req_string);
-
     let evtools_args = ["--req", &appsumm_req_string];
 
     let output = Command::new(evtools_path)
@@ -213,16 +210,6 @@ fn run_appsumm_request (evtools_path:String, appsumm_req:AppraisalSummaryRequest
 
     if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking copland-evidence-tools in rust-rodeo-client: {:?}", String::from_utf8(err_res))}
 
-    let appresp = String::from_utf8(out_res.clone());
-
-    let appresp_string = 
-    match appresp {
-        Ok(v) => {v}
-        _ => panic!("hi") 
-    };
-
-    eprintln!("AppraisalSummaryResponse string: {}", appresp_string);
-
     let resp : Result<AppraisalSummaryResponse, serde_json::Error> = serde_json::from_slice(&out_res);
     match resp {
 
@@ -231,7 +218,6 @@ fn run_appsumm_request (evtools_path:String, appsumm_req:AppraisalSummaryRequest
 
     }
 }
-
 
 fn appsumm_rawev (rev:RawEv) -> bool {
 
@@ -302,16 +288,10 @@ fn main() -> std::io::Result<()> {
     let rodeo_resp_string = serde_json::to_string(&res_resp)?;
     print!("{}",rodeo_resp_string);
 
-
-
-
-
-
     let a_resp : ProtocolRunResponse = res_resp.RodeoClientResponse_cvm_response;
 
 
     let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
-    //let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
 
     let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
@@ -326,18 +306,10 @@ fn main() -> std::io::Result<()> {
         EVIDENCE: a_resp.PAYLOAD
     };
 
-    /*
-    let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
-
-    let appsumm_resp_str = am_sendRec_string_all(args.server_uuid.clone(), args.client_uuid.clone(), appsumm_req_str)?;
-    println!("Got a TCP Response String: \n");
-    println!("{appsumm_resp_str}\n");
-    */
-
     let evtools_path = "/Users/adampetz/.opam/5.2/bin/copland_evidence_tools".to_string();
 
-    let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(evtools_path, appsumm_req)?; //serde_json::from_str(&appsumm_resp_str)?;
-    eprintln!("Decoded AppraisalSummaryResponse: \n");
+    let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(evtools_path, appsumm_req)?;
+    eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
     eprintln!("{:?}\n", appsumm_resp);
 
     eprint_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
