@@ -6,7 +6,7 @@ const DEFAULT_CLIENT_UUID: &'static str = "";
 const DEFAULT_PLCMAP_PATH: &'static str = "/rust-am-clients/testing/plc_maps/plcmap_default.json";
 const DEFAULT_SESSION_PATH: &'static str = "/rust-am-clients/testing/attestation_sessions/session_cert_appr.json";
 
-const DEFAULT_ENV_PATH: &'static str = "/rust-am-clients/testing/rodeo_envs/env_rodeo_cert_appr.json";
+const DEFAULT_ENV_PATH: &'static str = "/rust-am-clients/rodeo_configs/rodeo_envs/env_rodeo_attest.json";
 
 pub const AM_REPOS_ROOT_ENV_VAR: &'static str = "AM_REPOS_ROOT";
 

@@ -54,7 +54,7 @@ fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, s
                     if keep_orig 
                     {params.ASP_ARGS} 
                 else 
-                    {serde_json::json!(null)}
+                    {serde_json::json!({})}
 
                 }
             }
@@ -63,7 +63,7 @@ fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, s
             if keep_orig 
                 {params.ASP_ARGS} 
             else 
-                {serde_json::json!(null)}
+                {serde_json::json!({})}
         }
         
       };
@@ -178,7 +178,7 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
     let output = Command::new(cvm_path)
                                 .args(cvm_args).output().expect("error running cvm executable within rust-rodeo-client");
 
-    let err_res = output.stderr;
+    let err_res : Vec<u8> = output.stderr;
     let out_res : Vec<u8> = output.stdout;
 
     if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking cvm in rust-rodeo-client: {:?}", String::from_utf8(err_res))}
@@ -242,7 +242,7 @@ fn main() -> std::io::Result<()> {
     eprintln!("res_env_filepath arg: {}", res_env_filepath);
 
     let res_cvm_filepath : String = args.cvm_filepath;
-    eprintln!("res_cvm_filepath arg: {}", res_env_filepath);
+    eprintln!("res_cvm_filepath arg: {}", res_cvm_filepath);
 
     let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
     eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");

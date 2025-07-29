@@ -26,6 +26,9 @@ test:
 rodeo_client_help:
 	cargo run --release --bin rust-rodeo-client -- --help
 
+rodeo_client_test:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)/abstract_requests/req_rodeo_attest_abstract.json -e $(RODEO_ENVS_DIR)env_rodeo_attest.json
+
 rodeo_client_hamr:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json 2> /dev/null
 
