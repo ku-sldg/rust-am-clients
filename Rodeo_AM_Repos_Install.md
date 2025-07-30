@@ -5,6 +5,7 @@
 * cvm (copland virtual machine):  https://github.com/ku-sldg/cvm 
 * rust-am-clients:  https://github.com/ku-sldg/rust-am-clients
 * asp-libs (attestation service provider libs):  https://github.com/ku-sldg/asp-libs 
+* copland-evidence-tools:  https://github.com/ku-sldg/copland-evidence-tools 
 
 ## Install Steps
 
@@ -17,7 +18,7 @@ export AM_REPOS_ROOT=<path-to-common-dir>
 Install Steps:
 1) `git clone` each of the above repo dependencies
 1) `git checkout` the appropriate branch within each cloned repo (i.e. `git checkout -b <branch_name>`)
-1) Follow the installation steps in the top-level README of each cloned repo (this should _hopefully_ just be a `make` command, possibly after some (manual, but minor) installation of tool-specific dependencies).
+1) Install each repo manually according to its top-level README (rather than the opam install, which may be lagging the latest changes). 
 
 After those installs, you should have a directory structre like the following:
 
@@ -27,6 +28,7 @@ $AM_REPOS_ROOT/
     -- cvm/
     -- asp-libs/
     -- rust-am-clients/
+    -- copland-evidence-tools/
 ```
 
 ## Testing the Installs

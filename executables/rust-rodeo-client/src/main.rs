@@ -195,8 +195,13 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
 
 }
 
-fn run_appsumm_request (evtools_path:String, appsumm_req:AppraisalSummaryRequest) -> std::io::Result<AppraisalSummaryResponse> {
+fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<AppraisalSummaryResponse> {
 
+    const DEFAULT_EVTOOLS_PATH: &'static str = "/copland-evidence-tools/_build/install/default/bin/copland_evidence_tools";
+
+    let evtools_path = get_local_env_var_w_suffix(lib::clientArgs::AM_REPOS_ROOT_ENV_VAR.to_string(), 
+                                   DEFAULT_EVTOOLS_PATH).expect(&format!("Couldn't initialize default value for evtools_path inside run_cvm_request().  
+                                                                Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR));
 
     let appsumm_req_string = serde_json::to_string(&appsumm_req)?;
 
@@ -306,9 +311,7 @@ fn main() -> std::io::Result<()> {
         EVIDENCE: a_resp.PAYLOAD
     };
 
-    let evtools_path = "/Users/adampetz/.opam/5.2/bin/copland_evidence_tools".to_string();
-
-    let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(evtools_path, appsumm_req)?;
+    let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
     eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
     eprintln!("{:?}\n", appsumm_resp);
 
