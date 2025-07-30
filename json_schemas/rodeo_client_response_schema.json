@@ -1,0 +1,29 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "RodeoClientResponse",
+    "description": "Rodeo Client Response structure",
+    "type": "object", 
+    "properties": {
+        "RodeoClientResponse_success": 
+            {
+                "description": "Boolean flag indicating overall attestation and/or appraisal success",
+                "type": "boolean"
+            },
+        "RodeoClientResponse_error":
+            {
+                "description": "String indicating errors that occured during attestation",
+                "type": "string"
+            },
+        "RodeoClientResponse_cvm_request":
+        {
+            "description": "Copland ProtocolRunRequest JSON structure selected by Rodeo tools, derived from 'RodeoClientRequest_attest_id' parameter of RodeoClientRequest",
+            "type": "object"
+        },
+        "RodeoClientResponse_cvm_response":
+        {
+            "description": "Copland ProtocolRunResponse JSON structure produced by a cvm interpreting the ProtocolRunRequest JSON structure ('RodeoClientResponse_cvm_request') of RodeoClientResponse",
+            "type": "object"
+        }
+    },
+    "required": ["RodeoClientResponse_success"]
+  }

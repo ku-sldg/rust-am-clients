@@ -6,7 +6,7 @@ const DEFAULT_CLIENT_UUID: &'static str = "";
 const DEFAULT_PLCMAP_PATH: &'static str = "/rust-am-clients/testing/plc_maps/plcmap_default.json";
 const DEFAULT_SESSION_PATH: &'static str = "/rust-am-clients/testing/attestation_sessions/session_cert_appr.json";
 
-const DEFAULT_ENV_PATH: &'static str = "/rust-am-clients/rodeo_configs/rodeo_envs/env_rodeo_attest.json";
+const DEFAULT_CVM_PATH: &'static str = "/cvm/_build/install/default/bin/cvm";
 
 pub const AM_REPOS_ROOT_ENV_VAR: &'static str = "AM_REPOS_ROOT";
 
@@ -135,19 +135,19 @@ pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct RodeoClientArgs {
+    /// Path pointing to local cvm executable
+    #[arg(short, long, default_value_t = 
+        get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
+                                   DEFAULT_CVM_PATH).expect(&format!("Couldn't initialize default value for cvm_filepath field of RodeoClientArgs struct.  
+                                                              Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR)))]
+    pub cvm_filepath: String,
+
     /// Path pointing to (JSON) RodeoClientRequest file
     #[arg(short, long)]
     pub req_filepath: String,
-
-    /// Path pointing to local cvm executable
-    #[arg(short, long)]
-    pub cvm_filepath: String,
     
     /// Path pointing to (JSON) RodeoEnvironmentMap file
-    #[arg(short, long , default_value_t = 
-        get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
-                                   DEFAULT_ENV_PATH).expect(&format!("Couldn't initialize default value for env_filepath field of RodeoClientArgs struct.  
-                                                                Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR)))]
+    #[arg(short, long)]
     pub env_filepath: String
 
 }
