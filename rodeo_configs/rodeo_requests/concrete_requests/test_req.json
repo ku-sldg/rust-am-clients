@@ -1,0 +1,13 @@
+{
+    "RodeoClientRequest_attest_id": "some_protocol",
+    "RodeoClientRequest_attest_args": {
+        "some_asp1": {
+            "some_targ1": {
+                "some_field1": ""
+            },
+            "some_targ2": {
+                "some_field2": ""
+            }
+        }
+    }
+}

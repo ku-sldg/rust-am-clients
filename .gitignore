@@ -9,4 +9,3 @@ target
 Cargo.lock
 
 testing/asp_args/concretized_args/*
-testing/rodeo_requests/concrete_requests/*
