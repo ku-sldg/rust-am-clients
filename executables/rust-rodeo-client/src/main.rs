@@ -197,6 +197,33 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
 
 fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<AppraisalSummaryResponse> {
 
+
+    let et = appsumm_req.EVIDENCE.1;
+    let rev = appsumm_req.EVIDENCE.0;
+    let rev_t = match rev { RawEv::RawEv(v) => v };
+    let g = appsumm_req.ATTESTATION_SESSION.Session_Context;
+
+    let appsumm_result = do_AppraisalSummary(et, rev_t, g);
+
+    let summ : AppraisalSummary = match appsumm_result {
+        Ok(s) => {s} 
+        _ => panic!("do_AppraisalSummary failed in run_appsumm_request")
+    };
+
+    let appsumm_resp : AppraisalSummaryResponse = 
+    AppraisalSummaryResponse {
+        TYPE: "RESPONSE".to_string(), 
+        ACTION: "APPSUMM".to_string(), 
+        SUCCESS: true,
+        PAYLOAD: summ
+    };
+
+    Ok(appsumm_resp)
+
+
+
+    /*
+
     const DEFAULT_EVTOOLS_PATH: &'static str = "/copland-evidence-tools/_build/install/default/bin/copland_evidence_tools";
 
     let evtools_path = get_local_env_var_w_suffix(lib::clientArgs::AM_REPOS_ROOT_ENV_VAR.to_string(), 
@@ -222,6 +249,7 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<
         _ => {panic!("Error decoding AppraisalSummaryResponse from copland-evidence-tools executable in run_appsumm_request (via rust-rodeo-client)")}
 
     }
+    */
 }
 
 fn appsumm_rawev (rev:RawEv) -> bool {
