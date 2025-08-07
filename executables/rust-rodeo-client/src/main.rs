@@ -198,27 +198,39 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
 fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<AppraisalSummaryResponse> {
 
 
-    let et = appsumm_req.EVIDENCE.1;
-    let rev = appsumm_req.EVIDENCE.0;
-    let rev_t = match rev { RawEv::RawEv(v) => v };
+    let et = appsumm_req.EVIDENCE.1.clone();
+    let rev = appsumm_req.EVIDENCE.0.clone();
+    let rev_t = match rev.clone() { RawEv::RawEv(v) => v };
     let g = appsumm_req.ATTESTATION_SESSION.Session_Context;
 
     let appsumm_result = do_AppraisalSummary(et, rev_t, g);
 
-    let summ : AppraisalSummary = match appsumm_result {
-        Ok(s) => {s} 
-        _ => panic!("do_AppraisalSummary failed in run_appsumm_request")
+    let summ : AppraisalSummaryResponse = match appsumm_result {
+        Ok(s) => {
+
+            let appsumm_resp : AppraisalSummaryResponse = 
+                AppraisalSummaryResponse {
+                    TYPE: "RESPONSE".to_string(), 
+                    ACTION: "APPSUMM".to_string(), 
+                    SUCCESS: true,
+                    PAYLOAD: s
+                };
+            appsumm_resp
+        } 
+        _ => { //panic!("do_AppraisalSummary failed in run_appsumm_request")
+                let appsumm_resp : AppraisalSummaryResponse = 
+                    AppraisalSummaryResponse {
+                        TYPE: "RESPONSE".to_string(), 
+                        ACTION: "APPSUMM".to_string(), 
+                        SUCCESS: false,
+                        PAYLOAD: HashMap::new()
+                    };
+                    appsumm_resp  
+        } 
+
     };
 
-    let appsumm_resp : AppraisalSummaryResponse = 
-    AppraisalSummaryResponse {
-        TYPE: "RESPONSE".to_string(), 
-        ACTION: "APPSUMM".to_string(), 
-        SUCCESS: true,
-        PAYLOAD: summ
-    };
-
-    Ok(appsumm_resp)
+    Ok(summ)
 
 
 
@@ -323,27 +335,27 @@ fn main() -> std::io::Result<()> {
 
     let a_resp : ProtocolRunResponse = res_resp.RodeoClientResponse_cvm_response;
 
-
     let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
 
     let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_att_session = my_env.RodeoClientEnv_session.clone();
 
-
     let appsumm_req : AppraisalSummaryRequest = 
     AppraisalSummaryRequest {
         TYPE: "REQUEST".to_string(), 
         ACTION: "APPSUMM".to_string(), 
         ATTESTATION_SESSION: my_att_session.clone(),
-        EVIDENCE: a_resp.PAYLOAD
+        EVIDENCE: a_resp.PAYLOAD.clone()
     };
 
     let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
     eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
     eprintln!("{:?}\n", appsumm_resp);
 
-    eprint_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
+    let appraisal_valid = appsumm_rawev(a_resp.PAYLOAD.0.clone());
+
+    eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
 
     Ok (())
 
