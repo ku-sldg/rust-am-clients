@@ -3,34 +3,78 @@
     "title": "CoplandTerm",
     "description": "Copland protocol term structure",
     "type": "object", 
-    "oneOf": [{ "$ref": "#/$defs/aspTerm" }], 
+    "oneOf": [{ "$ref": "#/$defs/aspTerm" }, 
+              { "$ref": "#/$defs/lseqTerm" }, 
+              { "$ref": "#/$defs/bseqTerm" }], 
 
     "$defs": {
-    "aspTerm": {
-        "type": "object",
-        "properties": {
-            "TERM_CONSTRUCTOR": {"const": "asp"}, 
-            "TERM_BODY": { "$ref": "#/$defs/aspcTerm" }
-        },
-        "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
-    }, 
 
-     "aspcTerm": {
-        "type": "object",
-        "properties": {
-            "ASP_CONSTRUCTOR": {"const": "ASPC"}, 
-            "ASP_BODY": {"type": "object", 
-                         "properties": {
-                            "ASP_ID": {"type": "string"},
-                            "ASP_ARGS": {"type": "object"},
-                            "ASP_PLC": {"type": "string"},
-                            "ASP_TARG_ID": {"type": "string"}
-                         }, 
-                         "required": ["ASP_ID"]
-            }
+        "splitTuple": {"type":"array", 
+                       "prefixItems": [ { "$ref": "#/$defs/spEnum" }, 
+                                        { "$ref": "#/$defs/spEnum" } ],
+                       "minItems": 2 },
+        "spEnum": {"type":"string", 
+                   "oneOf": [{ "const": "ALL" }, 
+                             { "const": "NONE" }]
+                  },
+        "bseqTerm": {
+            "type": "object",
+            "properties": {
+                "TERM_CONSTRUCTOR": {"const": "bseq"}, 
+                "TERM_BODY": {"type": "array", 
+                              "prefixItems": [ { "$ref": "#/$defs/splitTuple" }, { "$ref": "#" }, { "$ref": "#" } ], 
+                              "minItems": 3
+                            }
+            },
+            "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
+        },
+
+        "lseqTerm": {
+            "type": "object",
+            "properties": {
+                "TERM_CONSTRUCTOR": {"const": "lseq"}, 
+                "TERM_BODY": {"type": "array", 
+                              "prefixItems": [ { "$ref": "#" }, { "$ref": "#" } ], 
+                              "minItems": 2
+                            }
+            },
+            "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
+        },
+
+        "aspTerm": {
+            "type": "object",
+            "properties": {
+                "TERM_CONSTRUCTOR": {"const": "asp"}, 
+                "TERM_BODY": {"type":"object",
+                              "oneOf": [ { "$ref": "#/$defs/aspcTerm" }, 
+                                         { "$ref": "#/$defs/apprcTerm" } ]}
+            },
+            "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
         }, 
-        "required": ["ASP_CONSTRUCTOR", "ASP_BODY"]
-    }
+
+        "aspcTerm": {
+            "type": "object",
+            "properties": {
+                "ASP_CONSTRUCTOR": {"const": "ASPC"}, 
+                "ASP_BODY": {"type": "object", 
+                            "properties": {
+                                "ASP_ID": {"type": "string"},
+                                "ASP_ARGS": {"type": "object"},
+                                "ASP_PLC": {"type": "string"},
+                                "ASP_TARG_ID": {"type": "string"}
+                            }, 
+                            "required": ["ASP_ID"]
+                }
+            }, 
+            "required": ["ASP_CONSTRUCTOR", "ASP_BODY"]
+        }, 
+        "apprcTerm": {
+            "type": "object",
+            "properties": {
+                "ASP_CONSTRUCTOR": {"const": "APPR"}
+            }, 
+            "required": ["ASP_CONSTRUCTOR"]
+        }
 
   }
 }
