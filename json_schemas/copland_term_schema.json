@@ -1,0 +1,36 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "CoplandTerm",
+    "description": "Copland protocol term structure",
+    "type": "object", 
+    "oneOf": [{ "$ref": "#/$defs/aspTerm" }], 
+
+    "$defs": {
+    "aspTerm": {
+        "type": "object",
+        "properties": {
+            "TERM_CONSTRUCTOR": {"const": "asp"}, 
+            "TERM_BODY": { "$ref": "#/$defs/aspcTerm" }
+        },
+        "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
+    }, 
+
+     "aspcTerm": {
+        "type": "object",
+        "properties": {
+            "ASP_CONSTRUCTOR": {"const": "ASPC"}, 
+            "ASP_BODY": {"type": "object", 
+                         "properties": {
+                            "ASP_ID": {"type": "string"},
+                            "ASP_ARGS": {"type": "object"},
+                            "ASP_PLC": {"type": "string"},
+                            "ASP_TARG_ID": {"type": "string"}
+                         }, 
+                         "required": ["ASP_ID"]
+            }
+        }, 
+        "required": ["ASP_CONSTRUCTOR", "ASP_BODY"]
+    }
+
+  }
+}
