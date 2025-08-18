@@ -5,7 +5,8 @@
     "type": "object", 
     "oneOf": [{ "$ref": "#/$defs/aspTerm" }, 
               { "$ref": "#/$defs/lseqTerm" }, 
-              { "$ref": "#/$defs/bseqTerm" }], 
+              { "$ref": "#/$defs/bseqTerm" },
+              { "$ref": "#/$defs/attTerm" }], 
 
     "$defs": {
 
@@ -17,6 +18,18 @@
                    "oneOf": [{ "const": "ALL" }, 
                              { "const": "NONE" }]
                   },
+
+        "attTerm": {
+            "type": "object",
+            "properties": {
+                "TERM_CONSTRUCTOR": {"const": "att"}, 
+                "TERM_BODY": {"type": "array", 
+                              "prefixItems": [ { "type":"string" }, { "$ref": "#" } ], 
+                              "minItems": 2
+                            }
+            },
+            "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
+        },
         "bseqTerm": {
             "type": "object",
             "properties": {
