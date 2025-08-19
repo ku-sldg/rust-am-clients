@@ -1,0 +1,81 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "CvmRunRequest + CvmRunResponse",
+    "description": "MAESTRO CVM Request/Response structures",
+    "type": "object", 
+    "properties": {
+        "TYPE": 
+            {
+                "description": "String representing the type of message (REQUEST | RESPONSE)",
+                "enum": ["REQUEST", "RESPONSE"]
+            },
+        "ACTION":
+            {
+                "description": "String indicating the type of cvm action (i.e. 'RUN' for protocol execution)",
+                "type": "string"
+            }
+        },
+        "required": ["TYPE", "ACTION"],
+
+        "allOf": [
+
+        {
+        "if": {
+            "properties": {
+                "TYPE": { "const": "REQUEST" } 
+            }
+        },
+        "then": {
+            "properties": {
+                "REQ_PLC":
+                    {
+                        "description": "String indicating the requesting Place",
+                        "type": "string"
+                    },
+                "TO_PLC":
+                    {
+                        "description": "String indicating the destination Place",
+                        "type": "string"
+                    },
+                "TERM":
+                    { "$ref": "copland_term_schema.json#" },
+
+                "EVIDENCE":
+                    {"type": "array", 
+                              "prefixItems": [ { "type":"object" }, { "$ref": "copland_evidence_schema.json#" } ], 
+                              "minItems": 2
+                    },
+
+                "ATTESTATION_SESSION":
+                    {
+                        "description": "Attestation Session structure",
+                        "type": "object"
+                    }
+            },
+            "required": ["TERM", "EVIDENCE", "ATTESTATION_SESSION"]
+        }
+        },
+        {
+        "if":
+        {
+            "properties": {
+                "TYPE": { "const": "RESPONSE" } 
+            }
+        },
+        "then":
+        {
+            "properties": {
+                "SUCCESS": { "type": "boolean" }, 
+                "PAYLOAD": {"type": "array", 
+                              "prefixItems": [ { "type":"object" }, { "$ref": "copland_evidence_schema.json#" } ], 
+                              "minItems": 2
+                    }
+            }, 
+            "required": [ "SUCCESS", "PAYLOAD" ]
+        }
+        }
+
+    ]
+
+}
+

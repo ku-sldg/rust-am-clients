@@ -1,0 +1,188 @@
+{
+    "TYPE": "RESPONSE",
+    "ACTION": "RUN",
+    "SUCCESS": true,
+    "PAYLOAD": [
+        {
+            "RawEv": [
+                "",
+                ""
+            ]
+        },
+        {
+            "EvidenceT_CONSTRUCTOR": "split_evt",
+            "EvidenceT_BODY": [
+                {
+                    "EvidenceT_CONSTRUCTOR": "split_evt",
+                    "EvidenceT_BODY": [
+                        {
+                            "EvidenceT_CONSTRUCTOR": "asp_evt",
+                            "EvidenceT_BODY": [
+                                "P0",
+                                {
+                                    "ASP_ID": "hashfile_appr",
+                                    "ASP_ARGS": {
+                                        "env_var": "",
+                                        "env_var_golden": "",
+                                        "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos//am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                        "omit_file_suffixes": [],
+                                        "paths": [
+                                            "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                        ],
+                                        "recursive": false
+                                    },
+                                    "ASP_PLC": "micro_demo_Plc",
+                                    "ASP_TARG_ID": "aadl_dir_targ"
+                                },
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "left_evt",
+                                    "EvidenceT_BODY": {
+                                        "EvidenceT_CONSTRUCTOR": "split_evt",
+                                        "EvidenceT_BODY": [
+                                            {
+                                                "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                "EvidenceT_BODY": [
+                                                    "P0",
+                                                    {
+                                                        "ASP_ID": "hashdir",
+                                                        "ASP_ARGS": {
+                                                            "env_var": "",
+                                                            "env_var_golden": "",
+                                                            "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos//am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                                            "omit_file_suffixes": [],
+                                                            "paths": [
+                                                                "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                                            ],
+                                                            "recursive": false
+                                                        },
+                                                        "ASP_PLC": "micro_demo_Plc",
+                                                        "ASP_TARG_ID": "aadl_dir_targ"
+                                                    },
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "mt_evt"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                "EvidenceT_BODY": [
+                                                    "P0",
+                                                    {
+                                                        "ASP_ID": "hashdir",
+                                                        "ASP_ARGS": {
+                                                            "env_var": "",
+                                                            "env_var_golden": "",
+                                                            "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos//am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                                            "omit_file_suffixes": [],
+                                                            "paths": [
+                                                                "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                                            ],
+                                                            "recursive": false
+                                                        },
+                                                        "ASP_PLC": "micro_demo_Plc",
+                                                        "ASP_TARG_ID": "microkit_dir_targ"
+                                                    },
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "mt_evt"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "EvidenceT_CONSTRUCTOR": "mt_evt"
+                        }
+                    ]
+                },
+                {
+                    "EvidenceT_CONSTRUCTOR": "split_evt",
+                    "EvidenceT_BODY": [
+                        {
+                            "EvidenceT_CONSTRUCTOR": "asp_evt",
+                            "EvidenceT_BODY": [
+                                "P0",
+                                {
+                                    "ASP_ID": "hashfile_appr",
+                                    "ASP_ARGS": {
+                                        "env_var": "",
+                                        "env_var_golden": "",
+                                        "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos//am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                        "omit_file_suffixes": [],
+                                        "paths": [
+                                            "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                        ],
+                                        "recursive": false
+                                    },
+                                    "ASP_PLC": "micro_demo_Plc",
+                                    "ASP_TARG_ID": "microkit_dir_targ"
+                                },
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "right_evt",
+                                    "EvidenceT_BODY": {
+                                        "EvidenceT_CONSTRUCTOR": "split_evt",
+                                        "EvidenceT_BODY": [
+                                            {
+                                                "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                "EvidenceT_BODY": [
+                                                    "P0",
+                                                    {
+                                                        "ASP_ID": "hashdir",
+                                                        "ASP_ARGS": {
+                                                            "env_var": "",
+                                                            "env_var_golden": "",
+                                                            "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos//am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                                            "omit_file_suffixes": [],
+                                                            "paths": [
+                                                                "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                                            ],
+                                                            "recursive": false
+                                                        },
+                                                        "ASP_PLC": "micro_demo_Plc",
+                                                        "ASP_TARG_ID": "aadl_dir_targ"
+                                                    },
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "mt_evt"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                "EvidenceT_BODY": [
+                                                    "P0",
+                                                    {
+                                                        "ASP_ID": "hashdir",
+                                                        "ASP_ARGS": {
+                                                            "env_var": "",
+                                                            "env_var_golden": "",
+                                                            "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos//am-cakeml/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                                            "omit_file_suffixes": [],
+                                                            "paths": [
+                                                                "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                                            ],
+                                                            "recursive": false
+                                                        },
+                                                        "ASP_PLC": "micro_demo_Plc",
+                                                        "ASP_TARG_ID": "microkit_dir_targ"
+                                                    },
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "mt_evt"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "EvidenceT_CONSTRUCTOR": "mt_evt"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "CoplandEvidence",
+    "description": "Copland evidence term structure",
+    "type": "object", 
+    "oneOf": [ { "$ref": "#/$defs/mt_evt_Term" },
+               { "$ref": "#/$defs/asp_evt_Term" },
+               { "$ref": "#/$defs/split_evt_Term" }
+            ], 
+
+    "$defs": {
+
+        "mt_evt_Term": {
+            "type": "object",
+            "properties": {
+                "EvidenceT_CONSTRUCTOR": {"const": "mt_evt"}
+            },
+            "required": ["EvidenceT_CONSTRUCTOR"]
+        }, 
+
+        "asp_evt_Term": {
+            "type": "object",
+            "properties": {
+                "EvidenceT_CONSTRUCTOR": {"const": "asp_evt"}
+            },
+            "required": ["EvidenceT_CONSTRUCTOR"]
+        }, 
+
+         "split_evt_Term": {
+            "type": "object",
+            "properties": {
+                "EvidenceT_CONSTRUCTOR": {"const": "split_evt"}, 
+                "EvidenceT_BODY": {"type": "array", 
+                              "prefixItems": [ { "$ref": "#" }, { "$ref": "#" } ], 
+                              "minItems": 2
+                            }
+            },
+            "required": ["EvidenceT_CONSTRUCTOR", "EvidenceT_BODY"]
+        }
+  }
+}
