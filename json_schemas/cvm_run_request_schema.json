@@ -49,7 +49,25 @@
                 "ATTESTATION_SESSION":
                     {
                         "description": "Attestation Session structure",
-                        "type": "object"
+                        "type": "object", 
+                        "properties": {
+                            "Session_Plc": { "type":"string"}, 
+                            "Plc_Mapping": { "type": "object" }, 
+                            "PubKey_Mapping" : { "type": "object" }, 
+                            "Session_Context" : { "type": "object", 
+                                                  "properties": {
+                                                    "ASP_Types": {"type":"object",
+                                                                  "additionalProperties":   { "$ref": "copland_term_schema.json#/$defs/aspType" }
+                                                                },
+                                                    "ASP_Comps": {"type":"object",
+                                                                  "additionalProperties":   { "type": "string" }
+                                                                }
+                                                  }, 
+                                                  "required": ["ASP_Types", "ASP_Comps"]
+                                                }
+                            
+                        }, 
+                        "required": ["Session_Context"]
                     }
             },
             "required": ["TERM", "EVIDENCE", "ATTESTATION_SESSION"]

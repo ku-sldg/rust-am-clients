@@ -65,11 +65,27 @@
             "required": ["TERM_CONSTRUCTOR", "TERM_BODY"]
         }, 
 
-        "aspcTerm": {
-            "type": "object",
-            "properties": {
-                "ASP_CONSTRUCTOR": {"const": "ASPC"}, 
-                "ASP_BODY": {"type": "object", 
+        "fwd": { "enum": ["REPLACE", "WRAP", "UNWRAP", "EXTEND"] },
+
+        "evInSig": { "enum": ["ALL", "NONE"] },
+
+        "evOutSig": {"type":"object", 
+                     "properties": {
+                        "EvOutSig_CONSTRUCTOR": { "enum": ["OutN"] },
+                        "EvOutSig_BODY": { "type": "number" }
+                     }, 
+                     "required": ["EvOutSig_CONSTRUCTOR"]
+                    },
+
+        "aspType" : { "type": "object", 
+                      "properties": {
+                        "FWD": { "$ref": "#/$defs/fwd" },
+                        "EvInSig": { "$ref": "#/$defs/evInSig" },
+                        "EvOutSig": { "$ref": "#/$defs/evOutSig" }
+                      }, 
+                      "requried": ["FWD", "EvInSig", "EvOutSig"]
+                    },
+        "aspArgs": {"type": "object", 
                             "properties": {
                                 "ASP_ID": {"type": "string"},
                                 "ASP_ARGS": {"type": "object"},
@@ -77,7 +93,13 @@
                                 "ASP_TARG_ID": {"type": "string"}
                             }, 
                             "required": ["ASP_ID"]
-                }
+                },
+
+        "aspcTerm": {
+            "type": "object",
+            "properties": {
+                "ASP_CONSTRUCTOR": {"const": "ASPC"}, 
+                "ASP_BODY": { "$ref": "#/$defs/aspArgs" }
             }, 
             "required": ["ASP_CONSTRUCTOR", "ASP_BODY"]
         }, 
