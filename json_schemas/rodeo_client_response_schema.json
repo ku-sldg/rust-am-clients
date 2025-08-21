@@ -14,16 +14,8 @@
                 "description": "String indicating errors that occured during attestation",
                 "type": "string"
             },
-        "RodeoClientResponse_cvm_request":
-        {
-            "description": "Copland ProtocolRunRequest JSON structure selected by Rodeo tools, derived from 'RodeoClientRequest_attest_id' parameter of RodeoClientRequest",
-            "type": "object"
-        },
-        "RodeoClientResponse_cvm_response":
-        {
-            "description": "Copland ProtocolRunResponse JSON structure produced by a cvm interpreting the ProtocolRunRequest JSON structure ('RodeoClientResponse_cvm_request') of RodeoClientResponse",
-            "type": "object"
-        }
+        "RodeoClientResponse_cvm_request":  { "$ref": "cvm_run_message_schema.json#" },
+        "RodeoClientResponse_cvm_response": { "$ref": "cvm_run_message_schema.json#" }
     },
-    "required": ["RodeoClientResponse_success"]
+    "required": ["RodeoClientResponse_success", "RodeoClientResponse_cvm_request"]
   }

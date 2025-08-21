@@ -16,13 +16,8 @@
         {
             "TERM_CONSTRUCTOR": "asp",
             "TERM_BODY": {
-                "ASP_CONSTRUCTOR": "ASPC",
-                "ASP_BODY": {
-                    "ASP_ID": "hashdir",
-                    "ASP_ARGS": {},
-                    "ASP_PLC": "micro_demo_Plc",
-                    "ASP_TARG_ID": "aadl_dir_targ"
-                }
+                "ASP_CONSTRUCTOR": "ENC", 
+                "ASP_BODY": ["P1"]
             }
         }
     ]

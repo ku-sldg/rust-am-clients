@@ -52,8 +52,10 @@
                         "type": "object", 
                         "properties": {
                             "Session_Plc": { "type":"string"}, 
-                            "Plc_Mapping": { "type": "object" }, 
-                            "PubKey_Mapping" : { "type": "object" }, 
+                            "Plc_Mapping": { "type": "object",
+                                             "additionalProperties": { "type":"string" } }, 
+                            "PubKey_Mapping" : { "type": "object",
+                                                 "additionalProperties": { "type":"string" } }, 
                             "Session_Context" : { "type": "object", 
                                                   "properties": {
                                                     "ASP_Types": {"type":"object",
@@ -84,7 +86,7 @@
         {
             "properties": {
                 "SUCCESS": { "type": "boolean" }, 
-                "PAYLOAD": {"type": "array", 
+                "PAYLOAD": { "type": "array", 
                               "prefixItems": [ { "type":"object" }, { "$ref": "copland_evidence_schema.json#" } ], 
                               "minItems": 2
                     }
