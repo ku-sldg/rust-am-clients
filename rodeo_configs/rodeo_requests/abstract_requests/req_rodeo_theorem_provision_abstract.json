@@ -1,0 +1,75 @@
+{
+    "RodeoClientRequest_attest_id": "theorem_provision_protocol",
+    "RodeoClientRequest_attest_args": {
+        "hashdir": {
+            "coq_env_dir_targ": {
+                "env_var": "",
+                "paths": [
+                    "$$x$$/my_theorems_env/"
+                ],
+                "omit_file_suffixes": [
+                    ".glob",
+                    ".vo",
+                    ".vok",
+                    ".vos",
+                    ".aux"
+                ],
+                "recursive": true,
+                "env_var_golden": "",
+                "filepath_golden": "$$y$$/rust-am-clients/goldenFiles/theorems_env_dir_golden.txt"
+            }
+        },
+        "run_command": {
+            "run_coq_theorem_targ": {
+                "exe_path": "$$x$$/my_theorems_env/rocq",
+                "exe_args": [
+                    "compile",
+                    "-R",
+                    "$$x$$/my_theorems/",
+                    "ImportantModule",
+                    "$$x$$/my_theorems/ImportantTheorem.v"
+                ],
+                "env_var_golden": "",
+                "filepath_golden": "$$y$$/rust-am-clients/goldenFiles/theorem_output_golden.txt"
+            },
+            "run_coq_theorem_test_targ": {
+                "exe_path": "$$x$$/my_theorems_env/rocq",
+                "exe_args": [
+                    "compile",
+                    "-R",
+                    "$$x$$/my_theorems/",
+                    "ImportantModule",
+                    "$$x$$/my_theorems_env/ImportantTheoremTest.v"
+                ],
+                "env_var_golden": "",
+                "filepath_golden": "$$y$$/rust-am-clients/goldenFiles/theorem_test_output_golden.txt"
+            }
+        },
+        "provision": {
+            "provision_coq_env_dir_targ": {
+                "env_var": "",
+                "paths": [],
+                "omit_file_suffixes": [],
+                "recursive": false,
+                "env_var_golden": "",
+                "filepath_golden": "$$y$$/rust-am-clients/goldenFiles/theorems_env_dir_golden.txt"
+            },
+            "provision_run_coq_theorem_targ": {
+                "env_var": "",
+                "paths": [],
+                "omit_file_suffixes": [],
+                "recursive": false,
+                "env_var_golden": "",
+                "filepath_golden": "$$y$$/rust-am-clients/goldenFiles/theorem_output_golden.txt"
+            },
+            "provision_run_coq_theorem_test_targ": {
+                "env_var": "",
+                "paths": [],
+                "omit_file_suffixes": [],
+                "recursive": false,
+                "env_var_golden": "",
+                "filepath_golden": "$$y$$/rust-am-clients/goldenFiles/theorem_test_output_golden.txt"
+            }
+        }
+    }
+}

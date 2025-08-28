@@ -1,0 +1,32 @@
+{
+        "hashdir": {
+            "coq_env_dir_targ": {
+                "env_var": "",
+                "paths": ["/Users/adampetz/Documents/Fall_2024/my_theorems_env/"],
+                "omit_file_suffixes": [".glob", ".vo", ".vok", ".vos", ".aux"],
+                "recursive": true
+            }
+        },
+
+        "run_command": {
+            "run_coq_theorem_targ": {
+                "exe_path": "/Users/adampetz/Documents/Fall_2024/my_theorems_env/coqc",
+                "exe_args": [
+                    "-R",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems/",
+                    "ImportantModule",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems/ImportantTheorem.v"
+                ]
+            },
+
+            "run_coq_theorem_test_targ": {
+                "exe_path": "/Users/adampetz/Documents/Fall_2024/my_theorems_env/coqc",
+                "exe_args": [
+                    "-R",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems/",
+                    "ImportantModule",
+                    "/Users/adampetz/Documents/Fall_2024/my_theorems_env/ImportantTheoremTest.v"
+                ]
+            }
+        }
+    }

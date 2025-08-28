@@ -1,0 +1,23 @@
+{
+    "hashdir": {
+        "aadl_dir_targ": {
+            "env_var": "",
+            "paths": [
+                "/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+            ],
+            "omit_file_suffixes": [],
+            "recursive": false
+        },
+        "microkit_dir_targ": {
+            "env_var": "",
+            "paths": [
+                "/Users/adampetz/Documents/Spring_2023/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+            ],
+            "omit_file_suffixes": [],
+            "recursive": false
+        }
+    },
+    "hashevidence": {
+        "micro_hash_composite_targ": {}
+    }
+}

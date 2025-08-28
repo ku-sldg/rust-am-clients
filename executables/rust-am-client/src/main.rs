@@ -5,6 +5,8 @@
 
 // Custom package imports
 use rust_am_lib::copland::*;
+use rust_am_lib::copland::Term::asp;
+use rust_am_lib::copland::ASP::APPR;
 
 use rust_am_lib::tcp::*;
 use lib::clientArgs::*;
@@ -12,9 +14,9 @@ use lib::clientArgs::*;
 // Other packages required to perform specific ASP action.
 use std::fs;
 use std::collections::HashMap;
+use serde_json::Value;
 
 fn get_session_from_am_client_args (args:&AmClientArgs) -> std::io::Result<Attestation_Session> {
-
 
     let maybe_env_filepath = args.env_filepath.clone(); 
     let maybe_glob_comps_filepath = args.glob_comps_filepath.clone();
@@ -87,6 +89,88 @@ fn get_session_from_am_client_args (args:&AmClientArgs) -> std::io::Result<Attes
 
 }
 
+fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> ASP_PARAMS {
+
+    let id : ASP_ID = params.ASP_ID.clone();
+    let targid : TARG_ID = params.ASP_TARG_ID.clone();
+    let new_args: Value = 
+      match args_map.get(&id) {
+        Some (targs_map) => {
+
+            match targs_map.get(&targid) {
+                Some (val) => {
+                    val.clone()
+                }
+
+                None => {
+                    if keep_orig 
+                    {params.ASP_ARGS} 
+                else 
+                    {serde_json::json!(null)}
+
+                }
+            }
+        }
+        None => {
+            if keep_orig 
+                {params.ASP_ARGS} 
+            else 
+                {serde_json::json!(null)}
+        }
+        
+      };
+      
+    ASP_PARAMS { 
+        ASP_ARGS: new_args,
+        ASP_ID: params.ASP_ID,
+        ASP_PLC: params.ASP_PLC,
+        ASP_TARG_ID: params.ASP_TARG_ID,
+    }
+
+}
+
+fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> Term {
+    match t {
+
+        Term::asp(ref a) => {
+            match a {
+                ASP::ASPC(params) => {Term::asp(ASP::ASPC(aspc_args_swap(params.clone(), args_map, keep_orig)))}
+                _ => {t}
+            }
+        }
+
+        Term::att(q,t1) => {
+            let t1: Term = term_swap_args(*t1, args_map, keep_orig);
+            Term::att(q, Box::new(t1)) 
+        }
+
+        Term::lseq(t1,t2) => 
+            { 
+                let t1: Term = term_swap_args(*t1, args_map.clone(), keep_orig);
+                let t2: Term = term_swap_args(*t2, args_map.clone(), keep_orig);
+
+                Term::lseq(Box::new(t1), Box::new(t2))
+            }
+
+        Term::bseq(sp, t1,t2) => 
+        { 
+            let t1: Term = term_swap_args(*t1, args_map.clone(), keep_orig);
+            let t2: Term = term_swap_args(*t2, args_map.clone(), keep_orig);
+
+            Term::bseq(sp, Box::new(t1), Box::new(t2))
+        }
+
+        Term::bpar(sp, t1,t2) => 
+        { 
+            let t1: Term = term_swap_args(*t1, args_map.clone(), keep_orig);
+            let t2: Term = term_swap_args(*t2, args_map.clone(), keep_orig);
+
+            Term::bpar(sp, Box::new(t1), Box::new(t2))
+        }
+    }
+}
+
+
 fn main() -> std::io::Result<()> {
 
     let args = get_am_client_args()?;
@@ -114,7 +198,26 @@ fn main() -> std::io::Result<()> {
 
     let my_att_session = get_session_from_am_client_args(&args)?;
 
-    let my_term: Term = t;  
+    let maybe_attestation_args_string = args.b_attestation_asp_args_filepath.clone();
+  
+   let my_term: Term = 
+        match maybe_attestation_args_string {
+            Some(attestation_args_filepath) => {
+
+                let attestation_args_contents = fs::read_to_string(attestation_args_filepath).expect("Couldn't read Appraisal ASP_ARGS JSON file");
+                eprintln!("\nAttestation ASP_ARGS contents:\n{attestation_args_contents}");
+
+                let app_asp_args :  HashMap<ASP_ID, HashMap<TARG_ID, ASP_ARGS>> = serde_json::from_str(&attestation_args_contents)?;
+                eprintln!("\nDecoded Attestation ASP_ARGS as:");
+                eprintln!("{:?}", app_asp_args);
+
+                term_swap_args(t, app_asp_args, true)
+            }
+
+            _ => {t}
+
+        };
+
     let vreq : ProtocolRunRequest = 
         ProtocolRunRequest {
             TYPE: "REQUEST".to_string(), 
@@ -135,12 +238,57 @@ fn main() -> std::io::Result<()> {
     println!("Decoded ProtocolRunResponse: \n");
     println!("{:?}\n", resp);
 
+    let maybe_app_server = args.r_appraisal_server_uuid;
+
+    let a_resp : ProtocolRunResponse = 
+    match maybe_app_server {
+        Some(app_server) => {
+
+            let appraisal_args_filepath = args.d_appraisal_asp_args_filepath.expect("Bad Client Args:  provided appraisal server UUID, but not filepath to appraisal ASP_ARGS!");
+
+            let appraisal_args_contents = fs::read_to_string(appraisal_args_filepath).expect("Couldn't read Appraisal ASP_ARGS JSON file");
+            eprintln!("\nAppraisal ASP_ARGS contents:\n{appraisal_args_contents}");
+
+            let app_asp_args :  HashMap<ASP_ID, HashMap<TARG_ID, ASP_ARGS>> = serde_json::from_str(&appraisal_args_contents)?;
+            eprintln!("\nDecoded Appraisal ASP_ARGS as:");
+            eprintln!("{:?}", app_asp_args);
+
+            let app_term: Term = asp(APPR);  
+            let app_evidence: Evidence = resp.PAYLOAD.clone(); //extend_w_appraisal_args(app_asp_args, resp.PAYLOAD.clone());
+            let app_req : ProtocolRunRequest = 
+                ProtocolRunRequest {
+                TYPE: "REQUEST".to_string(), 
+                ACTION: "RUN".to_string(), 
+                REQ_PLC: "TOP_PLC".to_string(), 
+                TO_PLC: "P0".to_string(),
+                TERM: app_term,
+                EVIDENCE: app_evidence,
+                ATTESTATION_SESSION: my_att_session.clone()};
+
+            let app_req_str = serde_json::to_string(&app_req)?;
+
+            let app_resp_str = am_sendRec_string_all(app_server, "".to_string(), app_req_str)?;
+            eprintln!("Got a TCP Response String: \n");
+            eprintln!("{resp_str}\n");
+
+            let app_resp : ProtocolRunResponse = serde_json::from_str(&app_resp_str)?;
+            println!("Decoded ProtocolRunResponse: \n");
+            println!("{:?}\n", app_resp);
+
+            app_resp
+
+            }
+    | _ => {resp}
+    };
+
+    if args.m_appraisal_summary {
+
     let appsumm_req : AppraisalSummaryRequest = 
         AppraisalSummaryRequest {
             TYPE: "REQUEST".to_string(), 
             ACTION: "APPSUMM".to_string(), 
             ATTESTATION_SESSION: my_att_session.clone(),
-            EVIDENCE: resp.PAYLOAD
+            EVIDENCE: a_resp.PAYLOAD
         };
 
     let appsumm_req_str: String = serde_json::to_string(&appsumm_req)?;
@@ -154,6 +302,8 @@ fn main() -> std::io::Result<()> {
     eprintln!("{:?}\n", appsumm_resp);
 
     print_appsumm(appsumm_resp.PAYLOAD, appsumm_resp.SUCCESS);
+
+    }
 
      Ok (())
 

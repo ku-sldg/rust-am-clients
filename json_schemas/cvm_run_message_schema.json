@@ -1,0 +1,101 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "CvmRunRequest + CvmRunResponse",
+    "description": "MAESTRO CVM Request/Response structures",
+    "type": "object", 
+    "properties": {
+        "TYPE": 
+            {
+                "description": "String representing the type of message (REQUEST | RESPONSE)",
+                "enum": ["REQUEST", "RESPONSE"]
+            },
+        "ACTION":
+            {
+                "description": "String indicating the type of cvm action (i.e. 'RUN' for protocol execution)",
+                "type": "string"
+            }
+        },
+        "required": ["TYPE", "ACTION"],
+
+        "allOf": [
+
+        {
+        "if": {
+            "properties": {
+                "TYPE": { "const": "REQUEST" } 
+            }
+        },
+        "then": {
+            "properties": {
+                "REQ_PLC":
+                    {
+                        "description": "String indicating the requesting Place",
+                        "type": "string"
+                    },
+                "TO_PLC":
+                    {
+                        "description": "String indicating the destination Place",
+                        "type": "string"
+                    },
+                "TERM":
+                    { "$ref": "copland_term_schema.json#" },
+
+                "EVIDENCE":
+                    {"type": "array", 
+                              "prefixItems": [ { "type":"object" }, { "$ref": "copland_evidence_schema.json#" } ], 
+                              "minItems": 2
+                    },
+
+                "ATTESTATION_SESSION":
+                    {
+                        "description": "Attestation Session structure",
+                        "type": "object", 
+                        "properties": {
+                            "Session_Plc": { "type":"string"}, 
+                            "Plc_Mapping": { "type": "object",
+                                             "additionalProperties": { "type":"string" } }, 
+                            "PubKey_Mapping" : { "type": "object",
+                                                 "additionalProperties": { "type":"string" } }, 
+                            "Session_Context" : { "type": "object", 
+                                                  "properties": {
+                                                    "ASP_Types": {"type":"object",
+                                                                  "additionalProperties":   { "$ref": "copland_term_schema.json#/$defs/aspType" }
+                                                                },
+                                                    "ASP_Comps": {"type":"object",
+                                                                  "additionalProperties":   { "type": "string" }
+                                                                }
+                                                  }, 
+                                                  "required": ["ASP_Types", "ASP_Comps"]
+                                                }
+                            
+                        }, 
+                        "required": ["Session_Context"]
+                    }
+            },
+            "required": ["TERM", "EVIDENCE", "ATTESTATION_SESSION"]
+        }
+        },
+        {
+        "if":
+        {
+            "properties": {
+                "TYPE": { "const": "RESPONSE" } 
+            }
+        },
+        "then":
+        {
+            "properties": {
+                "SUCCESS": { "type": "boolean" }, 
+                "PAYLOAD": { "type": "array", 
+                              "prefixItems": [ { "type":"object" }, { "$ref": "copland_evidence_schema.json#" } ], 
+                              "minItems": 2
+                    }
+            }, 
+            "required": [ "SUCCESS", "PAYLOAD" ]
+        }
+        }
+
+    ]
+
+}
+

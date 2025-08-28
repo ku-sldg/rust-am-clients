@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "RodeoClientRequest",
+    "description": "Rodeo Client Request structure",
+    "type": "object", 
+    "properties": {
+        "RodeoClientRequest_attest_id": 
+            {
+                "description": "Abstract identifier for a pre-configured attestaiton protocol/scenario",
+                "type": "string"
+            },
+        "RodeoClientRequest_attest_args":
+            {
+                "description": "Arguments for a given attest_id",
+                "type": "object"
+            }
+    },
+    "required": ["RodeoClientRequest_attest_id"]
+  }

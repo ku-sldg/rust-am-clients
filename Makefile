@@ -1,11 +1,14 @@
 BIN := target
 
+ifdef AM_REPOS_ROOT
+CVM_EXE_PATH := $(AM_REPOS_ROOT)/cvm/_build/install/default/bin/cvm
+else
+$(error "ERROR:  AM_REPOS_ROOT environment variable not set!")
+endif
+
 # Variables used in make targets to configure various clients
-PROTOCOLS_DIR=testing/protocols/
-GLOBS_DIR=testing/globals/
-SESSIONS_DIR=testing/attestation_sessions/
-RODEO_REQUESTS_DIR=testing/rodeo_requests/
-RODEO_ENVS_DIR=testing/rodeo_envs/
+RODEO_REQUESTS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/rodeo_requests/
+RODEO_ENVS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/rodeo_envs/
 
 default:
 	cargo build --release --workspace
@@ -20,62 +23,26 @@ test:
 	make default
 	cargo test --workspace
 
-am_client_help:
-	cargo run --release --bin rust-am-client -- --help
-
-am_client:
-	cargo run --release --bin rust-am-client
-
-am_client_cert:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert.json
-
-am_client_cert_fixed:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert.json -c 127.0.0.1:5042
-
-am_client_cert_appr:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr.json -e $(GLOBS_DIR)glob_type_env_cert_appr.json -g $(GLOBS_DIR)glob_comps_cert_appr.json
-
-am_client_cert_appr_fixed:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cert_appr.json -e $(GLOBS_DIR)glob_type_env_cert_appr.json -g $(GLOBS_DIR)glob_comps_cert_appr.json -c 127.0.0.1:5043
-
-am_client_micro:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro.json -e $(GLOBS_DIR)glob_type_env_micro.json -g $(GLOBS_DIR)glob_comps_micro.json
-
-am_client_micro_session:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_micro.json -a $(SESSIONS_DIR)session_micro.json
-
-am_client_cds_dynamic:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cds_tpm.json 2>/dev/null
-
-am_client_cds_static:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cds_tpm_static.json 2>/dev/null
-
-am_client_cds_bad_key:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_cds_badkey.json -a $(SESSIONS_DIR)session_cds_tpm_bad_sig.json 2>/dev/null
-
-am_client_run_theorem_test:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_run_coq_all_appr.json -a $(SESSIONS_DIR)session_run_theorem_test.json
-
-am_client_run_theorem_test_provision:
-	cargo run --release --bin rust-am-client -- -t $(PROTOCOLS_DIR)protocol_run_coq_all_appr_provision.json -a $(SESSIONS_DIR)session_run_theorem_test.json
-
 rodeo_client_help:
 	cargo run --release --bin rust-rodeo-client -- --help
 
-rodeo_client_cert_appr:
-	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_cert_appr.json -e $(RODEO_ENVS_DIR)env_rodeo_cert_appr.json
+rodeo_client_test:
+	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)/abstract_requests/req_rodeo_attest_abstract.json -e $(RODEO_ENVS_DIR)env_rodeo_attest.json
 
-rodeo_client_cert_appr_fixed:
-	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_cert_appr.json -e $(RODEO_ENVS_DIR)env_rodeo_cert_appr.json -c 127.0.0.1:5044
+rodeo_client_hamr:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json 2> /dev/null
 
-rodeo_client_micro:
-	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_micro.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json
+rodeo_client_hamr_verbose:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json
 
-rodeo_client_micro_fixed:
-	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_micro.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json -c 127.0.0.1:5045
+rodeo_client_theorem_verbose:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_theorem_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_theorem.json
 
-rodeo_client_run_theorem_test:
-	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)req_rodeo_run_theorem_test.json -e $(RODEO_ENVS_DIR)env_rodeo_run_theorem_test.json
+rodeo_client_theorem_provision_verbose:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_theorem_provision_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_theorem_provision.json
+
+rodeo_client_hamr_provision_verbose:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_provision_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro_provision.json
 
 clean:
 	rm -rf $(BIN)

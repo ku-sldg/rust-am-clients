@@ -17,7 +17,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "large_output": {
@@ -25,7 +25,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "attest": {
@@ -33,7 +33,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "appraise": {
@@ -41,7 +41,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "certificate": {
@@ -49,7 +49,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "hashevidence": {
@@ -57,7 +57,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "hashfile": {
@@ -65,7 +65,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "hashfile_appr": {
@@ -73,7 +73,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "hashdir": {
@@ -81,7 +81,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "invary_get_measurement": {
@@ -89,7 +89,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "invary_get_measurement_appr": {
@@ -97,7 +97,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "provision": {
@@ -105,7 +105,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "0"
+              "EvOutSig_BODY": 0
             }
           },
           "readfile": {
@@ -113,7 +113,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "readfile_appr": {
@@ -121,15 +121,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
-            }
-          },
-          "goldenevidence_appr": {
-            "FWD": "REPLACE",
-            "EvInSig": "ALL",
-            "EvOutSig": {
-            "EvOutSig_CONSTRUCTOR": "OutN",
-            "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "selinux_pol_dump": {
@@ -137,7 +129,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "sig": {
@@ -145,7 +137,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "sig_appr": {
@@ -153,7 +145,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "sig_tpm": {
@@ -161,7 +153,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "sig_tpm_appr": {
@@ -169,7 +161,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           },
           "uptime": {
@@ -177,7 +169,7 @@
             "EvInSig": "ALL",
             "EvOutSig": {
               "EvOutSig_CONSTRUCTOR": "OutN",
-              "EvOutSig_BODY": "1"
+              "EvOutSig_BODY": 1
             }
           }
         },
@@ -185,9 +177,9 @@
           "attest": "magic_appr",
           "certificate": "magic_appr",
           "appraise": "magic_appr",
-          "hashevidence": "goldenevidence_appr",
+          "hashevidence": "hashfile_appr",
           "hashfile": "hashfile_appr",
-          "hashdir": "goldenevidence_appr",
+          "hashdir": "hashfile_appr",
           "invary_get_measurement": "invary_get_measurement_appr",
           "provision": "NULL",
           "readfile": "readfile_appr",

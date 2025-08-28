@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "RodeoClientResponse",
+    "description": "Rodeo Client Response structure",
+    "type": "object", 
+    "properties": {
+        "RodeoClientResponse_success": 
+            {
+                "description": "Boolean flag indicating overall attestation and/or appraisal success",
+                "type": "boolean"
+            },
+        "RodeoClientResponse_error":
+            {
+                "description": "String indicating errors that occured during attestation",
+                "type": "string"
+            },
+        "RodeoClientResponse_cvm_request":  { "$ref": "cvm_run_message_schema.json#" },
+        "RodeoClientResponse_cvm_response": { "$ref": "cvm_run_message_schema.json#" }
+    },
+    "required": ["RodeoClientResponse_success", "RodeoClientResponse_cvm_request"]
+  }
