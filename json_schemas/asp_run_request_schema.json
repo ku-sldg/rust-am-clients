@@ -1,0 +1,77 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "AspRunRequest + AspRunResponse",
+    "description": "MAESTRO ASP Request/Response structures",
+    "type": "object", 
+    "properties": {
+        "TYPE": 
+            {
+                "description": "String representing the type of message (REQUEST | RESPONSE)",
+                "enum": ["REQUEST", "RESPONSE"]
+            },
+        "ACTION":
+            {
+                "description": "String indicating the type of cvm action (i.e. 'RUN' for protocol execution)",
+                "type": "string"
+            }
+        },
+        "required": ["TYPE", "ACTION"],
+
+        "allOf": [
+
+        {
+        "if": {
+            "properties": {
+                "TYPE": { "const": "REQUEST" } 
+            }
+        },
+        "then": {
+            "properties": {
+                "ASP_ID":
+                    {
+                        "description": "String indicating the ASP Identifier",
+                        "type": "string"
+                    },
+                "ASP_ARGS": 
+                {
+                    "description":  "JSON object with fields specific to the ASP implementation",
+                    "type": "object"
+
+                },
+                "ASP_PLC":
+                    {
+                        "description": "String indicating the ASP Place",
+                        "type": "string"
+                    },
+                "ASP_TARG_ID":
+                    {
+                        "description": "String indicating the ASP Target Identifier",
+                        "type": "string"
+                    },
+                "RAWEV":
+                    { "$ref": "copland_evidence_schema.json#/$defs/rawEvType" }
+            },
+            "required": ["ASP_ID", "ASP_ARGS", "ASP_PLC", "ASP_TARG_ID", "RAWEV"]
+        }
+        },
+        {
+        "if":
+        {
+            "properties": {
+                "TYPE": { "const": "RESPONSE" } 
+            }
+        },
+        "then":
+        {
+            "properties": {
+                "SUCCESS": { "type": "boolean" }, 
+                "PAYLOAD": { "$ref": "copland_evidence_schema.json#/$defs/rawEvType" }
+            }, 
+            "required": [ "SUCCESS", "PAYLOAD" ]
+        }
+        }
+
+    ]
+
+}
+

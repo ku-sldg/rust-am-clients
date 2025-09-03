@@ -42,7 +42,7 @@
 
                 "EVIDENCE":
                     {"type": "array", 
-                              "prefixItems": [ { "type":"object" }, { "$ref": "copland_evidence_schema.json#" } ], 
+                              "prefixItems": [ { "$ref": "copland_evidence_schema.json#/$defs/rawEvType" }, { "$ref": "copland_evidence_schema.json#" } ], 
                               "minItems": 2
                     },
 

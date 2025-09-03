@@ -13,6 +13,18 @@
 
     "$defs": {
 
+        "rawEvType": {
+            "type": "object",
+            "properties": {
+                "RawEv": {"type": "array", 
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+            },
+            "required": ["RawEv"]
+        }, 
+
         "mt_evt_Term": {
             "type": "object",
             "properties": {

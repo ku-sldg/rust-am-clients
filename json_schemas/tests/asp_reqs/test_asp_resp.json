@@ -1,0 +1,8 @@
+{
+  "TYPE": "RESPONSE",
+  "ACTION": "ASP_RUN",
+  "SUCCESS": true,
+  "PAYLOAD": {
+    "RawEv": ["ASDF"]
+  }
+}
