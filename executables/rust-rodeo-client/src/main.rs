@@ -308,7 +308,32 @@ fn main() -> std::io::Result<()> {
 
     let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone())?;
 
-    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, vreq.clone())?;
+    // Check for "provisinoing mode"
+    let maybe_provisioning_flag = args.provisioned_evidence_filepath;
+
+    let new_vreq = 
+        match maybe_provisioning_flag {
+            None => {vreq.clone()}
+            Some(prov_filepath) => {
+
+                let new_term: Term = 
+                    rust_am_lib::copland::append_provisioning_term(&prov_filepath, 
+                                                                    &vreq.REQ_PLC, 
+                                                              &vreq.EVIDENCE.1, 
+                                                             &vreq.TERM, 
+                                                                    vreq.TERM.clone());
+                let term_string = serde_json::to_string(&new_term)?;
+                print!("\n\nProvisioning Term: {}\n\n", term_string);
+
+                ProtocolRunRequest {
+                    TERM: new_term,
+                    ..vreq.clone()
+                }
+            }
+
+        };
+
+    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, new_vreq)?;
 
     let resp_rawev = resp.PAYLOAD.clone().0;
 

@@ -1,45 +1,34 @@
 {
     "micro_protocol": {
         "RodeoClientEnv_term": {
-            "TERM_CONSTRUCTOR": "lseq",
+            "TERM_CONSTRUCTOR": "bseq",
             "TERM_BODY": [
                 {
-                    "TERM_CONSTRUCTOR": "bseq",
-                    "TERM_BODY": [
-                        {
-                            "split1": "ALL",
-                            "split2": "ALL"
-                        },
-                        {
-                            "TERM_CONSTRUCTOR": "asp",
-                            "TERM_BODY": {
-                                "ASP_CONSTRUCTOR": "ASPC",
-                                "ASP_BODY": {
-                                    "ASP_ID": "hashdir",
-                                    "ASP_ARGS": {},
-                                    "ASP_PLC": "micro_demo_Plc",
-                                    "ASP_TARG_ID": "aadl_dir_targ"
-                                }
-                            }
-                        },
-                        {
-                            "TERM_CONSTRUCTOR": "asp",
-                            "TERM_BODY": {
-                                "ASP_CONSTRUCTOR": "ASPC",
-                                "ASP_BODY": {
-                                    "ASP_ID": "hashdir",
-                                    "ASP_ARGS": {},
-                                    "ASP_PLC": "micro_demo_Plc",
-                                    "ASP_TARG_ID": "microkit_dir_targ"
-                                }
-                            }
-                        }
-                    ]
+                    "split1": "ALL",
+                    "split2": "ALL"
                 },
                 {
                     "TERM_CONSTRUCTOR": "asp",
                     "TERM_BODY": {
-                        "ASP_CONSTRUCTOR": "APPR"
+                        "ASP_CONSTRUCTOR": "ASPC",
+                        "ASP_BODY": {
+                            "ASP_ID": "hashdir",
+                            "ASP_ARGS": {},
+                            "ASP_PLC": "micro_demo_Plc",
+                            "ASP_TARG_ID": "aadl_dir_targ"
+                        }
+                    }
+                },
+                {
+                    "TERM_CONSTRUCTOR": "asp",
+                    "TERM_BODY": {
+                        "ASP_CONSTRUCTOR": "ASPC",
+                        "ASP_BODY": {
+                            "ASP_ID": "hashdir",
+                            "ASP_ARGS": {},
+                            "ASP_PLC": "micro_demo_Plc",
+                            "ASP_TARG_ID": "microkit_dir_targ"
+                        }
                     }
                 }
             ]

@@ -2,6 +2,7 @@ BIN := target
 
 ifdef AM_REPOS_ROOT
 CVM_EXE_PATH := $(AM_REPOS_ROOT)/cvm/_build/install/default/bin/cvm
+GOLDEN_EVIDENCE_DIR := $(AM_REPOS_ROOT)/rust-am-clients/goldenFiles/
 else
 $(error "ERROR:  AM_REPOS_ROOT environment variable not set!")
 endif
@@ -34,6 +35,9 @@ rodeo_client_hamr:
 
 rodeo_client_hamr_verbose:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json
+
+rodeo_client_hamr_auto_provision:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro_auto_provision.json -p $(GOLDEN_EVIDENCE_DIR)micro_evidence_golden.json
 
 rodeo_client_theorem_verbose:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_theorem_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_theorem.json

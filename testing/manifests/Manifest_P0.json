@@ -1,1 +1,1 @@
-{"ASPS":["hashdir","hashfile_appr","attest","magic_appr","provision", "run_command", "run_command_verus_appr"],"ASP_FS_MAP":{},"POLICY":[]}
+{"ASPS":["hashdir","hashfile_appr","attest","magic_appr","provision", "run_command", "run_command_verus_appr", "provision_goldenevidence"],"ASP_FS_MAP":{},"POLICY":[]}

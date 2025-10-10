@@ -148,7 +148,11 @@ pub struct RodeoClientArgs {
     
     /// Path pointing to (JSON) RodeoEnvironmentMap file
     #[arg(short, long)]
-    pub env_filepath: String
+    pub env_filepath: String,
+
+    /// Path for provisioned evidence (optional)
+     #[arg(short, long)]
+     pub provisioned_evidence_filepath: Option<String>,
 
 }
 
