@@ -130,6 +130,7 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
 
     let my_term_orig = my_env.RodeoClientEnv_term.clone();
     let my_term = term_swap_args (my_term_orig, asp_args_map_in, false);
+    let my_term_final: Term = rust_am_lib::copland::add_provisioning_args(my_term);
     let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
 
     let my_evidence : Evidence = init_evidence;
@@ -140,7 +141,7 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
         ACTION: "RUN".to_string(), 
         REQ_PLC: top_plc,
         TO_PLC: to_plc,
-        TERM: my_term,
+        TERM: my_term_final,
         EVIDENCE: my_evidence,
         ATTESTATION_SESSION: my_session};
 
@@ -321,6 +322,7 @@ fn main() -> std::io::Result<()> {
                                                                     &vreq.REQ_PLC, 
                                                               &vreq.EVIDENCE.1, 
                                                              &vreq.TERM, 
+                                                              &vreq.ATTESTATION_SESSION.Session_Context,
                                                                     vreq.TERM.clone());
                 let term_string = serde_json::to_string(&new_term)?;
                 print!("\n\nProvisioning Term: {}\n\n", term_string);
