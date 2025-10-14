@@ -118,7 +118,10 @@ fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::
     }
 }
 
-fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evidence, env:RodeoEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
+fn add_appr(t:Term) -> Term {
+    Term::lseq(Box::new(t), Box::new(Term::asp(ASP::APPR)))
+}
+fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evidence, env:RodeoEnvironmentMap, appr_bool:bool) -> std::io::Result<ProtocolRunRequest> {
 
     let top_plc: Plc = myPlc;
     let to_plc: Plc = "P0".to_string();
@@ -129,7 +132,9 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
     let my_env= env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
     let my_term_orig = my_env.RodeoClientEnv_term.clone();
-    let my_term = term_swap_args (my_term_orig, asp_args_map_in, false);
+    let my_term_orig_appr: Term = if appr_bool {add_appr(my_term_orig)}
+                                  else {my_term_orig};
+    let my_term = term_swap_args (my_term_orig_appr, asp_args_map_in, false);
     let my_term_final: Term = rust_am_lib::copland::add_provisioning_args(my_term);
     let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
 
@@ -307,7 +312,9 @@ fn main() -> std::io::Result<()> {
     let myPlc: Plc = "TOP_PLC".to_string();
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
-    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone())?;
+    let appr_bool = args.appraisal;
+
+    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone(), appr_bool)?;
 
     // Check for "provisinoing mode"
     let maybe_provisioning_flag = args.provisioned_evidence_filepath;

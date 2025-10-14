@@ -154,6 +154,10 @@ pub struct RodeoClientArgs {
      #[arg(short, long)]
      pub provisioned_evidence_filepath: Option<String>,
 
+    /// Boolean to indicate Appraisal Summary
+    #[arg(short, long, default_value_t = false)]
+    pub appraisal: bool
+
 }
 
 pub fn get_rodeo_client_args () -> std::io::Result<RodeoClientArgs> {

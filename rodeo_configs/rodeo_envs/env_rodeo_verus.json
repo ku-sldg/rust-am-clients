@@ -1,16 +1,37 @@
 {
     "verus_protocol": {
         "RodeoClientEnv_term": {
-            "TERM_CONSTRUCTOR": "asp",
-            "TERM_BODY": {
-                "ASP_CONSTRUCTOR": "ASPC",
-                "ASP_BODY": {
-                    "ASP_ID": "run_command",
-                    "ASP_ARGS": {},
-                    "ASP_PLC": "p1",
-                    "ASP_TARG_ID": "run_verus_targ"
+            "TERM_CONSTRUCTOR": "bseq",
+            "TERM_BODY": [
+                {
+                    "split1": "ALL",
+                    "split2": "ALL"
+                },
+                {
+                    "TERM_CONSTRUCTOR": "asp",
+                    "TERM_BODY": {
+                        "ASP_CONSTRUCTOR": "ASPC",
+                        "ASP_BODY": {
+                            "ASP_ID": "hashfile",
+                            "ASP_ARGS": {},
+                            "ASP_PLC": "p1",
+                            "ASP_TARG_ID": "verus_exe_targ"
+                        }
+                    }
+                },
+                {
+                    "TERM_CONSTRUCTOR": "asp",
+                    "TERM_BODY": {
+                        "ASP_CONSTRUCTOR": "ASPC",
+                        "ASP_BODY": {
+                            "ASP_ID": "run_command",
+                            "ASP_ARGS": {},
+                            "ASP_PLC": "p1",
+                            "ASP_TARG_ID": "run_verus_targ"
+                        }
+                    }
                 }
-            }
+            ]
         },
         "RodeoClientEnv_session": {
             "Session_Plc": "P0",
@@ -90,6 +111,14 @@
                             "EvOutSig_BODY": 1
                         }
                     },
+                    "goldenevidence_appr": {
+                        "FWD": "REPLACE",
+                        "EvInSig": "ALL",
+                        "EvOutSig": {
+                            "EvOutSig_CONSTRUCTOR": "OutN",
+                            "EvOutSig_BODY": 1
+                        }
+                    },
                     "hashdir": {
                         "FWD": "EXTEND",
                         "EvInSig": "ALL",
@@ -123,6 +152,14 @@
                         }
                     },
                     "provision": {
+                        "FWD": "EXTEND",
+                        "EvInSig": "ALL",
+                        "EvOutSig": {
+                            "EvOutSig_CONSTRUCTOR": "OutN",
+                            "EvOutSig_BODY": 0
+                        }
+                    },
+                    "provision_goldenevidence": {
                         "FWD": "EXTEND",
                         "EvInSig": "ALL",
                         "EvOutSig": {
@@ -208,16 +245,17 @@
                     "certificate": "magic_appr",
                     "appraise": "magic_appr",
                     "hashevidence": "hashfile_appr",
-                    "hashfile": "hashfile_appr",
-                    "hashdir": "hashfile_appr",
+                    "hashfile": "goldenevidence_appr",
+                    "hashdir": "goldenevidence_appr",
                     "invary_get_measurement": "invary_get_measurement_appr",
                     "provision": "NULL",
+                    "provision_goldenevidence": "magic_appr",
                     "readfile": "readfile_appr",
                     "selinux_pol_dump": "hashfile_appr",
                     "sig": "sig_appr",
                     "sig_tpm": "sig_tpm_appr",
                     "uptime": "NULL",
-                    "run_command": "hashfile_appr"
+                    "run_command": "run_command_verus_appr"
                 }
             }
         }

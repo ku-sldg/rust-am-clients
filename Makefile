@@ -48,8 +48,11 @@ rodeo_client_theorem_provision_verbose:
 rodeo_client_hamr_provision_verbose:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_provision_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro_provision.json
 
+rodeo_client_verus_auto_provision:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_verus_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_verus.json -p $(GOLDEN_EVIDENCE_DIR)verus_evidence_golden.json
+
 rodeo_client_verus_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_verus_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_verus_appr.json
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_verus_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_verus.json -a
 
 clean:
 	rm -rf $(BIN)
