@@ -11,6 +11,7 @@ use lib::clientArgs::*;
 use std::fs;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 
 use std::process::{Command};
 
@@ -260,33 +261,50 @@ fn appsumm_rawev (rev:RawEv) -> bool {
     result
 }
 
+fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
+
+     let err_string = format!("Couldn't read {type_string} JSON file");
+     let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
+                                eprintln!("\n{type_string} contents:\n{term_contents}");
+                                let term : T = serde_json::from_str(&term_contents)?;
+                                eprintln!("\nDecoded Term as:");
+                                eprintln!("{:?}", term);
+                                Ok(term)
+}
+
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
 
     let (my_term, my_session, my_asp_args)
             :(Term, Attestation_Session, HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>) 
                 = match (args.term_filepath, args.session_filepath, args.g_asp_args_filepath) {
                             (Some(term_fp), Some(session_fp), Some(args_fp)) => {
+
+                                let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
+
+                                /*
                                 let term_contents = fs::read_to_string(term_fp).expect("Couldn't read Term JSON file");
                                 eprintln!("\nTerm contents:\n{term_contents}");
-
                                 let term : Term = serde_json::from_str(&term_contents)?;
                                 eprintln!("\nDecoded Term as:");
                                 eprintln!("{:?}", term);
+                                */
 
+                                /*
                                 let session_contents = fs::read_to_string(session_fp).expect("Couldn't read Attestation Session file");
                                 eprintln!("\nTerm contents:\n{session_contents}");
-
                                 let session : Attestation_Session = serde_json::from_str(&session_contents)?;
                                 eprintln!("\nDecoded Attestation_Session as:");
                                 eprintln!("{:?}", session);
 
                                 let asp_args_map_contents = fs::read_to_string(args_fp).expect("Couldn't read ASP ARGS MAP file");
                                 eprintln!("\nASP ARGS MAP contents:\n{asp_args_map_contents}");
-
                                 let asp_args_map : HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = serde_json::from_str(&asp_args_map_contents)?;
                                 eprintln!("\nDecoded ASP ARGS MAP as:");
                                 eprintln!("{:?}", asp_args_map);
+                                */
 
+                                let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
+                                let asp_args_map = decode_from_file_and_print(args_fp, "ASP ARGS MAP".to_string())?;
                                 (term, session, asp_args_map)
                             }
                             _ => {
@@ -298,22 +316,25 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                         eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
                                         eprintln!("\nres_env_filepath arg: {}", res_env_filepath);
 
+                                        /*
                                         let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
                                         eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");
-
                                         let res_req : RodeoClientRequest = serde_json::from_str(&res_req_contents)?;
                                         eprintln!("\nDecoded RodeoClientRequest as:");
                                         eprintln!("{:?}", res_req);
 
                                         let res_env_contents = fs::read_to_string(res_env_filepath).expect("Couldn't read res_env JSON file");
-
                                         eprintln!{"\n\nAttempting to decode RodeoEnvironmentMap...\n\n"};
                                         let my_res_env: RodeoEnvironmentMap = serde_json::from_str(&res_env_contents)?;
                                         eprintln!("\nDecoded res_env as:");
                                         eprintln!("{:?}", my_res_env);
+                                        */
+
+                                        let res_req: RodeoClientRequest = decode_from_file_and_print(res_req_filepath, "RodeoClientRequest".to_string())?;
+                                        let my_res_env: RodeoEnvironmentMap = decode_from_file_and_print(res_env_filepath, "RodeoEnvironmentMap".to_string())?;
 
                                         let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
-                                        let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+                                        let my_env = my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
                                         let my_term_orig = my_env.RodeoClientEnv_term.clone();
 
                                         let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
