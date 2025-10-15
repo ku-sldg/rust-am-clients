@@ -121,24 +121,45 @@ fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::
 fn add_appr(t:Term) -> Term {
     Term::lseq(Box::new(t), Box::new(Term::asp(ASP::APPR)))
 }
-fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evidence, env:RodeoEnvironmentMap, appr_bool:bool) -> std::io::Result<ProtocolRunRequest> {
 
-    let top_plc: Plc = myPlc;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RodeoSessionConfig {
+    pub RodeoSessionConfig_term: Term,
+    pub RodeoSessionConfig_plc: Plc,
+    pub RodeoSessionConfig_evidence: Evidence,
+    pub RodeoSessionConfig_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>,
+    pub RodeoSessionConfig_session: Attestation_Session,
+    pub RodeoSessionConfig_appr_flag: bool
+}
+
+fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<ProtocolRunRequest> {
+
+    let RodeoSessionConfig {RodeoSessionConfig_term: my_term_orig, 
+                            RodeoSessionConfig_evidence: my_evidence,
+                            RodeoSessionConfig_appr_flag: appr_bool,
+                            RodeoSessionConfig_attest_args: asp_args_map_in,
+                            RodeoSessionConfig_plc: top_plc,
+                            RodeoSessionConfig_session: my_session} = rodeo_config;
+
+
+
+    //let top_plc: Plc = rodeo_config.RodeoSessionConfig_plc;
     let to_plc: Plc = "P0".to_string();
     
-    let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
-    let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
+    //let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
+    //let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = rodeo_config.RodeoSessionConfig_attest_args; //res_req.RodeoClientRequest_attest_args;
 
-    let my_env= env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+    //let my_env= env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
-    let my_term_orig = my_env.RodeoClientEnv_term.clone();
+    //let my_term_orig = rodeo_config.RodeoSessionConfig_term; //my_env.RodeoClientEnv_term.clone();
     let my_term_orig_appr: Term = if appr_bool {add_appr(my_term_orig)}
                                   else {my_term_orig};
     let my_term = term_swap_args (my_term_orig_appr, asp_args_map_in, false);
     let my_term_final: Term = rust_am_lib::copland::add_provisioning_args(my_term);
-    let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
+    //let my_session: Attestation_Session = rodeo_config.RodeoSessionConfig_session; //my_env.RodeoClientEnv_session.clone();
 
-    let my_evidence : Evidence = init_evidence;
+    //let my_evidence : Evidence = //init_evidence;
 
     let vreq : ProtocolRunRequest = 
     ProtocolRunRequest {
@@ -281,10 +302,127 @@ fn appsumm_rawev (rev:RawEv) -> bool {
     result
 }
 
+pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
+
+    let (my_term, my_session, my_asp_args)
+            :(Term, Attestation_Session, HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>) 
+                = match (args.term_filepath, args.session_filepath, args.g_asp_args_filepath) {
+                            (Some(term_fp), Some(session_fp), Some(args_fp)) => {
+                                let term_contents = fs::read_to_string(term_fp).expect("Couldn't read Term JSON file");
+                                eprintln!("\nTerm contents:\n{term_contents}");
+
+                                let term : Term = serde_json::from_str(&term_contents)?;
+                                eprintln!("\nDecoded Term as:");
+                                eprintln!("{:?}", term);
+
+                                let session_contents = fs::read_to_string(session_fp).expect("Couldn't read Attestation Session file");
+                                eprintln!("\nTerm contents:\n{session_contents}");
+
+                                let session : Attestation_Session = serde_json::from_str(&session_contents)?;
+                                eprintln!("\nDecoded Attestation_Session as:");
+                                eprintln!("{:?}", session);
+
+                                let asp_args_map_contents = fs::read_to_string(args_fp).expect("Couldn't read ASP ARGS MAP file");
+                                eprintln!("\nASP ARGS MAP contents:\n{asp_args_map_contents}");
+
+                                let asp_args_map : HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = serde_json::from_str(&asp_args_map_contents)?;
+                                eprintln!("\nDecoded ASP ARGS MAP as:");
+                                eprintln!("{:?}", asp_args_map);
+
+                                (term, session, asp_args_map)
+                            }
+                            _ => {
+
+                                match (args.req_filepath, args.env_filepath) {
+
+                                    (Some(res_req_filepath), Some(res_env_filepath)) => {
+
+                                        //let res_req_filepath : String = args.req_filepath;
+                                        eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
+
+                                        //let res_env_filepath : String = args.env_filepath;
+                                        eprintln!("res_env_filepath arg: {}", res_env_filepath);
+
+                                        let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
+                                        eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");
+
+                                        let res_req : RodeoClientRequest = serde_json::from_str(&res_req_contents)?;
+                                        eprintln!("\nDecoded RodeoClientRequest as:");
+                                        eprintln!("{:?}", res_req); // :? notation since formatter uses #[derive(..., Debug)] trait
+
+                                        let res_env_contents = fs::read_to_string(res_env_filepath).expect("Couldn't read res_env JSON file");
+
+                                        eprintln!{"\n\nAttempting to decode RodeoEnvironmentMap...\n\n"};
+                                        let my_res_env: RodeoEnvironmentMap = serde_json::from_str(&res_env_contents)?;
+                                        eprintln!("\nDecoded res_env as:");
+                                        eprintln!("{:?}", my_res_env);
+
+                                        let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
+                                        //let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = rodeo_config.RodeoSessionConfig_attest_args; //res_req.RodeoClientRequest_attest_args;
+
+                                        let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+
+                                        let my_term_orig = my_env.RodeoClientEnv_term.clone();
+
+                                        let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
+                                        let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
+
+                                        (my_term_orig, my_session, asp_args_map_in)
+                                    }
+                                    _ => {panic!("Invalid arguments to RodeoClient:  Must provide either a Term or both of (RodeoClientRequest, RodeoClientEnvironment) args!")}
+                            }
+                        }
+    };
+
+
+
+    /*
+    let res_req_filepath : String = args.req_filepath;
+    eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
+
+    let res_env_filepath : String = args.env_filepath;
+    eprintln!("res_env_filepath arg: {}", res_env_filepath);
+
+    let res_cvm_filepath : String = args.cvm_filepath;
+    eprintln!("res_cvm_filepath arg: {}", res_cvm_filepath);
+
+    let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
+    eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");
+
+    let res_req : RodeoClientRequest = serde_json::from_str(&res_req_contents)?;
+    eprintln!("\nDecoded RodeoClientRequest as:");
+    eprintln!("{:?}", res_req); // :? notation since formatter uses #[derive(..., Debug)] trait
+
+    let res_env_contents = fs::read_to_string(res_env_filepath).expect("Couldn't read res_env JSON file");
+
+    eprintln!{"\n\nAttempting to decode RodeoEnvironmentMap...\n\n"};
+    let my_res_env: RodeoEnvironmentMap = serde_json::from_str(&res_env_contents)?;
+    eprintln!("\nDecoded res_env as:");
+    eprintln!("{:?}", my_res_env);
+
+    */
+
+    let myPlc: Plc = "TOP_PLC".to_string();
+    let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
+
+    let appr_bool = args.appraisal;
+
+    Ok (RodeoSessionConfig 
+        { RodeoSessionConfig_term: my_term, 
+          RodeoSessionConfig_plc: myPlc, 
+          RodeoSessionConfig_evidence: my_evidence, 
+          RodeoSessionConfig_attest_args: my_asp_args, 
+          RodeoSessionConfig_session: my_session, 
+          RodeoSessionConfig_appr_flag: appr_bool })
+
+}
+
 
 fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_client_args()?;
+
+    /*
 
     let res_req_filepath : String = args.req_filepath;
     eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
@@ -313,8 +451,11 @@ fn main() -> std::io::Result<()> {
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
 
     let appr_bool = args.appraisal;
+    */
 
-    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone(), appr_bool)?;
+    let rodeo_session_config = rodeo_client_args_to_rodeo_config(args.clone())?;
+
+    let vreq : ProtocolRunRequest = rodeo_to_am_request(rodeo_session_config.clone())?; //rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone(), appr_bool)?;
 
     // Check for "provisinoing mode"
     let maybe_provisioning_flag = args.provisioned_evidence_filepath;
@@ -342,6 +483,8 @@ fn main() -> std::io::Result<()> {
 
         };
 
+    let res_cvm_filepath : String = args.cvm_filepath;
+    eprintln!("res_cvm_filepath arg: {}", res_cvm_filepath);
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, new_vreq)?;
 
     let resp_rawev = resp.PAYLOAD.clone().0;
@@ -369,11 +512,11 @@ fn main() -> std::io::Result<()> {
 
     let a_resp : ProtocolRunResponse = res_resp.RodeoClientResponse_cvm_response;
 
-    let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
+    //let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
 
-    let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+    //let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
 
-    let my_att_session = my_env.RodeoClientEnv_session.clone();
+    let my_att_session = rodeo_session_config.RodeoSessionConfig_session; //my_env.RodeoClientEnv_session.clone();
 
     let appsumm_req : AppraisalSummaryRequest = 
     AppraisalSummaryRequest {

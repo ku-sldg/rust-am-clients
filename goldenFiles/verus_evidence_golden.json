@@ -1,1 +1,273 @@
-[[{"RawEv":["GdSRy5YbbR1GmDj0kj3JB/JiBalOvIqgBz/PzQviGvE=","ewogICJ2ZXJpZmljYXRpb24tcmVzdWx0cyI6IHsKICAgICJlbmNvdW50ZXJlZC12aXItZXJyb3IiOiBmYWxzZSwKICAgICJzdWNjZXNzIjogdHJ1ZSwKICAgICJ2ZXJpZmllZCI6IDIsCiAgICAiZXJyb3JzIjogMCwKICAgICJpcy12ZXJpZnlpbmctZW50aXJlLWNyYXRlIjogdHJ1ZQogIH0sCiAgInZlcnVzIjogewogICAgInByb2ZpbGUiOiAicmVsZWFzZSIsCiAgICAidmVyc2lvbiI6ICIwLjIwMjQuMDguMTMuMzMyNjlhYyIsCiAgICAicGxhdGZvcm0iOiB7CiAgICAgICJvcyI6ICJtYWNvcyIsCiAgICAgICJhcmNoIjogImFhcmNoNjQiCiAgICB9LAogICAgInRvb2xjaGFpbiI6ICIxLjc2LjAtYWFyY2g2NC1hcHBsZS1kYXJ3aW4iLAogICAgImNvbW1pdCI6ICIzMzI2OWFjNmEwZWEzM2EwODEwOWVlZmU1MDE2YzFmZGQwY2U5ZmJkIgogIH0KfQo="]},{"EvidenceT_CONSTRUCTOR":"split_evt","EvidenceT_BODY":[{"EvidenceT_CONSTRUCTOR":"asp_evt","EvidenceT_BODY":["TOP_PLC",{"ASP_ID":"hashfile","ASP_ARGS":{"asp_id_appr":"hashfile","env_var":"","env_var_golden":"","filepath":"/Users/adampetz/Documents/Summer_2025/verus/source/target-verus/release/verus","filepath_golden":"/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/verus_evidence_golden.json","targ_id_appr":"verus_exe_targ"},"ASP_PLC":"p1","ASP_TARG_ID":"verus_exe_targ"},{"EvidenceT_CONSTRUCTOR":"mt_evt"}]},{"EvidenceT_CONSTRUCTOR":"asp_evt","EvidenceT_BODY":["TOP_PLC",{"ASP_ID":"run_command","ASP_ARGS":{"asp_id_appr":"run_command","exe_args":["/Users/adampetz/Documents/Summer_2025/verus-proof-synthesis/benchmarks/CloverBench/verified/linear_search_verified.rs","--output-json"],"exe_path":"/Users/adampetz/Documents/Summer_2025/verus/source/target-verus/release/verus","targ_id_appr":"run_verus_targ"},"ASP_PLC":"p1","ASP_TARG_ID":"run_verus_targ"},{"EvidenceT_CONSTRUCTOR":"mt_evt"}]}]}],{"ASP_Types":{"run_command_verus_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"uptime":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"attest":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"sig":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"invary_get_measurement_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"sig_tpm":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"appraise":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"certificate":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"magic_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"provision_goldenevidence":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":0}},"readfile":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"provision":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":0}},"run_command":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"sig_tpm_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"invary_get_measurement":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"hashevidence":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"large_output":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"selinux_pol_dump":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"sig_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"hashdir":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"goldenevidence_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"hashfile_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"readfile_appr":{"FWD":"REPLACE","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}},"hashfile":{"FWD":"EXTEND","EvInSig":"ALL","EvOutSig":{"EvOutSig_CONSTRUCTOR":"OutN","EvOutSig_BODY":1}}},"ASP_Comps":{"sig":"sig_appr","appraise":"magic_appr","selinux_pol_dump":"hashfile_appr","hashevidence":"hashfile_appr","readfile":"readfile_appr","provision":"NULL","attest":"magic_appr","certificate":"magic_appr","hashdir":"goldenevidence_appr","uptime":"NULL","run_command":"run_command_verus_appr","sig_tpm":"sig_tpm_appr","invary_get_measurement":"invary_get_measurement_appr","provision_goldenevidence":"magic_appr","hashfile":"goldenevidence_appr"}}]
+[
+    [
+        {
+            "RawEv": [
+                "GdSRy5YbbR1GmDj0kj3JB/JiBalOvIqgBz/PzQviGvE=",
+                "ewogICJ2ZXJpZmljYXRpb24tcmVzdWx0cyI6IHsKICAgICJlbmNvdW50ZXJlZC12aXItZXJyb3IiOiBmYWxzZSwKICAgICJzdWNjZXNzIjogdHJ1ZSwKICAgICJ2ZXJpZmllZCI6IDIsCiAgICAiZXJyb3JzIjogMCwKICAgICJpcy12ZXJpZnlpbmctZW50aXJlLWNyYXRlIjogdHJ1ZQogIH0sCiAgInZlcnVzIjogewogICAgInByb2ZpbGUiOiAicmVsZWFzZSIsCiAgICAidmVyc2lvbiI6ICIwLjIwMjQuMDguMTMuMzMyNjlhYyIsCiAgICAicGxhdGZvcm0iOiB7CiAgICAgICJvcyI6ICJtYWNvcyIsCiAgICAgICJhcmNoIjogImFhcmNoNjQiCiAgICB9LAogICAgInRvb2xjaGFpbiI6ICIxLjc2LjAtYWFyY2g2NC1hcHBsZS1kYXJ3aW4iLAogICAgImNvbW1pdCI6ICIzMzI2OWFjNmEwZWEzM2EwODEwOWVlZmU1MDE2YzFmZGQwY2U5ZmJkIgogIH0KfQo="
+            ]
+        },
+        {
+            "EvidenceT_CONSTRUCTOR": "split_evt",
+            "EvidenceT_BODY": [
+                {
+                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                    "EvidenceT_BODY": [
+                        "TOP_PLC",
+                        {
+                            "ASP_ID": "hashfile",
+                            "ASP_ARGS": {
+                                "asp_id_appr": "hashfile",
+                                "env_var": "",
+                                "env_var_golden": "",
+                                "filepath": "/Users/adampetz/Documents/Summer_2025/verus/source/target-verus/release/verus",
+                                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/verus_evidence_golden.json",
+                                "targ_id_appr": "verus_exe_targ"
+                            },
+                            "ASP_PLC": "p1",
+                            "ASP_TARG_ID": "verus_exe_targ"
+                        },
+                        {
+                            "EvidenceT_CONSTRUCTOR": "mt_evt"
+                        }
+                    ]
+                },
+                {
+                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                    "EvidenceT_BODY": [
+                        "TOP_PLC",
+                        {
+                            "ASP_ID": "run_command",
+                            "ASP_ARGS": {
+                                "asp_id_appr": "run_command",
+                                "exe_args": [
+                                    "/Users/adampetz/Documents/Summer_2025/verus-proof-synthesis/benchmarks/CloverBench/verified/linear_search_verified.rs",
+                                    "--output-json"
+                                ],
+                                "exe_path": "/Users/adampetz/Documents/Summer_2025/verus/source/target-verus/release/verus",
+                                "targ_id_appr": "run_verus_targ"
+                            },
+                            "ASP_PLC": "p1",
+                            "ASP_TARG_ID": "run_verus_targ"
+                        },
+                        {
+                            "EvidenceT_CONSTRUCTOR": "mt_evt"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    {
+        "ASP_Types": {
+            "readfile": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "selinux_pol_dump": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig_tpm": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "goldenevidence_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "run_command": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "run_command_verus_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "large_output": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "hashfile": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "readfile_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "provision_goldenevidence": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 0
+                }
+            },
+            "hashfile_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "certificate": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "hashdir": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "hashevidence": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "magic_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig_tpm_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "appraise": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "invary_get_measurement_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "uptime": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "attest": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "invary_get_measurement": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "provision": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 0
+                }
+            }
+        },
+        "ASP_Comps": {
+            "certificate": "magic_appr",
+            "hashfile": "goldenevidence_appr",
+            "invary_get_measurement": "invary_get_measurement_appr",
+            "sig": "sig_appr",
+            "appraise": "magic_appr",
+            "selinux_pol_dump": "hashfile_appr",
+            "provision_goldenevidence": "magic_appr",
+            "readfile": "readfile_appr",
+            "uptime": "NULL",
+            "attest": "magic_appr",
+            "sig_tpm": "sig_tpm_appr",
+            "hashdir": "goldenevidence_appr",
+            "hashevidence": "hashfile_appr",
+            "run_command": "run_command_verus_appr",
+            "provision": "NULL"
+        }
+    }
+]
