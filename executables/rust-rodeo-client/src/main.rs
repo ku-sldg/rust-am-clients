@@ -281,28 +281,6 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
                                 let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
 
-                                /*
-                                let term_contents = fs::read_to_string(term_fp).expect("Couldn't read Term JSON file");
-                                eprintln!("\nTerm contents:\n{term_contents}");
-                                let term : Term = serde_json::from_str(&term_contents)?;
-                                eprintln!("\nDecoded Term as:");
-                                eprintln!("{:?}", term);
-                                */
-
-                                /*
-                                let session_contents = fs::read_to_string(session_fp).expect("Couldn't read Attestation Session file");
-                                eprintln!("\nTerm contents:\n{session_contents}");
-                                let session : Attestation_Session = serde_json::from_str(&session_contents)?;
-                                eprintln!("\nDecoded Attestation_Session as:");
-                                eprintln!("{:?}", session);
-
-                                let asp_args_map_contents = fs::read_to_string(args_fp).expect("Couldn't read ASP ARGS MAP file");
-                                eprintln!("\nASP ARGS MAP contents:\n{asp_args_map_contents}");
-                                let asp_args_map : HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = serde_json::from_str(&asp_args_map_contents)?;
-                                eprintln!("\nDecoded ASP ARGS MAP as:");
-                                eprintln!("{:?}", asp_args_map);
-                                */
-
                                 let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
                                 let asp_args_map = decode_from_file_and_print(args_fp, "ASP ARGS MAP".to_string())?;
                                 (term, session, asp_args_map)
@@ -315,20 +293,6 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
                                         eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
                                         eprintln!("\nres_env_filepath arg: {}", res_env_filepath);
-
-                                        /*
-                                        let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
-                                        eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");
-                                        let res_req : RodeoClientRequest = serde_json::from_str(&res_req_contents)?;
-                                        eprintln!("\nDecoded RodeoClientRequest as:");
-                                        eprintln!("{:?}", res_req);
-
-                                        let res_env_contents = fs::read_to_string(res_env_filepath).expect("Couldn't read res_env JSON file");
-                                        eprintln!{"\n\nAttempting to decode RodeoEnvironmentMap...\n\n"};
-                                        let my_res_env: RodeoEnvironmentMap = serde_json::from_str(&res_env_contents)?;
-                                        eprintln!("\nDecoded res_env as:");
-                                        eprintln!("{:?}", my_res_env);
-                                        */
 
                                         let res_req: RodeoClientRequest = decode_from_file_and_print(res_req_filepath, "RodeoClientRequest".to_string())?;
                                         let my_res_env: RodeoEnvironmentMap = decode_from_file_and_print(res_env_filepath, "RodeoEnvironmentMap".to_string())?;
@@ -375,7 +339,7 @@ fn main() -> std::io::Result<()> {
     let maybe_provisioning_flag = args.provisioned_evidence_filepath;
 
     let new_vreq = 
-        match maybe_provisioning_flag {
+        match maybe_provisioning_flag.clone() {
             None => {vreq.clone()}
             Some(prov_filepath) => {
 
@@ -412,15 +376,22 @@ fn main() -> std::io::Result<()> {
             RodeoClientResponse_cvm_response: resp.clone()
         };
 
-    let appsumm_req = build_appsumm_request(res_resp.clone());
 
-    let appraisal_valid = appsumm_rawev(res_resp.RodeoClientResponse_cvm_response.PAYLOAD.0);
+    match maybe_provisioning_flag {
 
-    let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
-    eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
-    eprintln!("{:?}\n", appsumm_resp);
+        None => {
+            let appsumm_req = build_appsumm_request(res_resp.clone());
 
-    eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
+            let appraisal_valid = appsumm_rawev(res_resp.RodeoClientResponse_cvm_response.PAYLOAD.0);
+
+            let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
+            eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
+            eprintln!("{:?}\n", appsumm_resp);
+
+            eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
+        }
+        Some(fp) => {eprintln!("Provisined golden evidence to file:\n\t{}\n", fp)}
+    };
 
     Ok (())
 

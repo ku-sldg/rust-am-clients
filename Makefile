@@ -8,6 +8,7 @@ $(error "ERROR:  AM_REPOS_ROOT environment variable not set!")
 endif
 
 # Variables used in make targets to configure various clients
+RODEO_CONFIGS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/
 RODEO_REQUESTS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/rodeo_requests/
 RODEO_ENVS_DIR=$(AM_REPOS_ROOT)/rust-am-clients/rodeo_configs/rodeo_envs/
 
@@ -48,11 +49,11 @@ rodeo_client_theorem_provision_verbose:
 rodeo_client_hamr_provision_verbose:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_provision_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro_provision.json
 
-rodeo_client_verus_auto_provision:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_verus_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_verus.json -p $(GOLDEN_EVIDENCE_DIR)verus_evidence_golden.json
+rodeo_client_verus:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_args_concrete.json -a
 
-rodeo_client_verus_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_verus_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_verus.json -a
+rodeo_client_verus_auto_provision:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_args_concrete.json -p $(GOLDEN_EVIDENCE_DIR)verus_evidence_golden.json
 
 clean:
 	rm -rf $(BIN)

@@ -1,0 +1,19 @@
+{
+    "run_command": {
+        "run_verus_targ": {
+            "exe_path": "/Users/adampetz/Documents/Summer_2025/verus/source/target-verus/release/verus",
+            "exe_args": [
+                "/Users/adampetz/Documents/Summer_2025/verus-proof-synthesis/benchmarks/CloverBench/verified/linear_search_verified.rs",
+                "--output-json"
+            ]
+        }
+    },
+    "hashfile": {
+        "verus_exe_targ": {
+            "env_var": "",
+            "filepath": "/Users/adampetz/Documents/Summer_2025/verus/source/target-verus/release/verus",
+            "env_var_golden": "",
+            "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/verus_evidence_golden.json"
+        }
+    }
+}
