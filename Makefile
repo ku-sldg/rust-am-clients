@@ -32,22 +32,19 @@ rodeo_client_test:
 	cargo run --release --bin rust-rodeo-client -- -r $(RODEO_REQUESTS_DIR)/abstract_requests/req_rodeo_attest_abstract.json -e $(RODEO_ENVS_DIR)env_rodeo_attest.json
 
 rodeo_client_hamr:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json 2> /dev/null
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -a 2> /dev/null
 
 rodeo_client_hamr_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro.json
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -a
 
 rodeo_client_hamr_auto_provision:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro_auto_provision.json -p $(GOLDEN_EVIDENCE_DIR)micro_evidence_golden.json
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -p $(GOLDEN_EVIDENCE_DIR)micro_evidence_golden.json
+
+rodeo_client_theorem_auto_provision:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_theorem.json -s $(RODEO_CONFIGS_DIR)sessions/session_theorem.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/theorem_args_concrete.json  -p $(GOLDEN_EVIDENCE_DIR)theorem_evidence_golden.json
 
 rodeo_client_theorem_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_theorem_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_theorem.json
-
-rodeo_client_theorem_provision_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_theorem_provision_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_theorem_provision.json
-
-rodeo_client_hamr_provision_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -r $(RODEO_REQUESTS_DIR)concrete_requests/req_rodeo_micro_provision_concrete.json -e $(RODEO_ENVS_DIR)env_rodeo_micro_provision.json
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_theorem.json -s $(RODEO_CONFIGS_DIR)sessions/session_theorem.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/theorem_args_concrete.json -a
 
 rodeo_client_verus:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_args_concrete.json -a

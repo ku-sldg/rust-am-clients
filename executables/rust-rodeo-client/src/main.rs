@@ -376,6 +376,9 @@ fn main() -> std::io::Result<()> {
             RodeoClientResponse_cvm_response: resp.clone()
         };
 
+    let rodeo_resp_string = serde_json::to_string(&res_resp)?;
+    print!("{}",rodeo_resp_string);
+
 
     match maybe_provisioning_flag {
 
@@ -390,7 +393,7 @@ fn main() -> std::io::Result<()> {
 
             eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
         }
-        Some(fp) => {eprintln!("Provisined golden evidence to file:\n\t{}\n", fp)}
+        Some(fp) => {eprintln!("\n\nProvisioned golden evidence to file:\n\t{}\n", fp)}
     };
 
     Ok (())

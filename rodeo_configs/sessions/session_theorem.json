@@ -1,176 +1,18 @@
-[
-    [
-        {
-            "RawEv": [
-                "y5ajre8vxJEzdwlavkH/tBnaOwPyJdaX2A80UmGp3IM=",
-                "4r0rm1kBOrUAAG6WwTTXFIFN7nM4Aa2rSAovnR5nGLk="
-            ]
-        },
-        {
-            "EvidenceT_CONSTRUCTOR": "split_evt",
-            "EvidenceT_BODY": [
-                {
-                    "EvidenceT_CONSTRUCTOR": "asp_evt",
-                    "EvidenceT_BODY": [
-                        "TOP_PLC",
-                        {
-                            "ASP_ID": "hashdir",
-                            "ASP_ARGS": {
-                                "asp_id_appr": "hashdir",
-                                "env_var": "",
-                                "env_var_golden": "",
-                                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/micro_evidence_golden.json",
-                                "omit_file_suffixes": [],
-                                "paths": [
-                                    "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
-                                ],
-                                "recursive": false,
-                                "targ_id_appr": "aadl_dir_targ"
-                            },
-                            "ASP_PLC": "micro_demo_Plc",
-                            "ASP_TARG_ID": "aadl_dir_targ"
-                        },
-                        {
-                            "EvidenceT_CONSTRUCTOR": "mt_evt"
-                        }
-                    ]
-                },
-                {
-                    "EvidenceT_CONSTRUCTOR": "asp_evt",
-                    "EvidenceT_BODY": [
-                        "TOP_PLC",
-                        {
-                            "ASP_ID": "hashdir",
-                            "ASP_ARGS": {
-                                "asp_id_appr": "hashdir",
-                                "env_var": "",
-                                "env_var_golden": "",
-                                "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/micro_evidence_golden.json",
-                                "omit_file_suffixes": [],
-                                "paths": [
-                                    "/Users/adampetz/Documents/Spring_2023//INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
-                                ],
-                                "recursive": false,
-                                "targ_id_appr": "microkit_dir_targ"
-                            },
-                            "ASP_PLC": "micro_demo_Plc",
-                            "ASP_TARG_ID": "microkit_dir_targ"
-                        },
-                        {
-                            "EvidenceT_CONSTRUCTOR": "mt_evt"
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    {
+{
+    "Session_Plc": "P0",
+    "Plc_Mapping": {
+        "P0": "127.0.0.1:5000",
+        "P1": "127.0.0.1:5001",
+        "P2": "127.0.0.1:5002",
+        "P3": "127.0.0.1:5003",
+        "P4": "127.0.0.1:5004",
+        "P5": "127.0.0.1:5005",
+        "P6": "127.0.0.1:5006"
+    },
+    "PubKey_Mapping": {},
+    "Session_Context": {
         "ASP_Types": {
-            "goldenevidence_appr": {
-                "FWD": "REPLACE",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "sig": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "run_command_verus_appr": {
-                "FWD": "REPLACE",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "certificate": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
             "magic_appr": {
-                "FWD": "REPLACE",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "provision_goldenevidence": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 0
-                }
-            },
-            "hashfile_appr": {
-                "FWD": "REPLACE",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "uptime": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "appraise": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "hashevidence": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "readfile_appr": {
-                "FWD": "REPLACE",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "sig_tpm_appr": {
-                "FWD": "REPLACE",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "hashfile": {
-                "FWD": "EXTEND",
-                "EvInSig": "ALL",
-                "EvOutSig": {
-                    "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 1
-                }
-            },
-            "sig_appr": {
                 "FWD": "REPLACE",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -186,7 +28,7 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "readfile": {
+            "attest": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -194,7 +36,7 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "selinux_pol_dump": {
+            "appraise": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -202,7 +44,7 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "sig_tpm": {
+            "certificate": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -210,12 +52,36 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "provision": {
+            "hashevidence": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
                     "EvOutSig_CONSTRUCTOR": "OutN",
-                    "EvOutSig_BODY": 0
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "hashfile": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "hashfile_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "goldenevidence_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
                 }
             },
             "hashdir": {
@@ -226,7 +92,7 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "run_command": {
+            "invary_get_measurement": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -242,7 +108,31 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "attest": {
+            "run_command_verus_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "provision": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 0
+                }
+            },
+            "provision_goldenevidence": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 0
+                }
+            },
+            "readfile": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -250,7 +140,63 @@
                     "EvOutSig_BODY": 1
                 }
             },
-            "invary_get_measurement": {
+            "run_command": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "readfile_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "selinux_pol_dump": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig_tpm": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "sig_tpm_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "uptime": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -261,20 +207,20 @@
         },
         "ASP_Comps": {
             "attest": "magic_appr",
-            "readfile": "readfile_appr",
-            "hashevidence": "hashfile_appr",
             "certificate": "magic_appr",
-            "hashdir": "goldenevidence_appr",
-            "sig": "sig_appr",
-            "uptime": "NULL",
             "appraise": "magic_appr",
+            "hashevidence": "hashfile_appr",
             "hashfile": "goldenevidence_appr",
-            "provision": "NULL",
+            "hashdir": "goldenevidence_appr",
             "invary_get_measurement": "invary_get_measurement_appr",
-            "run_command": "run_command_verus_appr",
-            "selinux_pol_dump": "hashfile_appr",
+            "provision": "NULL",
             "provision_goldenevidence": "magic_appr",
-            "sig_tpm": "sig_tpm_appr"
+            "readfile": "readfile_appr",
+            "selinux_pol_dump": "hashfile_appr",
+            "sig": "sig_appr",
+            "sig_tpm": "sig_tpm_appr",
+            "uptime": "NULL",
+            "run_command": "goldenevidence_appr"
         }
     }
-]
+}
