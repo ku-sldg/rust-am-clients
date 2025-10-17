@@ -9,3 +9,5 @@ target
 Cargo.lock
 
 testing/asp_args/concretized_args/*
+
+testing/repair_outputs/*

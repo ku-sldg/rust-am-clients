@@ -383,15 +383,18 @@ fn main() -> std::io::Result<()> {
     match maybe_provisioning_flag {
 
         None => {
-            let appsumm_req = build_appsumm_request(res_resp.clone());
+            if args.appraisal {
+                let appsumm_req = build_appsumm_request(res_resp.clone());
 
-            let appraisal_valid = appsumm_rawev(res_resp.RodeoClientResponse_cvm_response.PAYLOAD.0);
+                let appraisal_valid = appsumm_rawev(res_resp.RodeoClientResponse_cvm_response.PAYLOAD.0);
 
-            let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
-            eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
-            eprintln!("{:?}\n", appsumm_resp);
+                let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
+                eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
+                eprintln!("{:?}\n", appsumm_resp);
 
-            eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
+                eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
+            }
+            else {eprintln!("\n\nProtocol completed successfully!\n\n")}
         }
         Some(fp) => {eprintln!("\n\nProvisioned golden evidence to file:\n\t{}\n", fp)}
     };

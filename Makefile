@@ -52,6 +52,9 @@ rodeo_client_verus:
 rodeo_client_verus_auto_provision:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_args_concrete.json -p $(GOLDEN_EVIDENCE_DIR)verus_evidence_golden.json
 
+rodeo_client_autoverus:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_autoverus.json -s $(RODEO_CONFIGS_DIR)sessions/session_verus.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/autoverus_args_concrete.json
+
 clean:
 	rm -rf $(BIN)
 	cargo clean
