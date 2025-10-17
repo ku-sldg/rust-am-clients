@@ -5,7 +5,9 @@
             "exe_args": [
                 "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/repair_outputs/linear_search_candidate.rs",
                 "--output-json"
-            ]
+            ],
+            "env_var_golden": "",
+            "filepath_golden": ""
         }
     },
     "hashfile": {
