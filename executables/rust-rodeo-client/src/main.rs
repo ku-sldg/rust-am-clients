@@ -195,7 +195,7 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
     let err_res : Vec<u8> = output.stderr;
     let out_res : Vec<u8> = output.stdout;
 
-    if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking cvm in rust-rodeo-client: {:?}", String::from_utf8(err_res))}
+    if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking cvm in rust-rodeo-client: \n {:?}\n", String::from_utf8(err_res))}
 
     eprintln!("\n\n\nProtocolRunResponse string: {:?} \n\n\n", String::from_utf8(out_res.clone()));
 
