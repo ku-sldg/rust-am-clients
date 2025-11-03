@@ -22,7 +22,7 @@
             "TERM_BODY": {
                 "ASP_CONSTRUCTOR": "ASPC",
                 "ASP_BODY": {
-                    "ASP_ID": "run_command",
+                    "ASP_ID": "run_command_verus",
                     "ASP_ARGS": {},
                     "ASP_PLC": "p1",
                     "ASP_TARG_ID": "run_verus_targ"

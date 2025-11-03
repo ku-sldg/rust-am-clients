@@ -17,7 +17,7 @@
             "filepath_golden": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/theorem_evidence_golden.json"
         }
     },
-    "run_command": {
+    "run_command_rocq": {
         "run_coq_theorem_targ": {
             "exe_path": "/Users/adampetz/Documents/Summer_2025/theorem_demo/my_theorems_env/rocq",
             "exe_args": [
