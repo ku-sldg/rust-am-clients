@@ -3,6 +3,7 @@ BIN := target
 ifdef AM_REPOS_ROOT
 CVM_EXE_PATH := $(AM_REPOS_ROOT)/cvm/_build/install/default/bin/cvm
 GOLDEN_EVIDENCE_DIR := $(AM_REPOS_ROOT)/rust-am-clients/goldenFiles/
+OUTPUTS_DIR := $(AM_REPOS_ROOT)/rust-am-clients/testing/outputs/
 else
 $(error "ERROR:  AM_REPOS_ROOT environment variable not set!")
 endif
@@ -35,7 +36,7 @@ rodeo_client_hamr:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -a 2> /dev/null
 
 rodeo_client_hamr_verbose:
-	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -a
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -a -o $(OUTPUTS_DIR)
 
 rodeo_client_hamr_auto_provision:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -p $(GOLDEN_EVIDENCE_DIR)micro_evidence_golden.json

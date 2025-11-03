@@ -187,9 +187,7 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
 
     let cvm_args = ["--manifest", &manifest_contents, "--asp_bin", &asp_bin_path, "--req", &am_req_string];
 
-
     eprintln!("\n\n\nCVM_ARGS: {:?} \n\n\n", cvm_args);
-
 
     let output = Command::new(cvm_path)
                                 .args(cvm_args).output().expect("error running cvm executable within rust-rodeo-client");
@@ -363,7 +361,33 @@ fn main() -> std::io::Result<()> {
 
     let res_cvm_filepath : String = args.cvm_filepath;
     eprintln!("res_cvm_filepath arg: {}", res_cvm_filepath);
+
+    let maybe_out_dir = args.output_dir;
+
+    match &maybe_out_dir {
+        Some(fp) => {
+            let am_req_string = serde_json::to_string(&new_vreq)?;
+
+            let fp_suffix = "cvm_request.json".to_string();
+            let full_fp = format!("{fp}{fp_suffix}");
+            fs::write(full_fp, am_req_string)?;   
+        }
+        _ => {()}
+    };
+
+
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, new_vreq)?;
+
+    match &maybe_out_dir {
+        Some(fp) => {
+            let am_resp_string = serde_json::to_string(&resp)?;
+
+            let fp_suffix = "cvm_response.json".to_string();
+            let full_fp = format!("{fp}{fp_suffix}");
+            fs::write(full_fp, am_resp_string)?;   
+        }
+        _ => {()}
+    };
 
     let resp_rawev = resp.PAYLOAD.clone().0;
     let success_bool: bool = appsumm_rawev(resp_rawev);
@@ -392,7 +416,18 @@ fn main() -> std::io::Result<()> {
                 eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
                 eprintln!("{:?}\n", appsumm_resp);
 
-                eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
+                eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
+
+                    match &maybe_out_dir {
+                        Some(fp) => {
+                            let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
+
+                            let fp_suffix = "appsumm_response.json".to_string();
+                            let full_fp = format!("{fp}{fp_suffix}");
+                            fs::write(full_fp, appsumm_resp_string)?;   
+                        }
+                        _ => {()}
+                    };
             }
             else {eprintln!("\n\nProtocol completed successfully!\n\n")}
         }

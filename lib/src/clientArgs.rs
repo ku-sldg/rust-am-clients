@@ -168,7 +168,11 @@ pub struct RodeoClientArgs {
 
     /// Boolean to indicate Appraisal Summary
     #[arg(short, long, default_value_t = false)]
-    pub appraisal: bool
+    pub appraisal: bool,
+
+    /// Path pointing to output directory for cvm requests/responses
+    #[arg(short, long)]
+    pub output_dir: Option<String>
 
 }
 
