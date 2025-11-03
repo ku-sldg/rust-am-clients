@@ -108,6 +108,14 @@
                     "EvOutSig_BODY": 1
                 }
             },
+            "verus_compare_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
             "run_command_verus_appr": {
                 "FWD": "REPLACE",
                 "EvInSig": "ALL",
@@ -146,6 +154,14 @@
                 "EvOutSig": {
                     "EvOutSig_CONSTRUCTOR": "OutN",
                     "EvOutSig_BODY": 1
+                }
+            },
+            "verus_compare": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 4
                 }
             },
             "run_command_verus": {
@@ -237,7 +253,8 @@
             "sig_tpm": "sig_tpm_appr",
             "uptime": "NULL",
             "run_command_verus": "run_command_verus_appr",
-            "run_command_rocq": "run_command_rocq_appr"
+            "run_command_rocq": "run_command_rocq_appr",
+            "verus_compare": "verus_compare_appr"
         }
     }
 }

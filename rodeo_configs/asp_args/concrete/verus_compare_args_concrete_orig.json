@@ -1,0 +1,8 @@
+{
+    "verus_compare": {
+        "verus_compare_targ": {
+            "original": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/repair_targets/linear_search_unverified.rs",
+            "modified": "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/repair_outputs/linear_search_candidate.rs"
+        }
+    }
+}

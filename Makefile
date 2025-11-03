@@ -50,6 +50,9 @@ rodeo_client_theorem_verbose:
 rodeo_client_verus:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_args_concrete.json -a
 
+rodeo_client_verus_compare:
+	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus_compare.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_compare_args_concrete.json -a
+
 rodeo_client_verus_auto_provision:
 	cargo run --release --bin rust-rodeo-client -- -c $(CVM_EXE_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_verus.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/verus_args_concrete.json -p $(GOLDEN_EVIDENCE_DIR)verus_evidence_golden.json
 
