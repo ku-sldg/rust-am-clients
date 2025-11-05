@@ -1,0 +1,16 @@
+{
+    "run_command": {
+        "run_autoverus_targ": {
+            "exe_path": "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+            "exe_args": [
+               "/Users/adampetz/Documents/Summer_2025/verus-proof-synthesis/code/main.py",
+               "--input",
+               "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/repair_targets/linear_search_unverified.rs",
+               "--output",
+               "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/repair_outputs/linear_search_candidate.rs", 
+               "--config", 
+               "/Users/adampetz/Documents/Summer_2025/verus-proof-synthesis/code/my-config-artifact-openai.json"
+            ]
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "TERM_CONSTRUCTOR": "asp",
+    "TERM_BODY": {
+        "ASP_CONSTRUCTOR": "ASPC",
+        "ASP_BODY": {
+            "ASP_ID": "verus_compare",
+            "ASP_ARGS": {},
+            "ASP_PLC": "p1",
+            "ASP_TARG_ID": "verus_compare_targ"
+        }
+    }
+}

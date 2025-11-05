@@ -11,6 +11,7 @@ use lib::clientArgs::*;
 use std::fs;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 
 use std::process::{Command};
 
@@ -20,7 +21,7 @@ pub struct RodeoClientRequest {
     pub RodeoClientRequest_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RodeoClientResponse {
     pub RodeoClientResponse_success: bool,
     pub RodeoClientResponse_error: String,
@@ -118,21 +119,36 @@ fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::
     }
 }
 
-fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evidence, env:RodeoEnvironmentMap) -> std::io::Result<ProtocolRunRequest> {
+fn add_appr(t:Term) -> Term {
+    Term::lseq(Box::new(t), Box::new(Term::asp(ASP::APPR)))
+}
 
-    let top_plc: Plc = myPlc;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RodeoSessionConfig {
+    pub RodeoSessionConfig_term: Term,
+    pub RodeoSessionConfig_plc: Plc,
+    pub RodeoSessionConfig_evidence: Evidence,
+    pub RodeoSessionConfig_attest_args: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>,
+    pub RodeoSessionConfig_session: Attestation_Session,
+    pub RodeoSessionConfig_appr_flag: bool
+}
+
+fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<ProtocolRunRequest> {
+
+    let RodeoSessionConfig {RodeoSessionConfig_term: my_term_orig, 
+                            RodeoSessionConfig_evidence: my_evidence,
+                            RodeoSessionConfig_appr_flag: appr_bool,
+                            RodeoSessionConfig_attest_args: asp_args_map_in,
+                            RodeoSessionConfig_plc: top_plc,
+                            RodeoSessionConfig_session: my_session} = rodeo_config;
+
+
     let to_plc: Plc = "P0".to_string();
-    
-    let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
-    let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
-
-    let my_env= env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
-
-    let my_term_orig = my_env.RodeoClientEnv_term.clone();
-    let my_term = term_swap_args (my_term_orig, asp_args_map_in, false);
-    let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
-
-    let my_evidence : Evidence = init_evidence;
+    let my_term_orig_appr: Term = if appr_bool {add_appr(my_term_orig)}
+                                  else {my_term_orig};
+    let my_term = term_swap_args (my_term_orig_appr, asp_args_map_in, false);
+    let my_term_final: Term = rust_am_lib::copland::add_provisioning_args(my_term);
 
     let vreq : ProtocolRunRequest = 
     ProtocolRunRequest {
@@ -140,7 +156,7 @@ fn rodeo_to_am_request(res_req:RodeoClientRequest, myPlc:Plc, init_evidence:Evid
         ACTION: "RUN".to_string(), 
         REQ_PLC: top_plc,
         TO_PLC: to_plc,
-        TERM: my_term,
+        TERM: my_term_final,
         EVIDENCE: my_evidence,
         ATTESTATION_SESSION: my_session};
 
@@ -171,9 +187,7 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
 
     let cvm_args = ["--manifest", &manifest_contents, "--asp_bin", &asp_bin_path, "--req", &am_req_string];
 
-
     eprintln!("\n\n\nCVM_ARGS: {:?} \n\n\n", cvm_args);
-
 
     let output = Command::new(cvm_path)
                                 .args(cvm_args).output().expect("error running cvm executable within rust-rodeo-client");
@@ -181,7 +195,7 @@ fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Resu
     let err_res : Vec<u8> = output.stderr;
     let out_res : Vec<u8> = output.stdout;
 
-    if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking cvm in rust-rodeo-client: {:?}", String::from_utf8(err_res))}
+    if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking cvm in rust-rodeo-client: \n {:?}\n", String::from_utf8(err_res))}
 
     eprintln!("\n\n\nProtocolRunResponse string: {:?} \n\n\n", String::from_utf8(out_res.clone()));
 
@@ -217,7 +231,7 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<
                 };
             appsumm_resp
         } 
-        _ => { //panic!("do_AppraisalSummary failed in run_appsumm_request")
+        _ => {
                 let appsumm_resp : AppraisalSummaryResponse = 
                     AppraisalSummaryResponse {
                         TYPE: "RESPONSE".to_string(), 
@@ -232,36 +246,6 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<
 
     Ok(summ)
 
-
-
-    /*
-
-    const DEFAULT_EVTOOLS_PATH: &'static str = "/copland-evidence-tools/_build/install/default/bin/copland_evidence_tools";
-
-    let evtools_path = get_local_env_var_w_suffix(lib::clientArgs::AM_REPOS_ROOT_ENV_VAR.to_string(), 
-                                   DEFAULT_EVTOOLS_PATH).expect(&format!("Couldn't initialize default value for evtools_path inside run_cvm_request().  
-                                                                Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR));
-
-    let appsumm_req_string = serde_json::to_string(&appsumm_req)?;
-
-    let evtools_args = ["--req", &appsumm_req_string];
-
-    let output = Command::new(evtools_path)
-                                .args(evtools_args).output().expect("error running copland-evidence-tools within rust-rodeo-client");
-
-    let err_res = output.stderr;
-    let out_res : Vec<u8> = output.stdout;
-
-    if ! err_res.is_empty() {eprint!("FYI:  stderr output after invoking copland-evidence-tools in rust-rodeo-client: {:?}", String::from_utf8(err_res))}
-
-    let resp : Result<AppraisalSummaryResponse, serde_json::Error> = serde_json::from_slice(&out_res);
-    match resp {
-
-        Ok(v) => {return Ok(v)}
-        _ => {panic!("Error decoding AppraisalSummaryResponse from copland-evidence-tools executable in run_appsumm_request (via rust-rodeo-client)")}
-
-    }
-    */
 }
 
 fn appsumm_rawev (rev:RawEv) -> bool {
@@ -275,43 +259,137 @@ fn appsumm_rawev (rev:RawEv) -> bool {
     result
 }
 
+fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
+
+     let err_string = format!("Couldn't read {type_string} JSON file");
+     let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
+                                eprintln!("\n{type_string} contents:\n{term_contents}");
+                                let term : T = serde_json::from_str(&term_contents)?;
+                                eprintln!("\nDecoded Term as:");
+                                eprintln!("{:?}", term);
+                                Ok(term)
+}
+
+pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
+
+    let (my_term, my_session, my_asp_args)
+            :(Term, Attestation_Session, HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>) 
+                = match (args.term_filepath, args.session_filepath, args.g_asp_args_filepath) {
+                            (Some(term_fp), Some(session_fp), Some(args_fp)) => {
+
+                                let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
+
+                                let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
+                                let asp_args_map = decode_from_file_and_print(args_fp, "ASP ARGS MAP".to_string())?;
+                                (term, session, asp_args_map)
+                            }
+                            _ => {
+
+                                match (args.req_filepath, args.env_filepath) {
+
+                                    (Some(res_req_filepath), Some(res_env_filepath)) => {
+
+                                        eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
+                                        eprintln!("\nres_env_filepath arg: {}", res_env_filepath);
+
+                                        let res_req: RodeoClientRequest = decode_from_file_and_print(res_req_filepath, "RodeoClientRequest".to_string())?;
+                                        let my_res_env: RodeoEnvironmentMap = decode_from_file_and_print(res_env_filepath, "RodeoEnvironmentMap".to_string())?;
+
+                                        let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
+                                        let my_env = my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+                                        let my_term_orig = my_env.RodeoClientEnv_term.clone();
+
+                                        let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
+                                        let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
+
+                                        (my_term_orig, my_session, asp_args_map_in)
+                                    }
+                                    _ => {panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term, Attestation_Session, ASP_ARGS Map) or (RodeoClientRequest, RodeoClientEnvironment) args!")}
+                                }
+                        }
+    };
+
+    let myPlc: Plc = "TOP_PLC".to_string();
+    let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
+
+    let appr_bool = args.appraisal;
+
+    Ok (RodeoSessionConfig 
+        { RodeoSessionConfig_term: my_term, 
+          RodeoSessionConfig_plc: myPlc, 
+          RodeoSessionConfig_evidence: my_evidence, 
+          RodeoSessionConfig_attest_args: my_asp_args, 
+          RodeoSessionConfig_session: my_session, 
+          RodeoSessionConfig_appr_flag: appr_bool })
+
+}
+
 
 fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_client_args()?;
 
-    let res_req_filepath : String = args.req_filepath;
-    eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
+    let rodeo_session_config = rodeo_client_args_to_rodeo_config(args.clone())?;
 
-    let res_env_filepath : String = args.env_filepath;
-    eprintln!("res_env_filepath arg: {}", res_env_filepath);
+    let vreq : ProtocolRunRequest = rodeo_to_am_request(rodeo_session_config.clone())?;
+
+    // Check for "provisinoing mode"
+    let maybe_provisioning_flag = args.provisioned_evidence_filepath;
+
+    let new_vreq = 
+        match maybe_provisioning_flag.clone() {
+            None => {vreq.clone()}
+            Some(prov_filepath) => {
+
+                let new_term: Term = 
+                    rust_am_lib::copland::append_provisioning_term(&prov_filepath, 
+                                                                    &vreq.REQ_PLC, 
+                                                              &vreq.EVIDENCE.1, 
+                                                             &vreq.TERM, 
+                                                              &vreq.ATTESTATION_SESSION.Session_Context,
+                                                                    vreq.TERM.clone());
+                let term_string = serde_json::to_string(&new_term)?;
+                print!("\n\nProvisioning Term: {}\n\n", term_string);
+
+                ProtocolRunRequest {
+                    TERM: new_term,
+                    ..vreq.clone()
+                }
+            }
+
+        };
 
     let res_cvm_filepath : String = args.cvm_filepath;
     eprintln!("res_cvm_filepath arg: {}", res_cvm_filepath);
 
-    let res_req_contents = fs::read_to_string(res_req_filepath).expect("Couldn't read RodeoClientRequest JSON file");
-    eprintln!("\nRodeoClientRequest contents:\n{res_req_contents}");
+    let maybe_out_dir = args.output_dir;
 
-    let res_req : RodeoClientRequest = serde_json::from_str(&res_req_contents)?;
-    eprintln!("\nDecoded RodeoClientRequest as:");
-    eprintln!("{:?}", res_req); // :? notation since formatter uses #[derive(..., Debug)] trait
+    match &maybe_out_dir {
+        Some(fp) => {
+            let am_req_string = serde_json::to_string(&new_vreq)?;
 
-    let res_env_contents = fs::read_to_string(res_env_filepath).expect("Couldn't read res_env JSON file");
+            let fp_suffix = "cvm_request.json".to_string();
+            let full_fp = format!("{fp}{fp_suffix}");
+            fs::write(full_fp, am_req_string)?;   
+        }
+        _ => {()}
+    };
 
-    eprintln!{"\n\nAttempting to decode RodeoEnvironmentMap...\n\n"};
-    let my_res_env: RodeoEnvironmentMap = serde_json::from_str(&res_env_contents)?;
-    eprintln!("\nDecoded res_env as:");
-    eprintln!("{:?}", my_res_env);
 
-    let myPlc: Plc = "TOP_PLC".to_string();
-    let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
+    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, new_vreq)?;
 
-    let vreq : ProtocolRunRequest = rodeo_to_am_request(res_req.clone(), myPlc, my_evidence, my_res_env.clone())?;
+    match &maybe_out_dir {
+        Some(fp) => {
+            let am_resp_string = serde_json::to_string(&resp)?;
 
-    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, vreq.clone())?;
+            let fp_suffix = "cvm_response.json".to_string();
+            let full_fp = format!("{fp}{fp_suffix}");
+            fs::write(full_fp, am_resp_string)?;   
+        }
+        _ => {()}
+    };
 
     let resp_rawev = resp.PAYLOAD.clone().0;
-
     let success_bool: bool = appsumm_rawev(resp_rawev);
 
     let res_resp: RodeoClientResponse = 
@@ -322,24 +400,60 @@ fn main() -> std::io::Result<()> {
             RodeoClientResponse_cvm_response: resp.clone()
         };
 
-    eprintln!("RodeoClientResponse (Overall Appraisal Success): \n");
-    eprintln!("{:?}\n", res_resp.RodeoClientResponse_success);
-
-    eprintln!("RodeoClientResponse_cvm_request: \n {:?}: \n", res_resp.RodeoClientResponse_cvm_request);
-
-    eprintln!("RodeoClientResponse_cvm_response: \n {:?}: \n", res_resp.RodeoClientResponse_cvm_response);
-
-
     let rodeo_resp_string = serde_json::to_string(&res_resp)?;
     print!("{}",rodeo_resp_string);
 
-    let a_resp : ProtocolRunResponse = res_resp.RodeoClientResponse_cvm_response;
 
-    let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
+    match maybe_provisioning_flag {
 
-    let my_env= my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+        None => {
+            if args.appraisal {
+                let appsumm_req = build_appsumm_request(res_resp.clone());
 
-    let my_att_session = my_env.RodeoClientEnv_session.clone();
+                let appraisal_valid = appsumm_rawev(res_resp.RodeoClientResponse_cvm_response.PAYLOAD.0);
+
+                let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
+                eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
+                eprintln!("{:?}\n", appsumm_resp);
+
+                eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
+
+                    match &maybe_out_dir {
+                        Some(fp) => {
+                            let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
+
+                            let fp_suffix = "appsumm_response.json".to_string();
+                            let full_fp = format!("{fp}{fp_suffix}");
+                            fs::write(full_fp, appsumm_resp_string)?;   
+                        }
+                        _ => {()}
+                    };
+            }
+            else {eprintln!("\n\nProtocol completed successfully!\n\n")}
+        }
+        Some(fp) => {eprintln!("\n\nProvisioned golden evidence to file:\n\t{}\n", fp)}
+    };
+
+    Ok (())
+
+}
+
+fn build_appsumm_request (rodeo_resp:RodeoClientResponse) -> AppraisalSummaryRequest {
+
+
+    let RodeoClientResponse 
+        {RodeoClientResponse_success: success_bool,
+            RodeoClientResponse_error: _,
+            RodeoClientResponse_cvm_request: vreq,
+            RodeoClientResponse_cvm_response: vresp} = rodeo_resp;
+
+    eprintln!("RodeoClientResponse (Overall Appraisal Success): \n {:?}: \n", success_bool);
+    eprintln!("RodeoClientResponse_cvm_request: \n {:?}: \n", vreq);
+    eprintln!("RodeoClientResponse_cvm_response: \n {:?}: \n", vresp);
+
+    let a_resp : ProtocolRunResponse = vresp;
+
+    let my_att_session = vreq.ATTESTATION_SESSION;
 
     let appsumm_req : AppraisalSummaryRequest = 
     AppraisalSummaryRequest {
@@ -349,14 +463,7 @@ fn main() -> std::io::Result<()> {
         EVIDENCE: a_resp.PAYLOAD.clone()
     };
 
-    let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
-    eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
-    eprintln!("{:?}\n", appsumm_resp);
+    appsumm_req
 
-    let appraisal_valid = appsumm_rawev(a_resp.PAYLOAD.0.clone());
-
-    eprint_appsumm(appsumm_resp.PAYLOAD, appraisal_valid);
-
-    Ok (())
 
 }

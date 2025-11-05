@@ -1,0 +1,3 @@
+(verus_compare p1 verus_compare_targ) +<+
+(hashfile p1 verus_exe_targ) +<+ 
+(run_command_verus p1 run_verus_targ)

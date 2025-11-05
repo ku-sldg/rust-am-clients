@@ -132,7 +132,7 @@ pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
 }
 
 // Adapted from:  https://docs.rs/clap/latest/clap/
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 pub struct RodeoClientArgs {
     /// Path pointing to local cvm executable
@@ -144,11 +144,35 @@ pub struct RodeoClientArgs {
 
     /// Path pointing to (JSON) RodeoClientRequest file
     #[arg(short, long)]
-    pub req_filepath: String,
+    pub req_filepath: Option<String>,
     
     /// Path pointing to (JSON) RodeoEnvironmentMap file
     #[arg(short, long)]
-    pub env_filepath: String
+    pub env_filepath: Option<String>,
+
+    /// Path pointing to (JSON) Term file
+    #[arg(short, long)]
+    pub term_filepath: Option<String>,
+
+    /// Path pointing to (JSON) Attestation Session file
+    #[arg(short, long)]
+    pub session_filepath: Option<String>,
+
+    /// Path for ASP_ARGS (optional)
+     #[arg(short, long)]
+     pub g_asp_args_filepath: Option<String>,
+
+    /// Path for provisioned evidence (optional)
+     #[arg(short, long)]
+     pub provisioned_evidence_filepath: Option<String>,
+
+    /// Boolean to indicate Appraisal Summary
+    #[arg(short, long, default_value_t = false)]
+    pub appraisal: bool,
+
+    /// Path pointing to output directory for cvm requests/responses
+    #[arg(short, long)]
+    pub output_dir: Option<String>
 
 }
 
