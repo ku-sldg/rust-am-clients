@@ -1,0 +1,24 @@
+{
+    "verus_compare": {
+        "verus_compare_targ": {
+            "original": "<HEAL_demo_dir>/temp_files/orig.rs",
+            "modified": "<HEAL_demo_dir>/temp_files/cur.rs"
+        }
+    },
+    "hashfile": {
+        "verus_exe_targ": {
+            "env_var": "",
+            "filepath": "<path_to_verus_bin>/verus",
+            "env_var_golden": "",
+            "filepath_golden": "<AM_REPOS_ROOT>/rust-am-clients/goldenFiles/verus_workflow_evidence_golden.json"
+        }
+    },
+    "run_command_verus": {
+        "run_verus_targ": {
+            "exe_args": [
+                "<HEAL_demo_dir>/temp_files/cur.rs",
+                "--output-json"
+            ]
+        }
+    }
+}
