@@ -172,7 +172,15 @@ pub struct RodeoClientArgs {
 
     /// Path pointing to output directory for cvm requests/responses
     #[arg(short, long)]
-    pub output_dir: Option<String>
+    pub output_dir: Option<String>,
+
+    /// Path pointing to asp-libs bin
+    #[arg(short, long)]
+    pub libs_asp_bin: String,
+
+    /// Path pointing to manifest filepath
+    #[arg(short, long)]
+    pub manifest_filepath: String
 
 }
 

@@ -163,18 +163,7 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     Ok (vreq)
 }
 
-fn run_cvm_request (cvm_path:String, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
-
-    const DEFAULT_ASP_BIN_PATH: &'static str = "/asp-libs/target/release/";
-    const DEFAULT_MANIFEST_PATH: &'static str = "/rust-am-clients/testing/manifests/Manifest_P0.json";
-
-    let manifest_path = get_local_env_var_w_suffix(lib::clientArgs::AM_REPOS_ROOT_ENV_VAR.to_string(), 
-                                   DEFAULT_MANIFEST_PATH).expect(&format!("Couldn't initialize default value for manifest_path inside run_cvm_request().  
-                                                                Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR));
-
-    let asp_bin_path = get_local_env_var_w_suffix(lib::clientArgs::AM_REPOS_ROOT_ENV_VAR.to_string(), 
-                                   DEFAULT_ASP_BIN_PATH).expect(&format!("Couldn't initialize default value for asp_bin_path inside run_cvm_request().  
-                                                                Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR));
+fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
     eprintln!("\n\n manifest_path: {}", manifest_path);
 
@@ -362,6 +351,12 @@ fn main() -> std::io::Result<()> {
     let res_cvm_filepath : String = args.cvm_filepath;
     eprintln!("res_cvm_filepath arg: {}", res_cvm_filepath);
 
+    let res_asp_libs_filepath : String = args.libs_asp_bin;
+    eprintln!("res_asp_libs_filepath arg: {}", res_asp_libs_filepath);
+
+    let res_manifest_filepath : String = args.manifest_filepath;
+    eprintln!("res_manifest_filepath arg: {}", res_manifest_filepath);
+
     let maybe_out_dir = args.output_dir;
 
     match &maybe_out_dir {
@@ -376,7 +371,7 @@ fn main() -> std::io::Result<()> {
     };
 
 
-    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, new_vreq)?;
+    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, new_vreq)?;
 
     match &maybe_out_dir {
         Some(fp) => {
