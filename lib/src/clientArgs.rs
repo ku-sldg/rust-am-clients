@@ -137,9 +137,6 @@ pub fn get_am_client_args () -> std::io::Result<AmClientArgs> {
 pub struct RodeoClientArgs {
     /// Path pointing to local cvm executable
     #[arg(short, long, default_value_t = DEFAULT_CVM_PATH.to_string())]
-        /* get_local_env_var_w_suffix(AM_REPOS_ROOT_ENV_VAR.to_string(), 
-                                   DEFAULT_CVM_PATH).expect(&format!("Couldn't initialize default value for cvm_filepath field of RodeoClientArgs struct.  
-                                                              Check for missing Environment Variable: {}", AM_REPOS_ROOT_ENV_VAR)))] */
     pub cvm_filepath: String,
 
     /// Path pointing to (JSON) RodeoClientRequest file
@@ -170,7 +167,7 @@ pub struct RodeoClientArgs {
     #[arg(short, long, default_value_t = false)]
     pub appraisal: bool,
 
-    /// Path pointing to output directory for cvm requests/responses
+    /// Path pointing to output directory for cvm requests/responses and AppraisalSummary
     #[arg(short, long)]
     pub output_dir: Option<String>,
 
