@@ -68,6 +68,12 @@ rodeo_client_verus_auto_provision:
 rodeo_client_autoverus:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_autoverus.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/autoverus_args_concrete.json
 
+rodeo_client_readfile_range:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_readfile_range.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/readfile_range_args_concrete.json -o $(OUTPUTS_DIR) -a
+
+rodeo_client_readfile_range_provision:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_readfile_range.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/readfile_range_args_concrete.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)readfile_range_evidence_golden.json
+
 clean:
 	rm -rf $(BIN)
 	cargo clean
