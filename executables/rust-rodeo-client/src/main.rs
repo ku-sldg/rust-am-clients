@@ -254,7 +254,7 @@ fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(ter
      let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
                                 eprintln!("\n{type_string} contents:\n{term_contents}");
                                 let term : T = serde_json::from_str(&term_contents)?;
-                                eprintln!("\nDecoded Term as:");
+                                eprintln!("\nDecoded term as:");
                                 eprintln!("{:?}", term);
                                 Ok(term)
 }
