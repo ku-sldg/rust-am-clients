@@ -15,3 +15,5 @@ testing/repair_outputs/*
 testing/outputs/*
 
 rodeo_configs/asp_args/concrete/*
+
+goldenFiles/*
