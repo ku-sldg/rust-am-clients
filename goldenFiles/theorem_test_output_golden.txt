@@ -1,4 +1,0 @@
-#> test_important_theorem
-Type: ok
-Assumptions:
-Closed under the global context

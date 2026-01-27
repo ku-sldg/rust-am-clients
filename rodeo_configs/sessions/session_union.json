@@ -156,6 +156,14 @@
                     "EvOutSig_BODY": 1
                 }
             },
+            "readfile_range": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
             "verus_compare": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
@@ -248,6 +256,7 @@
             "provision": "NULL",
             "provision_goldenevidence": "magic_appr",
             "readfile": "readfile_appr",
+            "readfile_range": "goldenevidence_appr",
             "selinux_pol_dump": "hashfile_appr",
             "sig": "sig_appr",
             "sig_tpm": "sig_tpm_appr",
