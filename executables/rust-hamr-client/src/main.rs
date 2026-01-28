@@ -119,13 +119,38 @@ fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_Compo
     res
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct ASP_ARGS_ReadfileRange {
+    filepath: String,
+    start_index: usize,
+    end_index: usize, 
+    metadata: String, 
+    env_var_golden: String,
+    filepath_golden: String
+}
+
 fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice) -> rust_am_lib::copland::ASP {
+
+        let asp_args : ASP_ARGS_ReadfileRange = ASP_ARGS_ReadfileRange 
+                { filepath: maestro_slice.uri, 
+                  start_index: maestro_slice.beginLine, 
+                  end_index: maestro_slice.endLine,
+                  metadata: maestro_slice.hamr_slice.meta.clone(), 
+                  env_var_golden: "".to_string(),
+                  filepath_golden: "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/hamr_readfile_range_evidence_golden.json".to_string()
+                };
+
+        let asp_args_json = serde_json::to_value(asp_args).unwrap();
+
+        let targid_prefix = maestro_slice.targid;
+        let targid_suffix = maestro_slice.hamr_slice.meta;
+        let targid = format!("{targid_prefix}:  {targid_suffix}");
 
         let slice_asp_params : rust_am_lib::copland::ASP_PARAMS = rust_am_lib::copland::ASP_PARAMS {
         ASP_ID: "readfile_range".to_string(),
-        ASP_ARGS: serde_json::Value::Null,
-        ASP_PLC: "hi".to_string(),
-        ASP_TARG_ID: "hi".to_string()
+        ASP_ARGS: asp_args_json,
+        ASP_PLC: "P0".to_string(),
+        ASP_TARG_ID: targid
 
     };
 
@@ -161,7 +186,7 @@ fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract
 
 }
 
-fn HAMR_relpath_to_abspath (project_root_fp:String, /* hamr_kind:String, */ relpath:String) -> String {
+fn relpath_to_abspath (project_root_fp:String, relpath:String) -> String {
 
     let root = Path::new(&project_root_fp);
     let relative = Path::new(&relpath);
@@ -184,7 +209,7 @@ fn HAMR_Slice_to_MAESTRO_Slice (hamr_slice:&HAMR_Slice, project_root_fp:String, 
     let uri_relative = hamr_slice.pos.uri.clone();
     //let hamr_kind = hamr_slice.kind.clone();
 
-    let uri_absolute = HAMR_relpath_to_abspath(project_root_fp, uri_relative);
+    let uri_absolute = relpath_to_abspath(project_root_fp, uri_relative);
     let bline = hamr_slice.pos.beginLine;
     let eline = hamr_slice.pos.endLine;
 
@@ -197,13 +222,42 @@ fn HAMR_Slice_to_MAESTRO_Slice (hamr_slice:&HAMR_Slice, project_root_fp:String, 
     res
 }
 
+fn add_asp (asp:rust_am_lib::copland::ASP, t:rust_am_lib::copland::Term) -> rust_am_lib::copland::Term {
+
+    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::Split {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL},
+                                Box::new(t),
+                                Box::new(rust_am_lib::copland::Term::asp(asp.clone())) 
+                              )
+
+}
+
+fn ASP_Vec_to_Term (asps:Vec<rust_am_lib::copland::ASP>) -> rust_am_lib::copland::Term {
+
+    match asps.as_slice() {
+
+        [] => {rust_am_lib::copland::Term::asp(rust_am_lib::copland::ASP::NULL)}
+        [x] => {rust_am_lib::copland::Term::asp(x.clone())}
+        [x, _, ..] => 
+            {
+                let asps_split = asps.split_first().unwrap();
+                let rest = asps_split.1.to_vec();
+            
+                add_asp(x.clone(), ASP_Vec_to_Term(rest))
+            }
+
+    }
+
+
+
+}
+
 
 fn main() -> std::io::Result<()> {
 
     //let args = get_hamr_client_args()?;
 
     
-    let attestation_report_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/executables/rust-hamr-client/test_data/aadl_attestation_report.json".to_string();
+    let attestation_report_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/executables/rust-hamr-client/test_data/aadl_attestation_report_medium.json".to_string();
 
 
 
@@ -217,6 +271,21 @@ fn main() -> std::io::Result<()> {
     let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, attestation_root_fp.clone());
 
     println!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+
+    let term = ASP_Vec_to_Term(asps);
+
+
+    println!("\nNew term: {:?} \n\n\n", term);
+
+    let term_string = serde_json::to_string(&term)?;
+
+    let full_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/hamr_term_medium.json".to_string();
+    fs::write(full_fp, term_string)?;
+
+
+
+
+
 
 
     /*

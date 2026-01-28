@@ -147,7 +147,7 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     let to_plc: Plc = "P0".to_string();
     let my_term_orig_appr: Term = if appr_bool {add_appr(my_term_orig)}
                                   else {my_term_orig};
-    let my_term = term_swap_args (my_term_orig_appr, asp_args_map_in, false);
+    let my_term = term_swap_args (my_term_orig_appr, asp_args_map_in, true);
     let my_term_final: Term = rust_am_lib::copland::add_provisioning_args(my_term);
 
     let vreq : ProtocolRunRequest = 
@@ -266,8 +266,10 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                 = match (args.term_filepath, args.session_filepath, args.g_asp_args_filepath) {
                             (Some(term_fp), Some(session_fp), Some(args_fp)) => {
 
+                                 eprintln!("\n\n\n\nBEFORE\n\n\n\n");
                                 let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
 
+                                eprintln!("\n\n\n\nGOT HERE\n\n\n\n");
                                 let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
                                 let asp_args_map = decode_from_file_and_print(args_fp, "ASP ARGS MAP".to_string())?;
                                 (term, session, asp_args_map)
