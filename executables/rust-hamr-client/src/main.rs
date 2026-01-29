@@ -257,7 +257,7 @@ fn main() -> std::io::Result<()> {
     //let args = get_hamr_client_args()?;
 
     
-    let attestation_report_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/executables/rust-hamr-client/test_data/aadl_attestation_report_medium.json".to_string();
+    let attestation_report_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/executables/rust-hamr-client/test_data/aadl_attestation_report.json".to_string();
 
 
 
@@ -279,7 +279,7 @@ fn main() -> std::io::Result<()> {
 
     let term_string = serde_json::to_string(&term)?;
 
-    let full_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/hamr_term_medium.json".to_string();
+    let full_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/hamr_term.json".to_string();
     fs::write(full_fp, term_string)?;
 
 

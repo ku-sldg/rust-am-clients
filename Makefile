@@ -72,10 +72,13 @@ rodeo_client_readfile_range:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_readfile_range.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/readfile_range_args_concrete.json -o $(OUTPUTS_DIR) -a
 
 rodeo_client_readfile_range_provision:
-	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_readfile_range.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/readfile_range_args_concrete.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)readfile_range_evidence_golden.json
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_readfile_range.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)readfile_range_evidence_golden.json
 
 rodeo_client_hamr_readfile_range:
-	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_readfile_range_test.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR)
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_readfile_range_test.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -a
+
+rodeo_client_hamr_readfile_range_provision:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_readfile_range_test.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)hamr_readfile_range_evidence_golden.json
 
 rodeo_client_hamr_readfile_range_short:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_readfile_range_test_short.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -a

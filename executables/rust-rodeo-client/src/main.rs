@@ -13,6 +13,9 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
 
+use serde_json::{Value, from_value};
+use serde_stacker::Deserializer;
+
 use std::process::{Command};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -172,9 +175,13 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
     let am_req_string = serde_json::to_string(&am_req)?;
 
+    let req_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/outputs/cvm_req_temp.json";
+
+    fs::write(req_fp, am_req_string.clone())?; 
+
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
 
-    let cvm_args = ["--manifest", &manifest_contents, "--asp_bin", &asp_bin_path, "--req", &am_req_string];
+    let cvm_args = ["--manifest", &manifest_contents, "--asp_bin", &asp_bin_path, "--req_file", req_fp];
 
     eprintln!("\n\n\nCVM_ARGS: {:?} \n\n\n", cvm_args);
 
@@ -188,7 +195,15 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
     eprintln!("\n\n\nProtocolRunResponse string: {:?} \n\n\n", String::from_utf8(out_res.clone()));
 
-    let resp : Result<ProtocolRunResponse, serde_json::Error> = serde_json::from_slice(&out_res);
+
+    let resp_string = String::from_utf8(out_res.clone()).unwrap();
+
+
+    let respval = deserialize_deep_json(&resp_string)?;
+
+    let resp: Result<ProtocolRunResponse, serde_json::Error> = from_value(respval);
+
+    //let resp : Result<ProtocolRunResponse, serde_json::Error> = serde_json::from_slice(&out_res);
     match resp {
 
         Ok(v) => {return Ok(v)}
@@ -250,13 +265,33 @@ fn appsumm_rawev (rev:RawEv) -> bool {
 
 fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
 
+     eprintln!("In decode_from_file_and_print");
      let err_string = format!("Couldn't read {type_string} JSON file");
      let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
-                                eprintln!("\n{type_string} contents:\n{term_contents}");
-                                let term : T = serde_json::from_str(&term_contents)?;
+                                //eprintln!("\n{type_string} contents:\n{term_contents}");
+                                
+                                let termval = deserialize_deep_json(&term_contents)?;
+
+                                let term : T = from_value(termval)?;
+                                
+                                //let term : T = serde_json::from_str(&term_contents)?;
+                                //eprintln!("\n\n\n\nHEREEEE");
                                 eprintln!("\nDecoded term as:");
                                 eprintln!("{:?}", term);
                                 Ok(term)
+}
+
+fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
+    let mut de = serde_json::de::Deserializer::from_str(json_data);
+    de.disable_recursion_limit(); // This method is only available with the feature
+    
+    // Wrap with serde_stacker's Deserializer to use a dynamically growing stack
+    let stacker_de = Deserializer::new(&mut de);
+    
+    // Deserialize the data
+    let value = Value::deserialize(stacker_de)?;
+    
+    Ok(value)
 }
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
@@ -266,8 +301,26 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                 = match (args.term_filepath, args.session_filepath, args.g_asp_args_filepath) {
                             (Some(term_fp), Some(session_fp), Some(args_fp)) => {
 
-                                 eprintln!("\n\n\n\nBEFORE\n\n\n\n");
-                                let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
+                                eprintln!("\n\n\n\nBEFORE\n\n\n\n");
+                                //let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
+
+                                eprintln!("decoding Term inline");
+                                let err_string = format!("Couldn't read Term JSON file");
+                                let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
+
+                                //eprintln!("\n{type_string} contents:\n{term_contents}");
+                                //let term= serde_json::from_str(&term_contents)?;
+                                //eprintln!("\n\n\n\nHEREEEE");
+
+                                let termval = deserialize_deep_json(&term_contents)?;
+
+                                let term : Term = from_value(termval)?;
+
+
+                                eprintln!("\nDecoded term as:");
+                                eprintln!("{:?}", term);
+
+                                //let term = rust_am_lib::copland::Term::asp(rust_am_lib::copland::ASP::SIG);
 
                                 eprintln!("\n\n\n\nGOT HERE\n\n\n\n");
                                 let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
