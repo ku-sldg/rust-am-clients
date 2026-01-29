@@ -92,6 +92,13 @@ rodeo_client_hamr_readfile_range_medium:
 rodeo_client_hamr_readfile_range_medium_provision:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_readfile_range_test_medium.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)hamr_readfile_range_evidence_golden.json
 
+rodeo_client_hamr_contracts:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_contracts.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -a
+
+rodeo_client_hamr_contracts_provision:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_contracts.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)hamr_contracts_golden_evidence.json
+
+
 clean:
 	rm -rf $(BIN)
 	cargo clean

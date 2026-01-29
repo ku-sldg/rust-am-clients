@@ -185,3 +185,25 @@ pub fn get_rodeo_client_args () -> std::io::Result<RodeoClientArgs> {
     let args: RodeoClientArgs = RodeoClientArgs::parse();
     Ok(args)
 }
+
+// Adapted from:  https://docs.rs/clap/latest/clap/
+#[derive(Parser, Debug, Clone)]
+#[command(version, about, long_about = None)]
+pub struct RodeoHamrClientArgs {
+    /// Path pointing to HAMR attestation directory
+    #[arg(short, long)]
+    pub attestation_root: String,
+
+    /// Path pointing to golden evidence file path used during provisioning and appraisal
+    #[arg(short, long)]
+    pub golden_evidence_filepath: String,
+
+    /// Path pointing to output file path for the generated Copland protocol term
+    #[arg(short, long)]
+    pub output_term_filepath: String
+}
+
+pub fn get_rodeo_hamr_client_args () -> std::io::Result<RodeoHamrClientArgs> {
+    let args: RodeoHamrClientArgs = RodeoHamrClientArgs::parse();
+    Ok(args)
+}

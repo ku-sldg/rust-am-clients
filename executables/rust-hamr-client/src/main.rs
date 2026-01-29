@@ -3,16 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-/*
-
-use std::collections::HashMap;
-
-use std::process::{Command};
-
-*/
-
 // Custom package imports
-use rust_am_lib::copland::*;
 use lib::clientArgs::*;
 
 // Other packages required to perform specific ASP action.
@@ -97,22 +88,22 @@ fn get_attestation_report_json (hamr_report_fp:String) -> std::io::Result<HAMR_A
     Ok (res)
 }
 
-fn HAMR_attestation_report_to_MAESTRO_Slice_ASPs (hamr_report:HAMR_AttestationReport, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
+fn HAMR_attestation_report_to_MAESTRO_Slice_ASPs (hamr_report:HAMR_AttestationReport, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
 
     let reports = hamr_report.reports;
 
-    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_report_to_MAESTRO_Slice_ASPs(x.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_report_to_MAESTRO_Slice_ASPs(x.clone(), golden_evidence_fp.clone(), project_root_fp.clone())).collect();
 
     let res = res1.into_iter().flatten().collect();
     res
 }
 
-fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_ComponentReport, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
+fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_ComponentReport, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
 
 
     let reports = hamr_component_report.reports;
 
-    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_contract_report_to_MAESTRO_Slice_ASPs(x.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_contract_report_to_MAESTRO_Slice_ASPs(x.clone(), golden_evidence_fp.clone(), project_root_fp.clone())).collect();
 
     let res = res1.into_iter().flatten().collect();
 
@@ -129,7 +120,7 @@ struct ASP_ARGS_ReadfileRange {
     filepath_golden: String
 }
 
-fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice) -> rust_am_lib::copland::ASP {
+fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice, golden_evidence_fp:String) -> rust_am_lib::copland::ASP {
 
         let asp_args : ASP_ARGS_ReadfileRange = ASP_ARGS_ReadfileRange 
                 { filepath: maestro_slice.uri, 
@@ -137,7 +128,7 @@ fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice) -> rust_am_lib::copland::A
                   end_index: maestro_slice.endLine,
                   metadata: maestro_slice.hamr_slice.meta.clone(), 
                   env_var_golden: "".to_string(),
-                  filepath_golden: "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/goldenFiles/hamr_readfile_range_evidence_golden.json".to_string()
+                  filepath_golden: golden_evidence_fp
                 };
 
         let asp_args_json = serde_json::to_value(asp_args).unwrap();
@@ -158,7 +149,7 @@ fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice) -> rust_am_lib::copland::A
 
 }
 
-fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract_report:HAMR_ComponentContractReport, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
+fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract_report:HAMR_ComponentContractReport, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
 
 
     let slices = hamr_component_contract_report.slices;
@@ -167,7 +158,7 @@ fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract
 
     let maestro_slices : Vec<MAESTRO_Slice> = slices.iter().map(|x| HAMR_Slice_to_MAESTRO_Slice(x, project_root_fp.clone(), my_id.clone())).collect();
 
-    let asps : Vec<rust_am_lib::copland::ASP> = maestro_slices.iter().map(|x| MAESTRO_Slice_to_ASP(x.clone())).collect();
+    let asps : Vec<rust_am_lib::copland::ASP> = maestro_slices.iter().map(|x| MAESTRO_Slice_to_ASP(x.clone(), golden_evidence_fp.clone())).collect();
 
     asps
 
@@ -254,52 +245,28 @@ fn ASP_Vec_to_Term (asps:Vec<rust_am_lib::copland::ASP>) -> rust_am_lib::copland
 
 fn main() -> std::io::Result<()> {
 
-    //let args = get_hamr_client_args()?;
+    let args = get_rodeo_hamr_client_args()?;
 
     
-    let attestation_report_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/executables/rust-hamr-client/test_data/aadl_attestation_report.json".to_string();
-
-
+    let attestation_report_root = args.attestation_root;
+    let attestation_report_fp = format!("{attestation_report_root}/aadl_attestation_report.json");
+    let golden_evidence_fp = args.golden_evidence_filepath;
 
     let att_report = get_attestation_report_json(attestation_report_fp)?;
-    println!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
-
-
-    let attestation_root_fp = "/Users/adampetz/Documents/Summer_2025/INSPECTA-models/isolette/hamr/microkit/attestation/".to_string();
+    eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
     
 
-    let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, attestation_root_fp.clone());
-
-    println!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+    let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
+    eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
 
     let term = ASP_Vec_to_Term(asps);
-
-
-    println!("\nNew term: {:?} \n\n\n", term);
+    eprintln!("\nNew term: {:?} \n\n\n", term);
 
     let term_string = serde_json::to_string(&term)?;
 
-    let full_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/hamr_term.json".to_string();
-    fs::write(full_fp, term_string)?;
-
-
-
-
-
-
-
-    /*
-    let hamr_uri = "../../../aadl/aadl/packages/Regulate.aadl".to_string();
-
-    let hamr_uri2 = "../crates/thermostat_rt_mri_mri/src/component/thermostat_rt_mri_mri_app.rs".to_string();
-
-    let root_path = "/Users/adampetz/Documents/Summer_2025/INSPECTA-models/isolette/hamr/microkit/attestation".to_string();
-
-    let newpath = HAMR_relpath_to_abspath(root_path, hamr_uri2);
-
-    println!("\nNew path: {:?} \n\n", newpath);
-    */
-
+    let output_term_fp = args.output_term_filepath.clone();
+    fs::write(output_term_fp.clone(), term_string)?;
+    eprintln!("\nNew protocol term output to file: {:?} \n\n\n", output_term_fp);
 
     Ok (())
 
