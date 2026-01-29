@@ -177,7 +177,11 @@ pub struct RodeoClientArgs {
 
     /// Path pointing to manifest filepath
     #[arg(short, long)]
-    pub manifest_filepath: String
+    pub manifest_filepath: String,
+
+    /// Path pointing to HAMR attestation directory
+    #[arg(short = 'h', long, value_delimiter = ' ', num_args = 1..4)]
+    pub hamr_root: Option<Vec<String>>,
 
 }
 
