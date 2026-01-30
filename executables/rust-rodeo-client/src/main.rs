@@ -215,7 +215,7 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
 }
 
-fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<AppraisalSummaryResponse> {
+fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest, appsumm_result_bool: bool) -> std::io::Result<AppraisalSummaryResponse> {
 
 
     let et = appsumm_req.EVIDENCE.1.clone();
@@ -233,6 +233,7 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<
                     TYPE: "RESPONSE".to_string(), 
                     ACTION: "APPSUMM".to_string(), 
                     SUCCESS: true,
+                    APPRAISAL_RESULT: appsumm_result_bool,
                     PAYLOAD: s
                 };
             appsumm_resp
@@ -243,6 +244,7 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest) -> std::io::Result<
                         TYPE: "RESPONSE".to_string(), 
                         ACTION: "APPSUMM".to_string(), 
                         SUCCESS: false,
+                        APPRAISAL_RESULT: false, // appsumm_result_bool,
                         PAYLOAD: HashMap::new()
                     };
                     appsumm_resp  
@@ -572,7 +574,7 @@ fn main() -> std::io::Result<()> {
 
                 let appraisal_valid = appsumm_rawev(res_resp.RodeoClientResponse_cvm_response.PAYLOAD.0);
 
-                let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req)?;
+                let appsumm_resp : AppraisalSummaryResponse = run_appsumm_request(appsumm_req, appraisal_valid)?;
                 eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
                 eprintln!("{:?}\n", appsumm_resp);
 
