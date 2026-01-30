@@ -53,5 +53,5 @@ Successful output should be some JSON logging followed by something like:
     cargo run --release --bin rust-rodeo-client -- -t <HAMR_ATTESTATION_ROOT>/hamr_contract_term.json -o <OUTPUT_DIR> -a
     ```
     The `-t` option points to the Copland protocol term generated in the previous step.  `-o` specifies an output directory for the Appraisal Summary and intermediate files.  `-a` tells the MAESTRO tools to perform evidence appraisal.
-1. Check the `<OUTPUT_DIR>` directory for the newly-generated file called `appsumm_response.json`.  This is an AppraisalSummary Response JSON structure.  The crucial field of this JSON object is `"APPRAISAL_RESULT"` which captures the overall appraisal judgement for the HAMR contract file slices as a boolean.  The full JSON schema for the AppraisalSummary Response can be found 
+1. Check the `<OUTPUT_DIR>` directory for the newly-generated file called `appsumm_response.json`.  This is an AppraisalSummary Response JSON structure.  The crucial field of this JSON object is `"APPRAISAL_RESULT"` which captures the overall appraisal judgement for the HAMR contract file slices as a boolean.  The JSON schema for the AppraisalSummary Response can be found [here](https://github.com/ku-sldg/rust-am-clients/blob/main/json_schemas/appsumm_response_schema.json)
 
