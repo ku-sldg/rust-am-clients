@@ -12,9 +12,10 @@ fn main() -> std::io::Result<()> {
 
     
     let attestation_report_root = args.attestation_root;
-    let attestation_report_fp = format!("{attestation_report_root}/aadl_attestation_report.json");
+    //let attestation_report_fp = format!("{attestation_report_root}/aadl_attestation_report.json");
     let golden_evidence_fp = args.golden_evidence_filepath;
 
+    /*
     let att_report = get_attestation_report_json(attestation_report_fp)?;
     eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
     
@@ -24,6 +25,9 @@ fn main() -> std::io::Result<()> {
 
     let term = ASP_Vec_to_Term(asps);
     eprintln!("\nNew term: {:?} \n\n\n", term);
+    */
+
+    let term = do_hamr_term_gen(attestation_report_root, golden_evidence_fp)?;
 
     let term_string = serde_json::to_string(&term)?;
 

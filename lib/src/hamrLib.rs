@@ -222,3 +222,20 @@ pub fn ASP_Vec_to_Term (asps:Vec<rust_am_lib::copland::ASP>) -> rust_am_lib::cop
             }
     }
 }
+
+pub fn do_hamr_term_gen(attestation_report_root:String, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
+
+    let default_report_filename: String = "aadl_attestation_report.json".to_string();
+    let attestation_report_fp = format!("{attestation_report_root}/{default_report_filename}");
+    let att_report = get_attestation_report_json(attestation_report_fp)?;
+    eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
+    
+
+    let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
+    eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+
+    let term = ASP_Vec_to_Term(asps);
+    eprintln!("\nNew term: {:?} \n\n\n", term);
+    Ok(term)
+
+}

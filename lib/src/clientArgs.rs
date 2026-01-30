@@ -9,6 +9,7 @@ const DEFAULT_SESSION_PATH: &'static str = "/rust-am-clients/testing/attestation
 const DEFAULT_CVM_PATH: &'static str = "cvm";
 
 pub const AM_REPOS_ROOT_ENV_VAR: &'static str = "AM_REPOS_ROOT";
+pub const ASP_BIN_ENV_VAR: &'static str = "ASP_BIN";
 
 fn get_local_env_var(s:String) -> std::io::Result<String> {
 
@@ -172,12 +173,15 @@ pub struct RodeoClientArgs {
     pub output_dir: Option<String>,
 
     /// Path pointing to asp-libs bin
-    #[arg(short, long)]
+    #[arg(short, long, default_value_t = 
+        get_local_env_var_w_suffix(ASP_BIN_ENV_VAR.to_string(), 
+                                   "" ).expect("Couldn't initialize default value for libs_asp_bin field of RodeoClientArgs struct.  
+                                                              Check for missing ASP_BIN Environment Variable?"))]
     pub libs_asp_bin: String,
 
     /// Path pointing to manifest filepath
     #[arg(short, long)]
-    pub manifest_filepath: String,
+    pub manifest_filepath: Option<String>,
 
     /// Path pointing to HAMR attestation directory
     #[arg(short = 'h', long, value_delimiter = ' ', num_args = 1..4)]

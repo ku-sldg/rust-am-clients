@@ -6,9 +6,11 @@
 // Custom package imports
 use rust_am_lib::copland::*;
 use lib::clientArgs::*;
+use lib::hamrLib::*;
 
 // Other packages required to perform specific ASP action.
 use std::fs;
+use std::env;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
@@ -294,64 +296,115 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
     Ok(value)
 }
 
+pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
+pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
+pub const DEFAULT_HAMR_TERM_FILENAME: &'static str = "hamr_contract_term.json";
+
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
+
+    let session_fp : String = 
+        match args.session_filepath {
+            Some(fp) => {fp}
+            None => {
+                let cur_dir = env::current_dir()?;
+                let cur_dir_string = cur_dir.to_str().unwrap();
+                let default_fp: String = format!("{cur_dir_string}/{DEFAULT_SESSION_FILENAME}");
+                default_fp
+            }
+        };
+
+    let asp_args_map : HashMap<String, HashMap<String, Value>> = 
+        match args.g_asp_args_filepath {
+            Some(fp) => {
+                let asp_args_map: HashMap<String, HashMap<String, Value>> = decode_from_file_and_print(fp, "ASP ARGS MAP".to_string())?;
+                asp_args_map
+            }
+            None => {
+                HashMap::new()
+            }
+        };
+
+    let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
+
 
     let (my_term, my_session, my_asp_args)
             :(Term, Attestation_Session, HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>) 
-                = match (args.term_filepath, args.session_filepath, args.g_asp_args_filepath) {
-                            (Some(term_fp), Some(session_fp), Some(args_fp)) => {
+                = match args.term_filepath {
+                    Some(term_fp) => {
+                        let err_string = format!("Couldn't read Term JSON file");
+                        let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
 
-                                eprintln!("\n\n\n\nBEFORE\n\n\n\n");
-                                //let term = decode_from_file_and_print(term_fp, "Term".to_string())?;
+                        let termval = deserialize_deep_json(&term_contents)?;
+                        let term : Term = from_value(termval)?;
+                        eprintln!("\nDecoded term as:");
+                        eprintln!("{:?}", term);
 
-                                eprintln!("decoding Term inline");
-                                let err_string = format!("Couldn't read Term JSON file");
-                                let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
+                        (term, session, asp_args_map)
+                    }
+                    _ => {
 
-                                //eprintln!("\n{type_string} contents:\n{term_contents}");
-                                //let term= serde_json::from_str(&term_contents)?;
-                                //eprintln!("\n\n\n\nHEREEEE");
+                        match (args.req_filepath, args.env_filepath) {
 
-                                let termval = deserialize_deep_json(&term_contents)?;
+                            (Some(res_req_filepath), Some(res_env_filepath)) => {
 
-                                let term : Term = from_value(termval)?;
+                                eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
+                                eprintln!("\nres_env_filepath arg: {}", res_env_filepath);
 
+                                let res_req: RodeoClientRequest = decode_from_file_and_print(res_req_filepath, "RodeoClientRequest".to_string())?;
+                                let my_res_env: RodeoEnvironmentMap = decode_from_file_and_print(res_env_filepath, "RodeoEnvironmentMap".to_string())?;
 
-                                eprintln!("\nDecoded term as:");
-                                eprintln!("{:?}", term);
+                                let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
+                                let my_env = my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
+                                let my_term_orig = my_env.RodeoClientEnv_term.clone();
 
-                                //let term = rust_am_lib::copland::Term::asp(rust_am_lib::copland::ASP::SIG);
+                                let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
+                                let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
 
-                                eprintln!("\n\n\n\nGOT HERE\n\n\n\n");
-                                let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
-                                let asp_args_map = decode_from_file_and_print(args_fp, "ASP ARGS MAP".to_string())?;
-                                (term, session, asp_args_map)
+                                (my_term_orig, my_session, asp_args_map_in)
                             }
-                            _ => {
+                            _ => { // Only valid CLI args left is hamr-root special case
+                            
+                                match args.hamr_root {
+                                    Some(vec) => {
 
-                                match (args.req_filepath, args.env_filepath) {
+                                        match &vec[..] { // Borrow the Vec as a slice
+                                            [hamr_root_dir] => {
+                                                let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
+                                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
 
-                                    (Some(res_req_filepath), Some(res_env_filepath)) => {
+                                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
+                                                let term_string = serde_json::to_string(&term)?;
+                                                fs::write(term_fp, term_string)?;
+                                                (term, session, asp_args_map)
+                                            },
+                                            [hamr_root_dir, golden_filename] => {
+                                                let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
+                                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
 
-                                        eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
-                                        eprintln!("\nres_env_filepath arg: {}", res_env_filepath);
-
-                                        let res_req: RodeoClientRequest = decode_from_file_and_print(res_req_filepath, "RodeoClientRequest".to_string())?;
-                                        let my_res_env: RodeoEnvironmentMap = decode_from_file_and_print(res_env_filepath, "RodeoEnvironmentMap".to_string())?;
-
-                                        let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
-                                        let my_env = my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
-                                        let my_term_orig = my_env.RodeoClientEnv_term.clone();
-
-                                        let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
-                                        let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
-
-                                        (my_term_orig, my_session, asp_args_map_in)
+                                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
+                                                let term_string = serde_json::to_string(&term)?;
+                                                fs::write(term_fp, term_string)?;
+                                                (term, session, asp_args_map)
+                                                
+                                            },
+                                            /*
+                                            [hamr_root_dir, golden_filename, protocol_filename] => {
+                                                //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
+                                            }
+                                            */
+                                            _ => {panic!("hamr_root CLI arg given wrong number of arguments...")}
+                                        }
+                    
                                     }
-                                    _ => {panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term, Attestation_Session, ASP_ARGS Map) or (RodeoClientRequest, RodeoClientEnvironment) args!")}
-                                }
+                                    None => {
+                                        panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (RodeoClientRequest, RodeoClientEnvironment) args!")
+                                    }
+                                } 
+                            }                          
                         }
+                }
     };
+
 
     let myPlc: Plc = "TOP_PLC".to_string();
     let my_evidence: Evidence = rust_am_lib::copland::EMPTY_EVIDENCE.clone();
@@ -368,6 +421,19 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
 }
 
+/*
+fn process_vector(v: &Vec<i32>) {
+    match &v[..] { // Borrow the Vec as a slice
+        [] => println!("The vector is empty."),
+        [first] => println!("The vector has one element: {}", first),
+        [first, second] => println!("The vector has two elements: {} and {}", first, second),
+        [first, second, third, ..] => {
+            println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
+        }
+        _ => println!("The vector has some other number of elements."),
+    }
+}
+*/
 
 fn main() -> std::io::Result<()> {
 
@@ -378,7 +444,38 @@ fn main() -> std::io::Result<()> {
     let vreq : ProtocolRunRequest = rodeo_to_am_request(rodeo_session_config.clone())?;
 
     // Check for "provisinoing mode"
-    let maybe_provisioning_flag = args.provisioned_evidence_filepath;
+    let maybe_provisioning_flag = 
+        match args.provisioned_evidence_filepath {
+            Some(golden_fp) => {Some(golden_fp)}
+            None => {
+
+                match args.hamr_root {
+                    Some(vec) => {
+
+                    match &vec[..] { // Borrow the Vec as a slice
+                        [hamr_root_dir] => {
+                            let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
+                            Some(golden_fp)
+                        },
+                        [hamr_root_dir, golden_filename] => {
+                            let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
+                            Some(golden_fp)
+                            //println!("The vector has two elements: {} and {}", first, second)
+                        },
+                        /*
+                        [hamr_root_dir, golden_filename, protocol_filename] => {
+                            //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
+                        }
+                        */
+                        _ => {panic!("hamr_root CLI arg given wrong number of arguments...")} //println!("The vector has some other number of elements."),
+                    }
+                        //Some("hi".to_string())
+                    }
+                    None => {None}
+                }
+            }
+
+        };
 
     let new_vreq = 
         match maybe_provisioning_flag.clone() {
@@ -409,7 +506,20 @@ fn main() -> std::io::Result<()> {
     let res_asp_libs_filepath : String = args.libs_asp_bin;
     eprintln!("res_asp_libs_filepath arg: {}", res_asp_libs_filepath);
 
-    let res_manifest_filepath : String = args.manifest_filepath;
+    let maybe_manifest_fp = args.manifest_filepath;
+
+    let res_manifest_filepath : String = 
+        match maybe_manifest_fp {
+
+            Some(fp) => {fp}
+            None => {
+                let cur_dir = env::current_dir()?;
+                let cur_dir_string = cur_dir.to_str().unwrap();
+                let default_manifest_fp: String = "testing/manifests/Manifest_P0.json".to_string();
+                let default_fp: String = format!("{cur_dir_string}/{default_manifest_fp}");
+                default_fp
+            }
+        };
     eprintln!("res_manifest_filepath arg: {}", res_manifest_filepath);
 
     let maybe_out_dir = args.output_dir;
