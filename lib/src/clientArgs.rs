@@ -9,6 +9,7 @@ const DEFAULT_SESSION_PATH: &'static str = "/rust-am-clients/testing/attestation
 const DEFAULT_CVM_PATH: &'static str = "cvm";
 
 pub const AM_REPOS_ROOT_ENV_VAR: &'static str = "AM_REPOS_ROOT";
+pub const ASP_BIN_ENV_VAR: &'static str = "ASP_BIN";
 
 fn get_local_env_var(s:String) -> std::io::Result<String> {
 
@@ -172,16 +173,45 @@ pub struct RodeoClientArgs {
     pub output_dir: Option<String>,
 
     /// Path pointing to asp-libs bin
-    #[arg(short, long)]
+    #[arg(short, long, default_value_t = 
+        get_local_env_var_w_suffix(ASP_BIN_ENV_VAR.to_string(), 
+                                   "" ).expect("Couldn't initialize default value for libs_asp_bin field of RodeoClientArgs struct.  
+                                                              Check for missing ASP_BIN Environment Variable?"))]
     pub libs_asp_bin: String,
 
     /// Path pointing to manifest filepath
     #[arg(short, long)]
-    pub manifest_filepath: String
+    pub manifest_filepath: Option<String>,
+
+    /// Path pointing to HAMR attestation directory
+    #[arg(short = 'h', long, value_delimiter = ' ', num_args = 1..4)]
+    pub hamr_root: Option<Vec<String>>,
 
 }
 
 pub fn get_rodeo_client_args () -> std::io::Result<RodeoClientArgs> {
     let args: RodeoClientArgs = RodeoClientArgs::parse();
+    Ok(args)
+}
+
+// Adapted from:  https://docs.rs/clap/latest/clap/
+#[derive(Parser, Debug, Clone)]
+#[command(version, about, long_about = None)]
+pub struct RodeoHamrClientArgs {
+    /// Path pointing to HAMR attestation directory
+    #[arg(short, long)]
+    pub attestation_root: String,
+
+    /// Path pointing to golden evidence file path used during provisioning and appraisal
+    #[arg(short, long)]
+    pub golden_evidence_filepath: String,
+
+    /// Path pointing to output file path for the generated Copland protocol term
+    #[arg(short, long)]
+    pub output_term_filepath: String
+}
+
+pub fn get_rodeo_hamr_client_args () -> std::io::Result<RodeoHamrClientArgs> {
+    let args: RodeoHamrClientArgs = RodeoHamrClientArgs::parse();
     Ok(args)
 }

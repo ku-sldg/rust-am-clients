@@ -1,0 +1,14 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "AppraisalSummaryResponse",
+    "description": "AppraisalSummary Response structure",
+    "type": "object", 
+    "properties": {
+        "TYPE": { "const": "RESPONSE" },
+        "ACTION": { "const": "APPSUMM" },
+        "SUCCESS": { "type": "boolean" },
+        "APPRAISAL_RESULT": { "type": "boolean" },
+        "PAYLOAD": {"type":  "object"}
+    },
+    "required": ["TYPE", "ACTION", "SUCCESS", "APPRAISAL_RESULT", "PAYLOAD"]
+  }
