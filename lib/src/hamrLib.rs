@@ -100,8 +100,9 @@ fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_Compo
 
 
     let reports = hamr_component_report.reports;
+    let idpath = hamr_component_report.idPath;
 
-    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_contract_report_to_MAESTRO_Slice_ASPs(x.clone(), golden_evidence_fp.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_contract_report_to_MAESTRO_Slice_ASPs(x.clone(), idpath.clone(), golden_evidence_fp.clone(), project_root_fp.clone())).collect();
 
     let res = res1.into_iter().flatten().collect();
 
@@ -114,6 +115,7 @@ struct ASP_ARGS_ReadfileRange {
     start_index: usize,
     end_index: usize, 
     metadata: String, 
+    meta: String,
     env_var_golden: String,
     filepath_golden: String
 }
@@ -125,6 +127,7 @@ fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice, golden_evidence_fp:String)
                   start_index: maestro_slice.beginLine, 
                   end_index: maestro_slice.endLine,
                   metadata: maestro_slice.hamr_slice.meta.clone(), 
+                  meta: maestro_slice.hamr_slice.meta.clone(),
                   env_var_golden: "".to_string(),
                   filepath_golden: golden_evidence_fp
                 };
@@ -132,8 +135,8 @@ fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice, golden_evidence_fp:String)
         let asp_args_json = serde_json::to_value(asp_args).unwrap();
 
         let targid_prefix = maestro_slice.targid;
-        let targid_suffix = maestro_slice.hamr_slice.meta;
-        let targid = format!("{targid_prefix}:  {targid_suffix}");
+        //let targid_suffix = maestro_slice.hamr_slice.meta;
+        let targid = targid_prefix; //format!("{targid_prefix}:  {targid_suffix}");
 
         let slice_asp_params : rust_am_lib::copland::ASP_PARAMS = rust_am_lib::copland::ASP_PARAMS {
         ASP_ID: "readfile_range".to_string(),
@@ -147,12 +150,18 @@ fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice, golden_evidence_fp:String)
 
 }
 
-fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract_report:HAMR_ComponentContractReport, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
+fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract_report:HAMR_ComponentContractReport, idpath:Vec<String>, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
 
 
     let slices = hamr_component_contract_report.slices;
 
-    let my_id = hamr_component_contract_report.id;
+    let idpath_string = idpath.join(".");
+    let component_contract_id = hamr_component_contract_report.id;
+    let my_id = format!("{idpath_string}:: {component_contract_id}");
+
+    //eprintln!("\n\n\n\n\n\nMY ID: {}\n\n\n\n\n\n", my_id);
+
+    //panic!("hi");
 
     let maestro_slices : Vec<MAESTRO_Slice> = slices.iter().map(|x| HAMR_Slice_to_MAESTRO_Slice(x, project_root_fp.clone(), my_id.clone())).collect();
 
@@ -189,12 +198,18 @@ fn HAMR_Slice_to_MAESTRO_Slice (hamr_slice:&HAMR_Slice, project_root_fp:String, 
     let bline = hamr_slice.pos.beginLine;
     let eline = hamr_slice.pos.endLine;
 
+    let bline_string= bline.to_string();
+    let eline_string = eline.to_string();
+    let uri_slice_string = format!("{uri_absolute}:: {bline_string}-{eline_string}");
+
+    let new_id = format!("{id}:: {uri_slice_string}");
+
     let res : MAESTRO_Slice = 
         MAESTRO_Slice { hamr_slice:hamr_slice.clone(), 
                         uri: uri_absolute, 
                         beginLine: bline, 
                         endLine: eline, 
-                        targid: id };
+                        targid: new_id };
     res
 }
 
