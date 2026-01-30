@@ -34,3 +34,24 @@ make rodeo_client_test
 Successful output should be some JSON logging followed by something like: 
 
 ``Protocol completed successfully!``
+
+## Steps for testing the RODEO-HAMR workflow
+
+1. Install and test the `rust-rodeo-client` executable and its dependencies (see above)
+1. Clone the [INSPECTA-models](https://github.com/loonwerks/INSPECTA-models) repository, and locate the `attestation/` directory for the codegen project you wish to attest (i.e. for the isolette project this would be:  `INSPECTA-models/isolette/hamr/microkit/attestation`).  We'll call this path `HAMR_ATTESTATION_ROOT`.
+1. Make sure there is a file named `aadl_attestation_report.json` at `HAMR_ATTESTATION_ROOT`.  MAESTRO tools rely on that specific filename (for now).
+1. From the top-level directory of the `rust-am-clients` repository, run HAMR contract provisioning:
+
+    ```bash
+    cargo run --release --bin rust-rodeo-client -- --hamr-root <HAMR_ATTESTATION_ROOT> hamr_contract_golden_evidence.json
+    ```
+
+    This will perform provisioning and populate two MAESTRO-generated files in the `HAMR_ATTESTATION_ROOT` directory, namely `hamr_contract_term.json` and `hamr_contract_golden_evidence.json`.  To verify their creation, type: `git status` in the INSPECTA-models repo.
+1. Again in `rust-am-clients/`, run HAMR contract appraisal:
+
+    ```bash
+    cargo run --release --bin rust-rodeo-client -- -t <HAMR_ATTESTATION_ROOT>/hamr_contract_term.json -o <OUTPUT_DIR> -a
+    ```
+    The `-t` option points to the Copland protocol term generated in the previous step.  `-o` specifies an output directory for the Appraisal Summary and intermediate files.  `-a` tells the MAESTRO tools to perform evidence appraisal.
+1. 
+
