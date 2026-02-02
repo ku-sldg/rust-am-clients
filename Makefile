@@ -35,6 +35,9 @@ rodeo_client_help:
 rodeo_client_test:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -r $(RODEO_REQUESTS_DIR)/abstract_requests/req_rodeo_attest_abstract.json -e $(RODEO_ENVS_DIR)env_rodeo_attest.json
 
+rodeo_client_test_granular:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_test.json -s $(RODEO_CONFIGS_DIR)sessions/session_test.json -o $(OUTPUTS_DIR)
+
 rodeo_client_hamr:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_micro.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/micro_args_concrete.json -a 2> /dev/null
 

@@ -191,6 +191,10 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
     let fp_suffix = "cvm_request.json".to_string();
     let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
     let am_req_string = serde_json::to_string(&am_req)?;
+
+
+
+    fs::create_dir_all(fp_prefix)?;
     fs::write(&full_req_fp, am_req_string.clone())?;
 
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
@@ -531,6 +535,8 @@ fn main() -> std::io::Result<()> {
 
             let fp_suffix = "cvm_response.json".to_string();
             let full_fp = format!("{fp}/{fp_suffix}");
+
+            fs::create_dir_all(fp)?;
             fs::write(full_fp, am_resp_string)?;   
         }
         _ => {()}
@@ -571,6 +577,7 @@ fn main() -> std::io::Result<()> {
 
                             let fp_suffix = "appsumm_response.json".to_string();
                             let full_fp = format!("{fp}/{fp_suffix}");
+                            fs::create_dir_all(fp)?;
                             fs::write(full_fp, appsumm_resp_string)?;   
                         }
                         _ => {()}
