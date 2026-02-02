@@ -168,22 +168,34 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     Ok (vreq)
 }
 
-fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
+fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
     eprintln!("\n\n manifest_path: {}", manifest_path);
 
     let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
     eprintln!("\nManifest contents:\n{manifest_contents}");
 
+    let fp_prefix : String = match &maybe_out_dir {
+        Some(fp) => {
+            fp.to_string()
+        }
+        None => {
+
+            let cur_dir = env::current_dir()?;
+            let cur_dir_string = cur_dir.to_str().unwrap();
+            let default_path = "testing/outputs/".to_string();
+            let default_prefix: String = format!("{cur_dir_string}/{default_path}");
+            default_prefix
+        }
+    };
+    let fp_suffix = "cvm_request.json".to_string();
+    let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
     let am_req_string = serde_json::to_string(&am_req)?;
-
-    let req_fp = "/Users/adampetz/Documents/Summer_2025/maestro_repos/rust-am-clients/testing/outputs/cvm_req_temp.json";
-
-    fs::write(req_fp, am_req_string.clone())?; 
+    fs::write(&full_req_fp, am_req_string.clone())?;
 
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
 
-    let cvm_args = ["--manifest", &manifest_contents, "--asp_bin", &asp_bin_path, "--req_file", req_fp];
+    let cvm_args = ["--manifest", &manifest_contents, "--asp_bin", &asp_bin_path, "--req_file", &full_req_fp];
 
     eprintln!("\n\n\nCVM_ARGS: {:?} \n\n\n", cvm_args);
 
@@ -423,20 +435,6 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
 }
 
-/*
-fn process_vector(v: &Vec<i32>) {
-    match &v[..] { // Borrow the Vec as a slice
-        [] => println!("The vector is empty."),
-        [first] => println!("The vector has one element: {}", first),
-        [first, second] => println!("The vector has two elements: {} and {}", first, second),
-        [first, second, third, ..] => {
-            println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
-        }
-        _ => println!("The vector has some other number of elements."),
-    }
-}
-*/
-
 fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_client_args()?;
@@ -471,7 +469,6 @@ fn main() -> std::io::Result<()> {
                         */
                         _ => {panic!("hamr_root CLI arg given wrong number of arguments...")} //println!("The vector has some other number of elements."),
                     }
-                        //Some("hi".to_string())
                     }
                     None => {None}
                 }
@@ -526,26 +523,14 @@ fn main() -> std::io::Result<()> {
 
     let maybe_out_dir = args.output_dir;
 
-    match &maybe_out_dir {
-        Some(fp) => {
-            let am_req_string = serde_json::to_string(&new_vreq)?;
-
-            let fp_suffix = "cvm_request.json".to_string();
-            let full_fp = format!("{fp}{fp_suffix}");
-            fs::write(full_fp, am_req_string)?;   
-        }
-        _ => {()}
-    };
-
-
-    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, new_vreq)?;
+    let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 
     match &maybe_out_dir {
         Some(fp) => {
             let am_resp_string = serde_json::to_string(&resp)?;
 
             let fp_suffix = "cvm_response.json".to_string();
-            let full_fp = format!("{fp}{fp_suffix}");
+            let full_fp = format!("{fp}/{fp_suffix}");
             fs::write(full_fp, am_resp_string)?;   
         }
         _ => {()}
@@ -585,7 +570,7 @@ fn main() -> std::io::Result<()> {
                             let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
 
                             let fp_suffix = "appsumm_response.json".to_string();
-                            let full_fp = format!("{fp}{fp_suffix}");
+                            let full_fp = format!("{fp}/{fp_suffix}");
                             fs::write(full_fp, appsumm_resp_string)?;   
                         }
                         _ => {()}
