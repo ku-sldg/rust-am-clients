@@ -2,7 +2,7 @@
 #![allow(non_snake_case)]
 
 // Custom package imports
-//use crate::clientArgs::*;
+use rust_am_lib::copland::*;
 
 // Other packages required to perform specific ASP action.
 use std::fs;
@@ -64,8 +64,80 @@ struct MAESTRO_Slice {
     targid: String
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Resolute_Appsumm_Member {
+    component:String,
+    contract_id:String,
+    location:String,
+    meta:String,
+    result:bool
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ResoluteAppraisalSummaryResponse {
+    pub TYPE: String,
+    pub ACTION: String,
+    pub SUCCESS: bool,
+    pub APPRAISAL_RESULT: bool,
+    pub PAYLOAD: Vec<Resolute_Appsumm_Member>
+}
 
 
+fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummReportValue) -> Resolute_Appsumm_Member {
+
+    let appsumm_targid_string = targid.clone();
+
+    let (component_res_string, rest) = appsumm_targid_string.split_once(":: ").unwrap();
+    let (id_res_string, rest) = rest.split_once(":: ").unwrap();
+    let (uri_res_string, rest) = rest.split_once(":: ").unwrap();
+    let range_res_string = rest;
+
+    let location_res_string = format!("{uri_res_string}::{range_res_string}");
+
+    let appsumm_result = v.result;
+
+     let res : Resolute_Appsumm_Member = Resolute_Appsumm_Member {
+        contract_id: id_res_string.to_string(),
+        component: component_res_string.to_string(),
+        location: location_res_string.to_string(),
+        meta: v.meta,
+        result: appsumm_result
+     };
+
+     res
+
+}
+
+fn appsumm_to_resolute_appsumms (appsumm:AppraisalSummary) -> Vec<Resolute_Appsumm_Member> {
+
+    let golden_evidence_appr_key = "goldenevidence_appr";
+    let targmap= appsumm.get(golden_evidence_appr_key).unwrap();
+
+    let targvec : Vec<(&String, &AppSummReportValue)> = targmap.into_iter().collect();
+
+    let resvec: Vec<Resolute_Appsumm_Member> = targvec.iter().map(|(x, y)| appsumm_report_value_to_resolute_appsumm_member((*x).clone(),(*y).clone())).collect();
+
+    resvec
+
+}
+
+pub fn appsumm_response_to_resolute_appsumm_response(resp:AppraisalSummaryResponse) -> ResoluteAppraisalSummaryResponse { 
+
+    let appsumm = resp.PAYLOAD;
+
+    let members = appsumm_to_resolute_appsumms(appsumm);
+
+    //let json_members: Vec<serde_json::Value> = members.iter().map(|x| serde_json::to_value(x).unwrap()).collect();
+         
+    let res : ResoluteAppraisalSummaryResponse = ResoluteAppraisalSummaryResponse {
+        TYPE: resp.TYPE,
+        ACTION: resp.ACTION,
+        SUCCESS: resp.SUCCESS,
+        APPRAISAL_RESULT: resp.APPRAISAL_RESULT,
+        PAYLOAD: members
+    };
+    res
+}
 
 
 fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
