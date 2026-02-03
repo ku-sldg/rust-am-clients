@@ -168,12 +168,8 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     Ok (vreq)
 }
 
-fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
-    eprintln!("\n\n manifest_path: {}", manifest_path);
-
-    let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
-    eprintln!("\nManifest contents:\n{manifest_contents}");
+fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: String, default_mid_path:String, outstring:String) -> std::io::Result<String> {
 
     let fp_prefix : String = match &maybe_out_dir {
         Some(fp) => {
@@ -183,19 +179,31 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
             let cur_dir = env::current_dir()?;
             let cur_dir_string = cur_dir.to_str().unwrap();
-            let default_path = "testing/outputs/".to_string();
+            let default_path = default_mid_path; //"testing/outputs/".to_string();
             let default_prefix: String = format!("{cur_dir_string}/{default_path}");
             default_prefix
         }
     };
-    let fp_suffix = "cvm_request.json".to_string();
+    //let fp_suffix = "cvm_request.json".to_string();
     let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
-    let am_req_string = serde_json::to_string(&am_req)?;
-
-
+    //let am_req_string = serde_json::to_string(&am_req)?;
 
     fs::create_dir_all(fp_prefix)?;
-    fs::write(&full_req_fp, am_req_string.clone())?;
+    fs::write(&full_req_fp, outstring)?;
+    Ok(full_req_fp)
+}
+
+fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
+
+    eprintln!("\n\n manifest_path: {}", manifest_path);
+
+    let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
+    eprintln!("\nManifest contents:\n{manifest_contents}");
+
+    let am_req_suffix = "cvm_request.json".to_string();
+    let am_req_mid_path = "testing/outputs/".to_string();
+    let am_req_string = serde_json::to_string(&am_req)?;
+    let full_req_fp = write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
 
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
 
@@ -529,18 +537,11 @@ fn main() -> std::io::Result<()> {
 
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 
-    match &maybe_out_dir {
-        Some(fp) => {
-            let am_resp_string = serde_json::to_string(&resp)?;
 
-            let fp_suffix = "cvm_response.json".to_string();
-            let full_fp = format!("{fp}/{fp_suffix}");
-
-            fs::create_dir_all(fp)?;
-            fs::write(full_fp, am_resp_string)?;   
-        }
-        _ => {()}
-    };
+    let am_resp_suffix = "cvm_response.json".to_string();
+    let am_resp_mid_path = "testing/outputs/".to_string();
+    let am_resp_string = serde_json::to_string(&resp)?;
+    let _ = write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
 
     let resp_rawev = resp.PAYLOAD.clone().0;
     let success_bool: bool = appsumm_rawev(resp_rawev);
@@ -571,17 +572,10 @@ fn main() -> std::io::Result<()> {
 
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
-                    match &maybe_out_dir {
-                        Some(fp) => {
-                            let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
-
-                            let fp_suffix = "appsumm_response.json".to_string();
-                            let full_fp = format!("{fp}/{fp_suffix}");
-                            fs::create_dir_all(fp)?;
-                            fs::write(full_fp, appsumm_resp_string)?;   
-                        }
-                        _ => {()}
-                    };
+                let appsumm_resp_suffix = "appsumm_response.json".to_string();
+                let appsumm_resp_mid_path = "testing/outputs/".to_string();
+                let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
+                let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path, appsumm_resp_string.clone())?;
             }
             else {eprintln!("\n\nProtocol completed successfully!\n\n")}
         }
