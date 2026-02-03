@@ -34,6 +34,7 @@ pub struct RodeoClientResponse {
     pub RodeoClientResponse_cvm_response: ProtocolRunResponse
 }
 
+/*
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RodeoEnvironment {
     pub RodeoClientEnv_term: Term,
@@ -41,6 +42,7 @@ pub struct RodeoEnvironment {
 }
 
 pub type RodeoEnvironmentMap = HashMap<ASP_ID, RodeoEnvironment>;
+*/
 
 
 fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>, keep_orig:bool) -> ASP_PARAMS {
@@ -367,8 +369,10 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
                         (term, session, asp_args_map)
                     }
-                    _ => {
+                    None => { // No Term filepath passed on CLI
 
+                        
+                        /*
                         match (args.req_filepath, args.env_filepath) {
 
                             (Some(res_req_filepath), Some(res_env_filepath)) => {
@@ -389,6 +393,8 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                 (my_term_orig, my_session, asp_args_map_in)
                             }
                             _ => { // Only valid CLI args left is hamr-root special case
+
+                            */
                             
                                 match args.hamr_root {
                                     Some(vec) => {
@@ -423,12 +429,12 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                     
                                     }
                                     None => {
-                                        panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (RodeoClientRequest, RodeoClientEnvironment) args!")
+                                        panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (--hamr-root) args!")
                                     }
                                 } 
-                            }                          
-                        }
-                }
+                        }                          
+                       // } 
+               // }
     };
 
 
