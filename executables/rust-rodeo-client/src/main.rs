@@ -34,15 +34,6 @@ pub struct RodeoClientResponse {
     pub RodeoClientResponse_cvm_response: ProtocolRunResponse
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct RodeoEnvironment {
-    pub RodeoClientEnv_term: Term,
-    pub RodeoClientEnv_session: Attestation_Session
-}
-
-pub type RodeoEnvironmentMap = HashMap<ASP_ID, RodeoEnvironment>;
-
-
 fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>, keep_orig:bool) -> ASP_PARAMS {
 
     let id : ASP_ID = params.ASP_ID.clone();
@@ -168,12 +159,8 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     Ok (vreq)
 }
 
-fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
-    eprintln!("\n\n manifest_path: {}", manifest_path);
-
-    let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
-    eprintln!("\nManifest contents:\n{manifest_contents}");
+fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: String, default_mid_path:String, outstring:String) -> std::io::Result<String> {
 
     let fp_prefix : String = match &maybe_out_dir {
         Some(fp) => {
@@ -183,19 +170,30 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
             let cur_dir = env::current_dir()?;
             let cur_dir_string = cur_dir.to_str().unwrap();
-            let default_path = "testing/outputs/".to_string();
+            let default_path = default_mid_path;
             let default_prefix: String = format!("{cur_dir_string}/{default_path}");
             default_prefix
         }
     };
-    let fp_suffix = "cvm_request.json".to_string();
+
     let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
-    let am_req_string = serde_json::to_string(&am_req)?;
-
-
 
     fs::create_dir_all(fp_prefix)?;
-    fs::write(&full_req_fp, am_req_string.clone())?;
+    fs::write(&full_req_fp, outstring)?;
+    Ok(full_req_fp)
+}
+
+fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
+
+    eprintln!("\n\n manifest_path: {}", manifest_path);
+
+    let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
+    eprintln!("\nManifest contents:\n{manifest_contents}");
+
+    let am_req_suffix = "cvm_request.json".to_string();
+    let am_req_mid_path = "testing/outputs/".to_string();
+    let am_req_string = serde_json::to_string(&am_req)?;
+    let full_req_fp = write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
 
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
 
@@ -285,20 +283,15 @@ fn appsumm_rawev (rev:RawEv) -> bool {
 
 fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
 
-     eprintln!("In decode_from_file_and_print");
-     let err_string = format!("Couldn't read {type_string} JSON file");
-     let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
-                                //eprintln!("\n{type_string} contents:\n{term_contents}");
+    let err_string = format!("Couldn't read {type_string} JSON file");
+    let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
                                 
-                                let termval = deserialize_deep_json(&term_contents)?;
-
-                                let term : T = from_value(termval)?;
-                                
-                                //let term : T = serde_json::from_str(&term_contents)?;
-                                //eprintln!("\n\n\n\nHEREEEE");
-                                eprintln!("\nDecoded term as:");
-                                eprintln!("{:?}", term);
-                                Ok(term)
+    let termval = deserialize_deep_json(&term_contents)?;
+    let term : T = from_value(termval)?;
+    
+    eprintln!("\nDecoded term as:");
+    eprintln!("{:?}", term);
+    Ok(term)
 }
 
 fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
@@ -359,68 +352,45 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
                         (term, session, asp_args_map)
                     }
-                    _ => {
+                    None => { // No Term filepath passed on CLI
 
-                        match (args.req_filepath, args.env_filepath) {
+                        match args.hamr_root {
+                            Some(vec) => {
 
-                            (Some(res_req_filepath), Some(res_env_filepath)) => {
+                                match &vec[..] { // Borrow the Vec as a slice
+                                    [hamr_root_dir] => {
+                                        let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
+                                        let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
 
-                                eprintln!("\nres_req_filepath arg: {}", res_req_filepath);
-                                eprintln!("\nres_env_filepath arg: {}", res_env_filepath);
+                                        let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
+                                        let term_string = serde_json::to_string(&term)?;
+                                        fs::write(term_fp, term_string)?;
+                                        (term, session, asp_args_map)
+                                    },
+                                    [hamr_root_dir, golden_filename] => {
+                                        let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
+                                        let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
 
-                                let res_req: RodeoClientRequest = decode_from_file_and_print(res_req_filepath, "RodeoClientRequest".to_string())?;
-                                let my_res_env: RodeoEnvironmentMap = decode_from_file_and_print(res_env_filepath, "RodeoEnvironmentMap".to_string())?;
-
-                                let asp_id_in: ASP_ID = res_req.RodeoClientRequest_attest_id;
-                                let my_env = my_res_env.get(&asp_id_in).expect(format!("Term not found in RodeoEnvironmentMap with key: '{}'", asp_id_in).as_str());
-                                let my_term_orig = my_env.RodeoClientEnv_term.clone();
-
-                                let my_session: Attestation_Session = my_env.RodeoClientEnv_session.clone();
-                                let asp_args_map_in: HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>> = res_req.RodeoClientRequest_attest_args;
-
-                                (my_term_orig, my_session, asp_args_map_in)
+                                        let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
+                                        let term_string = serde_json::to_string(&term)?;
+                                        fs::write(term_fp, term_string)?;
+                                        (term, session, asp_args_map)
+                                        
+                                    },
+                                    /*
+                                    [hamr_root_dir, golden_filename, protocol_filename] => {
+                                        //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
+                                    }
+                                    */
+                                    _ => {panic!("hamr_root CLI arg given wrong number of arguments...")}
+                                }
+            
                             }
-                            _ => { // Only valid CLI args left is hamr-root special case
-                            
-                                match args.hamr_root {
-                                    Some(vec) => {
-
-                                        match &vec[..] { // Borrow the Vec as a slice
-                                            [hamr_root_dir] => {
-                                                let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
-
-                                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
-                                                let term_string = serde_json::to_string(&term)?;
-                                                fs::write(term_fp, term_string)?;
-                                                (term, session, asp_args_map)
-                                            },
-                                            [hamr_root_dir, golden_filename] => {
-                                                let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
-                                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
-
-                                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
-                                                let term_string = serde_json::to_string(&term)?;
-                                                fs::write(term_fp, term_string)?;
-                                                (term, session, asp_args_map)
-                                                
-                                            },
-                                            /*
-                                            [hamr_root_dir, golden_filename, protocol_filename] => {
-                                                //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
-                                            }
-                                            */
-                                            _ => {panic!("hamr_root CLI arg given wrong number of arguments...")}
-                                        }
-                    
-                                    }
-                                    None => {
-                                        panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (RodeoClientRequest, RodeoClientEnvironment) args!")
-                                    }
-                                } 
-                            }                          
-                        }
-                }
+                            None => {
+                                panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (--hamr-root) args!")
+                            }
+                        } 
+                    }                          
     };
 
 
@@ -464,7 +434,6 @@ fn main() -> std::io::Result<()> {
                         [hamr_root_dir, golden_filename] => {
                             let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
                             Some(golden_fp)
-                            //println!("The vector has two elements: {} and {}", first, second)
                         },
                         /*
                         [hamr_root_dir, golden_filename, protocol_filename] => {
@@ -529,18 +498,11 @@ fn main() -> std::io::Result<()> {
 
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 
-    match &maybe_out_dir {
-        Some(fp) => {
-            let am_resp_string = serde_json::to_string(&resp)?;
 
-            let fp_suffix = "cvm_response.json".to_string();
-            let full_fp = format!("{fp}/{fp_suffix}");
-
-            fs::create_dir_all(fp)?;
-            fs::write(full_fp, am_resp_string)?;   
-        }
-        _ => {()}
-    };
+    let am_resp_suffix = "cvm_response.json".to_string();
+    let am_resp_mid_path = "testing/outputs/".to_string();
+    let am_resp_string = serde_json::to_string(&resp)?;
+    let _ = write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
 
     let resp_rawev = resp.PAYLOAD.clone().0;
     let success_bool: bool = appsumm_rawev(resp_rawev);
@@ -569,19 +531,20 @@ fn main() -> std::io::Result<()> {
                 eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
                 eprintln!("{:?}\n", appsumm_resp);
 
+                let appsumm_resp_mid_path = "testing/outputs/".to_string();
+
+                let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
+                let maestro_appsumm_resp_suffix = "maestro_appsumm_response.json".to_string();
+                let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
+
+                let resolute_appsumm_response = appsumm_response_to_resolute_appsumm_response(appsumm_resp.clone());
+
+                let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
+                let appsumm_resp_suffix = "appsumm_response.json".to_string();
+                let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
+
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
-                    match &maybe_out_dir {
-                        Some(fp) => {
-                            let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
-
-                            let fp_suffix = "appsumm_response.json".to_string();
-                            let full_fp = format!("{fp}/{fp_suffix}");
-                            fs::create_dir_all(fp)?;
-                            fs::write(full_fp, appsumm_resp_string)?;   
-                        }
-                        _ => {()}
-                    };
             }
             else {eprintln!("\n\nProtocol completed successfully!\n\n")}
         }

@@ -140,14 +140,6 @@ pub struct RodeoClientArgs {
     #[arg(short, long, default_value_t = DEFAULT_CVM_PATH.to_string())]
     pub cvm_filepath: String,
 
-    /// Path pointing to (JSON) RodeoClientRequest file
-    #[arg(short, long)]
-    pub req_filepath: Option<String>,
-    
-    /// Path pointing to (JSON) RodeoEnvironmentMap file
-    #[arg(short, long)]
-    pub env_filepath: Option<String>,
-
     /// Path pointing to (JSON) Term file
     #[arg(short, long)]
     pub term_filepath: Option<String>,
