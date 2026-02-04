@@ -2,13 +2,62 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "AppraisalSummaryResponse",
     "description": "AppraisalSummary Response structure",
-    "type": "object", 
+    "type": "object",
     "properties": {
-        "TYPE": { "const": "RESPONSE" },
-        "ACTION": { "const": "APPSUMM" },
-        "SUCCESS": { "type": "boolean" },
-        "APPRAISAL_RESULT": { "type": "boolean" },
-        "PAYLOAD": {"type":  "object"}
+        "TYPE": {
+            "const": "RESPONSE"
+        },
+        "ACTION": {
+            "const": "APPSUMM"
+        },
+        "SUCCESS": {
+            "type": "boolean"
+        },
+        "APPRAISAL_RESULT": {
+            "type": "boolean"
+        },
+        "PAYLOAD": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "component": {
+                        "type": "string",
+                        "description": "The AADL component ID path"
+                    },
+                    "contract_id": {
+                        "type": "string",
+                        "description": "The contract identifier."
+                    },
+                    "location": {
+                        "type": "string",
+                        "description": "<uri>::<begin-line>-<end-line>"
+                    },
+                    "meta": {
+                        "type": "string",
+                        "description": "The contract intent/metadata"
+                    },
+                    "result": {
+                        "type": "boolean",
+                        "description": "Indicator of appraisal success/failure for specific file slice"
+                    }
+                },
+                "required": [
+                    "component",
+                    "contract_id",
+                    "location",
+                    "meta",
+                    "result"
+                ],
+                "additionalProperties": false
+            }
+        }
     },
-    "required": ["TYPE", "ACTION", "SUCCESS", "APPRAISAL_RESULT", "PAYLOAD"]
-  }
+    "required": [
+        "TYPE",
+        "ACTION",
+        "SUCCESS",
+        "APPRAISAL_RESULT",
+        "PAYLOAD"
+    ]
+}

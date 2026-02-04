@@ -38,20 +38,21 @@ Successful output should be some JSON logging followed by something like:
 ## Steps for testing the RODEO-HAMR workflow
 
 1. Install and test the `rust-rodeo-client` executable and its dependencies (see above)
-1. Clone the [INSPECTA-models](https://github.com/loonwerks/INSPECTA-models) repository, and locate the `attestation/` directory for the codegen project you wish to attest (i.e. for the isolette project this would be:  `INSPECTA-models/isolette/hamr/microkit/attestation`).  We'll call this path `HAMR_ATTESTATION_ROOT`.
-1. Make sure there is a file named `aadl_attestation_report.json` at `HAMR_ATTESTATION_ROOT`.  MAESTRO tools rely on that specific filename (for now).
+1. Clone the [INSPECTA-models](https://github.com/loonwerks/INSPECTA-models) repository, and locate the `attestation/` directory for the codegen project you wish to attest (i.e. for the isolette project this would be:  `INSPECTA-models/isolette/hamr/microkit/attestation`).  Below we assume this path is in an environment variable called `$HAMR_ATTESTATION_ROOT`.
+1. Make sure there is a file named `aadl_attestation_report.json` at `$HAMR_ATTESTATION_ROOT`.  MAESTRO tools rely on that specific filename (for now).
 1. From the top-level directory of the `rust-am-clients` repository, run HAMR contract provisioning:
 
     ```bash
-    cargo run --release --bin rust-rodeo-client -- --hamr-root <HAMR_ATTESTATION_ROOT> hamr_contract_golden_evidence.json
+    cargo run --release --bin rust-rodeo-client -- --hamr-root $HAMR_ATTESTATION_ROOT hamr_contract_golden_evidence.json
     ```
 
-    This will perform provisioning and populate two MAESTRO-generated files in the `HAMR_ATTESTATION_ROOT` directory, namely `hamr_contract_term.json` and `hamr_contract_golden_evidence.json`.  To verify their creation, type: `git status` in the INSPECTA-models repo.
+    Note:  the `--hamr-root` CLI arg expects two distinct parameters (separated by a space):  the hamr attestation root directory, and the name of the golden evidence file to put in that directory.
+    MAESTRO provisioning will populate two output files in the `$HAMR_ATTESTATION_ROOT` directory, namely `hamr_contract_term.json` (this filename is hardcoded for now) and `hamr_contract_golden_evidence.json` (parameter passed to provisioning).  To verify their creation, type: `git status` in the INSPECTA-models repo.
 1. Again in `rust-am-clients/`, run HAMR contract appraisal:
 
     ```bash
-    cargo run --release --bin rust-rodeo-client -- -t <HAMR_ATTESTATION_ROOT>/hamr_contract_term.json -o <OUTPUT_DIR> -a
+    cargo run --release --bin rust-rodeo-client -- -t $HAMR_ATTESTATION_ROOT/hamr_contract_term.json -a
     ```
-    The `-t` option points to the Copland protocol term generated in the previous step.  `-o` specifies an output directory for the Appraisal Summary and intermediate files.  `-a` tells the MAESTRO tools to perform evidence appraisal.
-1. Check the `<OUTPUT_DIR>` directory for the newly-generated file called `appsumm_response.json`.  This is an AppraisalSummary Response JSON structure.  The crucial field of this JSON object is `"APPRAISAL_RESULT"` which captures the overall appraisal judgement for the HAMR contract file slices as a boolean.  The JSON schema for the AppraisalSummary Response can be found [here](https://github.com/ku-sldg/rust-am-clients/blob/main/json_schemas/appsumm_response_schema.json)
+    The `-t` option points to the Copland protocol term generated in the previous step.  `-a` tells the MAESTRO tools to perform evidence appraisal against the golden evidence file generated during provisioning above (the path to this golden evidence file is embedded into the protocol term during provisioning).  
+1. Check the `rust-am-clients/testing/outputs/` directory for the newly-generated file called `appsumm_response.json` (the `-o` option can override this default output directory).  This is an AppraisalSummary Response JSON structure.  The crucial field of this JSON object is `"APPRAISAL_RESULT"` which captures the overall appraisal judgement for the HAMR contract file slices as a boolean.  The JSON schema for the AppraisalSummary Response can be found [here](https://github.com/ku-sldg/rust-am-clients/blob/main/json_schemas/appsumm_response_schema.json).
 
