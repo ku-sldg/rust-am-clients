@@ -11,10 +11,12 @@
             "const": "APPSUMM"
         },
         "SUCCESS": {
-            "type": "boolean"
+            "type": "boolean", 
+            "description": "false indicates a runtime error during execution of the evidence appraisal procedure"
         },
         "APPRAISAL_RESULT": {
-            "type": "boolean"
+            "type": "boolean", 
+            "description": "Overall result of semantic evidence appraisal (a cumulative judgement over all sub-appraisals)"
         },
         "PAYLOAD": {
             "type": "array",
@@ -31,7 +33,7 @@
                     },
                     "location": {
                         "type": "string",
-                        "description": "<uri>::<begin-line>-<end-line>"
+                        "description": "A pointer to a specific file slice in the form:  <uri>::<begin-line>-<end-line>"
                     },
                     "meta": {
                         "type": "string",
