@@ -227,7 +227,7 @@ fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract
 
     let slices = hamr_component_contract_report.slices;
 
-    let idpath_string = idpath.join(".");
+    let idpath_string = idpath.join("::");
     let component_contract_id = hamr_component_contract_report.id;
     let my_id = format!("{idpath_string}:: {component_contract_id}");
 
