@@ -3,6 +3,7 @@
 
 // Custom package imports
 use rust_am_lib::copland::*;
+use serde_json::json;
 
 // Other packages required to perform specific ASP action.
 use std::fs;
@@ -322,7 +323,11 @@ pub fn do_hamr_term_gen(attestation_report_root:String, golden_evidence_fp:Strin
     eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
 
     let term = ASP_Vec_to_Term(asps);
-    eprintln!("\nNew term: {:?} \n\n\n", term);
-    Ok(term)
+
+    let sigparams : ASP_PARAMS = ASP_PARAMS { ASP_ID: "sig".to_string(), ASP_ARGS:json!({}), ASP_PLC: "P0".to_string(), ASP_TARG_ID: "sig_targid".to_string() };
+    let sigasp = ASP::ASPC(sigparams);
+    let sigterm = Term::lseq(Box::new(term), Box::new(Term::asp(sigasp)));
+    eprintln!("\nNew term: {:?} \n\n\n", sigterm);
+    Ok(sigterm)
 
 }
