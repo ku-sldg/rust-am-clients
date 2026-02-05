@@ -88,6 +88,9 @@ fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummRepo
 
     let appsumm_targid_string = targid.clone();
 
+    if targid.contains("::") 
+    {
+
     let (component_res_string, rest) = appsumm_targid_string.split_once(":: ").unwrap();
     let (id_res_string, rest) = rest.split_once(":: ").unwrap();
     let (uri_res_string, rest) = rest.split_once(":: ").unwrap();
@@ -95,17 +98,27 @@ fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummRepo
 
     let location_res_string = format!("{uri_res_string}::{range_res_string}");
 
-    let appsumm_result = v.result;
-
      let res : Resolute_Appsumm_Member = Resolute_Appsumm_Member {
         contract_id: id_res_string.to_string(),
         component: component_res_string.to_string(),
         location: location_res_string.to_string(),
         meta: v.meta,
-        result: appsumm_result
+        result: v.result
      };
 
      res
+    }
+    else {
+        let res : Resolute_Appsumm_Member = Resolute_Appsumm_Member {
+            contract_id: "".to_string(),
+            component: "".to_string(),
+            location: "".to_string(),
+            meta: v.meta,
+            result: v.result
+        };
+
+     res
+    }
 
 }
 

@@ -180,6 +180,22 @@
                     "EvOutSig_BODY": 1
                 }
             },
+            "run_command_cargo_verus": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "run_command_autoverus": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
             "run_command_rocq": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
@@ -262,7 +278,9 @@
             "sig_tpm": "sig_tpm_appr",
             "uptime": "NULL",
             "run_command_verus": "run_command_verus_appr",
+            "run_command_cargo_verus": "run_command_verus_appr",
             "run_command_rocq": "run_command_rocq_appr",
+            "run_command_autoverus": "magic_appr",
             "verus_compare": "verus_compare_appr"
         }
     }
