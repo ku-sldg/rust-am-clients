@@ -357,25 +357,16 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                         match args.hamr_root {
                             Some(vec) => {
 
+                                let (hamr_root_dir, golden_fp) = 
+
                                 match &vec[..] { // Borrow the Vec as a slice
                                     [hamr_root_dir] => {
                                         let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                                        let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
-
-                                        let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
-                                        let term_string = serde_json::to_string(&term)?;
-                                        fs::write(term_fp, term_string)?;
-                                        (term, session, asp_args_map)
+                                        (hamr_root_dir, golden_fp)
                                     },
                                     [hamr_root_dir, golden_filename] => {
                                         let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
-                                        let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
-
-                                        let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
-                                        let term_string = serde_json::to_string(&term)?;
-                                        fs::write(term_fp, term_string)?;
-                                        (term, session, asp_args_map)
-                                        
+                                        (hamr_root_dir, golden_fp)  
                                     },
                                     /*
                                     [hamr_root_dir, golden_filename, protocol_filename] => {
@@ -383,15 +374,21 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                     }
                                     */
                                     _ => {panic!("hamr_root CLI arg given wrong number of arguments...")}
-                                }
+                                };
             
+                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp)?;
+                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
+                                let term_string = serde_json::to_string(&term)?;
+                                fs::write(term_fp, term_string)?;
+                                (term, session, asp_args_map)
+
                             }
                             None => {
                                 panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (--hamr-root) args!")
                             }
                         } 
-                    }                          
-    };
+                    }  // end No Term filepath passed on CLI                        
+                };
 
 
     let myPlc: Plc = "TOP_PLC".to_string();

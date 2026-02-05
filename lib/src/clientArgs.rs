@@ -179,6 +179,18 @@ pub struct RodeoClientArgs {
     #[arg(short = 'h', long, value_delimiter = ' ', num_args = 1..4)]
     pub hamr_root: Option<Vec<String>>,
 
+    /// Boolean to indicate adding the hash of (invariant) HAMR contract file slices to the HAMR workflow protocol (NOTE: you must have the --hamr_root option active for this to flag to matter)
+    #[arg(short, long, default_value_t = false)]
+    pub hamr_contracts: bool,
+
+    /// Boolean to indicate adding the hash of the verus executable (cargo-verus) to the HAMR workflow protocol (NOTE: you must have the --hamr_root option active for this to flag to matter)
+    #[arg(short, long, default_value_t = false)]
+    pub verus_hash: bool,
+
+    /// Boolean to indicate adding running the verus executable (cargo-verus) to the HAMR workflow protocol (NOTE: you must have the --hamr_root option active for this to flag to matter)
+    #[arg(short, long, default_value_t = false)]
+    pub verus_run: bool,
+
 }
 
 pub fn get_rodeo_client_args () -> std::io::Result<RodeoClientArgs> {

@@ -1,0 +1,12 @@
+{
+    "TERM_CONSTRUCTOR": "asp",
+    "TERM_BODY": {
+        "ASP_CONSTRUCTOR": "ASPC",
+        "ASP_BODY": {
+            "ASP_ID": "run_command_cargo_verus",
+            "ASP_ARGS": {},
+            "ASP_PLC": "p1",
+            "ASP_TARG_ID": "run_cargo_verus_targ"
+        }
+    }
+}

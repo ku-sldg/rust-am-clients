@@ -124,12 +124,16 @@ fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummRepo
 
 fn appsumm_to_resolute_appsumms (appsumm:AppraisalSummary) -> Vec<Resolute_Appsumm_Member> {
 
-    let golden_evidence_appr_key = "goldenevidence_appr";
-    let targmap= appsumm.get(golden_evidence_appr_key).unwrap();
+    //let golden_evidence_appr_key = "goldenevidence_appr";
+    let targmap: std::collections::hash_map::Values<'_, String, std::collections::HashMap<String, AppSummReportValue>>= appsumm.values(); //appsumm.get(golden_evidence_appr_key).unwrap();
 
-    let targvec : Vec<(&String, &AppSummReportValue)> = targmap.into_iter().collect();
 
-    let resvec: Vec<Resolute_Appsumm_Member> = targvec.iter().map(|(x, y)| appsumm_report_value_to_resolute_appsumm_member((*x).clone(),(*y).clone())).collect();
+
+
+    /* : Vec<(&String, &AppSummReportValue)> */ 
+    let targvec: Vec<(&String, &AppSummReportValue)>  = targmap.flatten().collect();
+
+    let resvec: Vec<Resolute_Appsumm_Member> = targvec.into_iter().map(|(x, y)| appsumm_report_value_to_resolute_appsumm_member((*x).clone(),(*y).clone())).collect();
 
     resvec
 
@@ -308,6 +312,15 @@ fn add_asp (asp:rust_am_lib::copland::ASP, t:rust_am_lib::copland::Term) -> rust
 
 }
 
+fn add_term_bseq (new_t:rust_am_lib::copland::Term, t:rust_am_lib::copland::Term) -> rust_am_lib::copland::Term {
+
+    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::Split {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL},
+                                Box::new(t),
+                                Box::new(new_t) 
+                              )
+
+}
+
 pub fn ASP_Vec_to_Term (asps:Vec<rust_am_lib::copland::ASP>) -> rust_am_lib::copland::Term {
 
     match asps.as_slice() {
@@ -324,22 +337,76 @@ pub fn ASP_Vec_to_Term (asps:Vec<rust_am_lib::copland::ASP>) -> rust_am_lib::cop
     }
 }
 
-pub fn do_hamr_term_gen(attestation_report_root:String, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
+pub fn vec_terms_to_bseq(v:Vec<Term>) -> Term {
 
-    let default_report_filename: String = "aadl_attestation_report.json".to_string();
-    let attestation_report_fp = format!("{attestation_report_root}/{default_report_filename}");
-    let att_report = get_attestation_report_json(attestation_report_fp)?;
-    eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
+    match v.as_slice() {
+
+        [] => {rust_am_lib::copland::Term::asp(rust_am_lib::copland::ASP::NULL)}
+        [x] => {x.clone()}
+        [x, _, ..] => 
+            {
+                let terms_split = v.split_first().unwrap();
+                let rest = terms_split.1.to_vec();
+            
+                add_term_bseq(x.clone(), vec_terms_to_bseq(rest))
+            }
+    }
+
+    //Term::asp(ASP::NULL)
+}
+
+pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
+
+    let hamr_contracts_bool = 
+        if !(hamr_contracts_bool || verus_hash_bool || verus_run_bool)
+        { true } // default to ONLY contract checks if nothing specified
+        else
+        {hamr_contracts_bool};
     
+    let mut v: Vec<Term> = Vec::new();
 
-    let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
-    eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+    if hamr_contracts_bool {
+        let default_report_filename: String = "aadl_attestation_report.json".to_string();
+        let attestation_report_fp = format!("{attestation_report_root}/{default_report_filename}");
+        let att_report = get_attestation_report_json(attestation_report_fp)?;
+        eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
+        
 
-    let term = ASP_Vec_to_Term(asps);
+        let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
+        eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+
+        let term = ASP_Vec_to_Term(asps);
+        eprintln!("\nNew term: {:?} \n\n\n", term);
+
+        v.push(term)
+    }
+
+    if verus_hash_bool {
+        let verus_hash_asp_params : ASP_PARAMS = 
+                ASP_PARAMS { ASP_ID: "hashfile".to_string(), 
+                                ASP_ARGS: json!({}), 
+                                ASP_PLC: "p1".to_string(), 
+                                ASP_TARG_ID: "cargo_verus_exe_targ".to_string() };
+        let verus_hash_asp_term: Term = Term::asp(ASP::ASPC(verus_hash_asp_params));
+
+        v.push(verus_hash_asp_term);
+    }
+    
+    if verus_run_bool {
+        let verus_run_asp_params : ASP_PARAMS = 
+                        ASP_PARAMS { ASP_ID: "run_command_cargo_verus".to_string(), 
+                                    ASP_ARGS: json!({}), 
+                                    ASP_PLC: "p1".to_string(), 
+                                    ASP_TARG_ID: "run_cargo_verus_targ".to_string() };
+        let verus_run_asp_term: Term = Term::asp(ASP::ASPC(verus_run_asp_params));
+        v.push(verus_run_asp_term)
+    }
+
+    let contracts_hash_run_term = vec_terms_to_bseq(v);
 
     let sigparams : ASP_PARAMS = ASP_PARAMS { ASP_ID: "sig".to_string(), ASP_ARGS:json!({}), ASP_PLC: "P0".to_string(), ASP_TARG_ID: "sig_targid".to_string() };
     let sigasp = ASP::ASPC(sigparams);
-    let sigterm = Term::lseq(Box::new(term), Box::new(Term::asp(sigasp)));
+    let sigterm = Term::lseq(Box::new(contracts_hash_run_term), Box::new(Term::asp(sigasp)));
     eprintln!("\nNew term: {:?} \n\n\n", sigterm);
     Ok(sigterm)
 
