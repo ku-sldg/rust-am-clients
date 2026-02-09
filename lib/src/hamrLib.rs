@@ -7,6 +7,7 @@ use serde_json::json;
 
 // Other packages required to perform specific ASP action.
 use std::fs;
+use std::env;
 use std::path::{self, Path};
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
@@ -124,15 +125,8 @@ fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummRepo
 
 fn appsumm_to_resolute_appsumms (appsumm:AppraisalSummary) -> Vec<Resolute_Appsumm_Member> {
 
-    //let golden_evidence_appr_key = "goldenevidence_appr";
-    let targmap: std::collections::hash_map::Values<'_, String, std::collections::HashMap<String, AppSummReportValue>>= appsumm.values(); //appsumm.get(golden_evidence_appr_key).unwrap();
-
-
-
-
-    /* : Vec<(&String, &AppSummReportValue)> */ 
+    let targmap: std::collections::hash_map::Values<'_, String, std::collections::HashMap<String, AppSummReportValue>>= appsumm.values();
     let targvec: Vec<(&String, &AppSummReportValue)>  = targmap.flatten().collect();
-
     let resvec: Vec<Resolute_Appsumm_Member> = targvec.into_iter().map(|(x, y)| appsumm_report_value_to_resolute_appsumm_member((*x).clone(),(*y).clone())).collect();
 
     resvec
@@ -144,8 +138,6 @@ pub fn appsumm_response_to_resolute_appsumm_response(resp:AppraisalSummaryRespon
     let appsumm = resp.PAYLOAD;
 
     let members = appsumm_to_resolute_appsumms(appsumm);
-
-    //let json_members: Vec<serde_json::Value> = members.iter().map(|x| serde_json::to_value(x).unwrap()).collect();
          
     let res : ResoluteAppraisalSummaryResponse = ResoluteAppraisalSummaryResponse {
         TYPE: resp.TYPE,
@@ -351,8 +343,29 @@ pub fn vec_terms_to_bseq(v:Vec<Term>) -> Term {
                 add_term_bseq(x.clone(), vec_terms_to_bseq(rest))
             }
     }
+}
 
-    //Term::asp(ASP::NULL)
+pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: String, default_mid_path:String, outstring:String) -> std::io::Result<String> {
+
+    let fp_prefix : String = match &maybe_out_dir {
+        Some(fp) => {
+            fp.to_string()
+        }
+        None => {
+
+            let cur_dir = env::current_dir()?;
+            let cur_dir_string = cur_dir.to_str().unwrap();
+            let default_path = default_mid_path;
+            let default_prefix: String = format!("{cur_dir_string}/{default_path}");
+            default_prefix
+        }
+    };
+
+    let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
+
+    fs::create_dir_all(fp_prefix)?;
+    fs::write(&full_req_fp, outstring)?;
+    Ok(full_req_fp)
 }
 
 pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
@@ -367,16 +380,20 @@ pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool
 
     if hamr_contracts_bool {
         let default_report_filename: String = "aadl_attestation_report.json".to_string();
-        let attestation_report_fp = format!("{attestation_report_root}/{default_report_filename}");
-        let att_report = get_attestation_report_json(attestation_report_fp)?;
-        eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
+        let report_fp = attestation_report_root.clone();
+        let attestation_report_fp = format!("{report_fp}/{default_report_filename}");
+        let att_report = get_attestation_report_json(attestation_report_fp.clone())?;
+        eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report.clone());
         
 
-        let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
+        let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root.clone());
         eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
 
         let term = ASP_Vec_to_Term(asps);
-        eprintln!("\nNew term: {:?} \n\n\n", term);
+
+        let term_string = serde_json::to_string(&term)?;
+        let fp_suffix = "hamr_contracts_term.json".to_string();
+        write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
 
         v.push(term)
     }
@@ -389,6 +406,11 @@ pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool
                                 ASP_TARG_ID: "cargo_verus_exe_targ".to_string() };
         let verus_hash_asp_term: Term = Term::asp(ASP::ASPC(verus_hash_asp_params));
 
+
+        let term_string = serde_json::to_string(&verus_hash_asp_term)?;
+        let fp_suffix = "hamr_verus_hash_term.json".to_string();
+        write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
+
         v.push(verus_hash_asp_term);
     }
     
@@ -399,10 +421,15 @@ pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool
                                     ASP_PLC: "p1".to_string(), 
                                     ASP_TARG_ID: "run_cargo_verus_targ".to_string() };
         let verus_run_asp_term: Term = Term::asp(ASP::ASPC(verus_run_asp_params));
+
+        let term_string = serde_json::to_string(&verus_run_asp_term)?;
+        let fp_suffix = "hamr_verus_run_term.json".to_string();
+        write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
+
         v.push(verus_run_asp_term)
     }
 
-    let contracts_hash_run_term = vec_terms_to_bseq(v);
+    let contracts_hash_run_term = vec_terms_to_bseq(v.clone());
 
     let sigparams : ASP_PARAMS = ASP_PARAMS { ASP_ID: "sig".to_string(), ASP_ARGS:json!({}), ASP_PLC: "P0".to_string(), ASP_TARG_ID: "sig_targid".to_string() };
     let sigasp = ASP::ASPC(sigparams);

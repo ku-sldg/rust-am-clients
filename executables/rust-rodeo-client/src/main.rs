@@ -159,30 +159,6 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     Ok (vreq)
 }
 
-
-fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: String, default_mid_path:String, outstring:String) -> std::io::Result<String> {
-
-    let fp_prefix : String = match &maybe_out_dir {
-        Some(fp) => {
-            fp.to_string()
-        }
-        None => {
-
-            let cur_dir = env::current_dir()?;
-            let cur_dir_string = cur_dir.to_str().unwrap();
-            let default_path = default_mid_path;
-            let default_prefix: String = format!("{cur_dir_string}/{default_path}");
-            default_prefix
-        }
-    };
-
-    let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
-
-    fs::create_dir_all(fp_prefix)?;
-    fs::write(&full_req_fp, outstring)?;
-    Ok(full_req_fp)
-}
-
 fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
     eprintln!("\n\n manifest_path: {}", manifest_path);
@@ -193,7 +169,7 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
     let am_req_suffix = "cvm_request.json".to_string();
     let am_req_mid_path = "testing/outputs/".to_string();
     let am_req_string = serde_json::to_string(&am_req)?;
-    let full_req_fp = write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
+    let full_req_fp = lib::hamrLib::write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
 
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
 
