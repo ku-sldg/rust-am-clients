@@ -27,7 +27,8 @@ fn main() -> std::io::Result<()> {
     eprintln!("\nNew term: {:?} \n\n\n", term);
     */
 
-    let term = do_hamr_term_gen(attestation_report_root, false, false, false, golden_evidence_fp)?;
+    let default_report_filename: String = "aadl_attestation_report.json".to_string();
+    let term = do_hamr_term_gen(attestation_report_root, default_report_filename, false, false, false, golden_evidence_fp)?;
 
     let term_string = serde_json::to_string(&term)?;
 

@@ -368,7 +368,7 @@ pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: Stri
     Ok(full_req_fp)
 }
 
-pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
+pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
 
     let hamr_contracts_bool = 
         if !(hamr_contracts_bool || verus_hash_bool || verus_run_bool)
@@ -379,9 +379,7 @@ pub fn do_hamr_term_gen(attestation_report_root:String, hamr_contracts_bool:bool
     let mut v: Vec<Term> = Vec::new();
 
     if hamr_contracts_bool {
-        let default_report_filename: String = "aadl_attestation_report.json".to_string();
-        let report_fp = attestation_report_root.clone();
-        let attestation_report_fp = format!("{report_fp}/{default_report_filename}");
+        let attestation_report_fp = format!("{attestation_report_root}/{report_filename}");
         let att_report = get_attestation_report_json(attestation_report_fp.clone())?;
         eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report.clone());
         

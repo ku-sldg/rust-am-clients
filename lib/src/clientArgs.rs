@@ -176,8 +176,12 @@ pub struct RodeoClientArgs {
     pub manifest_filepath: Option<String>,
 
     /// Path pointing to HAMR attestation directory
-    #[arg(short = 'h', long, value_delimiter = ' ', num_args = 1..4)]
-    pub hamr_root: Option<Vec<String>>,
+    #[arg(short, long)]
+    pub hamr_root: Option<String>,
+
+    /// Path pointing to HAMR attestation directory
+    #[arg(short, long)]
+    pub hamr_model_filename: Option<String>,
 
     /// Boolean to indicate adding the hash of (invariant) HAMR contract file slices to the HAMR workflow protocol (NOTE: you must have the --hamr_root option active for this to flag to matter)
     #[arg(short, long, default_value_t = false)]

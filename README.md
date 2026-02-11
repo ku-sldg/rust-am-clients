@@ -43,11 +43,11 @@ Successful output should be some JSON logging followed by something like:
 1. From the top-level directory of the `rust-am-clients` repository, run HAMR contract provisioning:
 
     ```bash
-    cargo run --release --bin rust-rodeo-client -- --hamr-root $HAMR_ATTESTATION_ROOT hamr_contract_golden_evidence.json
+    cargo run --release --bin rust-rodeo-client -- --hamr-root $HAMR_ATTESTATION_ROOT --hamr-model-filename aadl_attestation_report.json -p $HAMR_ATTESTATION_ROOT/hamr_contract_golden_evidence.json
     ```
 
-    Note:  the `--hamr-root` CLI arg expects two distinct parameters (separated by a space):  the hamr attestation root directory, and the name of the golden evidence file to put in that directory.
-    MAESTRO provisioning will populate two output files in the `$HAMR_ATTESTATION_ROOT` directory, namely `hamr_contract_term.json` (this filename is hardcoded for now) and `hamr_contract_golden_evidence.json` (parameter passed to provisioning).  To verify their creation, type: `git status` in the INSPECTA-models repo.
+    Note:  the `--hamr-root` CLI arg expects the hamr attestation root directory path, and the `-p` option (provision) expects a path for the output golden evidence file.
+    After running the above command, MAESTRO provisioning will populate two output files in the `$HAMR_ATTESTATION_ROOT` directory, namely `hamr_contract_term.json` (this filename is hardcoded for now) and `hamr_contract_golden_evidence.json` (parameter passed to provisioning).  To verify their creation, type: `git status` in the INSPECTA-models repo.
 1. Again in `rust-am-clients/`, run HAMR contract appraisal:
 
     ```bash

@@ -331,28 +331,33 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                     None => { // No Term filepath passed on CLI
 
                         match args.hamr_root {
-                            Some(vec) => {
+                            Some(hamr_root_dir) => {
 
-                                let (hamr_root_dir, golden_fp) = 
+                                let golden_fp = 
 
-                                match &vec[..] { // Borrow the Vec as a slice
-                                    [hamr_root_dir] => {
-                                        let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                                        (hamr_root_dir, golden_fp)
-                                    },
-                                    [hamr_root_dir, golden_filename] => {
-                                        let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
-                                        (hamr_root_dir, golden_fp)  
-                                    },
-                                    /*
-                                    [hamr_root_dir, golden_filename, protocol_filename] => {
-                                        //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
-                                    }
-                                    */
-                                    _ => {panic!("hamr_root CLI arg given wrong number of arguments...")}
-                                };
-            
-                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp)?;
+                                    match args.provisioned_evidence_filepath {
+                                        Some(fp) => {
+                                            fp
+                                        }
+                                        None => {
+                                            let golden_fp: String = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
+                                            golden_fp
+                                        }
+                                    };
+
+                                let report_filename = 
+                                    match args.hamr_model_filename {
+                                        Some(fp) => {
+                                            fp
+                                        }
+                                        None => {
+                                            let default_report_filename: String = "aadl_attestation_report.json".to_string();
+                                            default_report_filename
+                                        }
+                                    };
+                                
+
+                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), report_filename, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp)?;
                                 let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
                                 let term_string = serde_json::to_string(&term)?;
                                 fs::write(term_fp, term_string)?;
@@ -395,31 +400,14 @@ fn main() -> std::io::Result<()> {
         match args.provisioned_evidence_filepath {
             Some(golden_fp) => {Some(golden_fp)}
             None => {
-
                 match args.hamr_root {
-                    Some(vec) => {
-
-                    match &vec[..] { // Borrow the Vec as a slice
-                        [hamr_root_dir] => {
-                            let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                            Some(golden_fp)
-                        },
-                        [hamr_root_dir, golden_filename] => {
-                            let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
-                            Some(golden_fp)
-                        },
-                        /*
-                        [hamr_root_dir, golden_filename, protocol_filename] => {
-                            //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
-                        }
-                        */
-                        _ => {panic!("hamr_root CLI arg given wrong number of arguments...")} //println!("The vector has some other number of elements."),
-                    }
+                    Some(hamr_root_dir) => {
+                        let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
+                        Some(golden_fp)
                     }
                     None => {None}
                 }
             }
-
         };
 
     let new_vreq = 
@@ -435,7 +423,7 @@ fn main() -> std::io::Result<()> {
                                                               &vreq.ATTESTATION_SESSION.Session_Context,
                                                                     vreq.TERM.clone());
                 let term_string = serde_json::to_string(&new_term)?;
-                print!("\n\nProvisioning Term: {}\n\n", term_string);
+                eprintln!("\n\nProvisioning Term: {}\n\n", term_string);
 
                 ProtocolRunRequest {
                     TERM: new_term,
@@ -471,6 +459,7 @@ fn main() -> std::io::Result<()> {
 
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 
+    
 
     let am_resp_suffix = "cvm_response.json".to_string();
     let am_resp_mid_path = "testing/outputs/".to_string();
