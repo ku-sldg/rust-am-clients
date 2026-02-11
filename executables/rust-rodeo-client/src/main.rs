@@ -499,12 +499,14 @@ fn main() -> std::io::Result<()> {
                 let maestro_appsumm_resp_suffix = "maestro_appsumm_response.json".to_string();
                 let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
 
+                /*
                 let resolute_appsumm_response = appsumm_response_to_resolute_appsumm_response(appsumm_resp.clone());
 
                 let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
                 let appsumm_resp_suffix = "appsumm_response.json".to_string();
                 let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
 
+                */
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
             }
