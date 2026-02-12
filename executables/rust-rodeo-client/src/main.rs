@@ -3,6 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+use clap::builder::Str;
 // Custom package imports
 use rust_am_lib::copland::*;
 use lib::clientArgs::*;
@@ -286,6 +287,7 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
 pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
 pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
 pub const DEFAULT_HAMR_TERM_FILENAME: &'static str = "hamr_contract_term.json";
+pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
 
@@ -351,7 +353,7 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                             fp
                                         }
                                         None => {
-                                            let default_report_filename: String = "aadl_attestation_report.json".to_string();
+                                            let default_report_filename: String = DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME.to_string();
                                             default_report_filename
                                         }
                                     };
@@ -395,12 +397,13 @@ fn main() -> std::io::Result<()> {
 
     let vreq : ProtocolRunRequest = rodeo_to_am_request(rodeo_session_config.clone())?;
 
-    // Check for "provisinoing mode"
+    /*
+    // Check for "provisioning mode"
     let maybe_provisioning_flag = 
         match args.provisioned_evidence_filepath {
             Some(golden_fp) => {Some(golden_fp)}
             None => {
-                match args.hamr_root {
+                match args.hamr_root.clone() {
                     Some(hamr_root_dir) => {
                         let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
                         Some(golden_fp)
@@ -409,9 +412,10 @@ fn main() -> std::io::Result<()> {
                 }
             }
         };
+    */
 
     let new_vreq = 
-        match maybe_provisioning_flag.clone() {
+        match args.provisioned_evidence_filepath.clone() {
             None => {vreq.clone()}
             Some(prov_filepath) => {
 
@@ -481,7 +485,7 @@ fn main() -> std::io::Result<()> {
     print!("{}",rodeo_resp_string);
 
 
-    match maybe_provisioning_flag {
+    match args.provisioned_evidence_filepath.clone() {
 
         None => {
             if args.appraisal {
@@ -499,14 +503,29 @@ fn main() -> std::io::Result<()> {
                 let maestro_appsumm_resp_suffix = "maestro_appsumm_response.json".to_string();
                 let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
 
-                /*
-                let resolute_appsumm_response = appsumm_response_to_resolute_appsumm_response(appsumm_resp.clone());
 
-                let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
-                let appsumm_resp_suffix = "appsumm_response.json".to_string();
-                let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
+                let hamr_root: Option<String> = args.hamr_root.clone();
+                
+                match hamr_root {
+                    Some(dir) => {
+                        let hamr_model_filename = 
+                            match args.hamr_model_filename {
+                                Some (n) => {n}
+                                None => {DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME.to_string()}
+                            };
+                        //panic!("hihihihi");
+                        
+                        let resolute_appsumm_response: ResoluteAppraisalSummaryResponse = lib::hamrLib::generate_resolute_appsumm(dir, hamr_model_filename)?;
 
-                */
+                        let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
+                        let appsumm_resp_suffix = "appsumm_response.json".to_string();
+                        let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
+                        
+                    }
+                    None => {
+                    }
+                };
+
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
             }
