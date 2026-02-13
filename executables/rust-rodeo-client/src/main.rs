@@ -167,7 +167,7 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
     eprintln!("\nManifest contents:\n{manifest_contents}");
 
     let am_req_suffix = "cvm_request.json".to_string();
-    let am_req_mid_path = "testing/outputs/".to_string();
+    let am_req_mid_path = DEFAULT_OUTPUT_DIR.to_string();
     let am_req_string = serde_json::to_string(&am_req)?;
     let full_req_fp = lib::hamrLib::write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
 
@@ -234,7 +234,7 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest, appsumm_result_bool
                         TYPE: "RESPONSE".to_string(), 
                         ACTION: "APPSUMM".to_string(), 
                         SUCCESS: false,
-                        APPRAISAL_RESULT: false, // appsumm_result_bool,
+                        APPRAISAL_RESULT: false,
                         PAYLOAD: HashMap::new()
                     };
                     appsumm_resp  
@@ -285,9 +285,9 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
 
 pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
 pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
-//pub const DEFAULT_HAMR_TERM_FILENAME: &'static str = "hamr_contract_term.json";
 pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
 pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
+pub const DEFAULT_OUTPUT_DIR: &'static str = "testing/outputs/";
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
 
@@ -397,23 +397,6 @@ fn main() -> std::io::Result<()> {
 
     let vreq : ProtocolRunRequest = rodeo_to_am_request(rodeo_session_config.clone())?;
 
-    /*
-    // Check for "provisioning mode"
-    let maybe_provisioning_flag = 
-        match args.provisioned_evidence_filepath {
-            Some(golden_fp) => {Some(golden_fp)}
-            None => {
-                match args.hamr_root.clone() {
-                    Some(hamr_root_dir) => {
-                        let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                        Some(golden_fp)
-                    }
-                    None => {None}
-                }
-            }
-        };
-    */
-
     let new_vreq = 
         match args.provisioned_evidence_filepath.clone() {
             None => {vreq.clone()}
@@ -466,7 +449,7 @@ fn main() -> std::io::Result<()> {
     
 
     let am_resp_suffix = "cvm_response.json".to_string();
-    let am_resp_mid_path = "testing/outputs/".to_string();
+    let am_resp_mid_path = DEFAULT_OUTPUT_DIR.to_string();
     let am_resp_string = serde_json::to_string(&resp)?;
     let _ = write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
 
@@ -497,38 +480,11 @@ fn main() -> std::io::Result<()> {
                 eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
                 eprintln!("{:?}\n", appsumm_resp);
 
-                let appsumm_resp_mid_path = "testing/outputs/".to_string();
+                let appsumm_resp_mid_path = DEFAULT_OUTPUT_DIR.to_string();
 
                 let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
                 let maestro_appsumm_resp_suffix = "maestro_appsumm_response.json".to_string();
                 let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
-
-
-                /*
-                let hamr_root: Option<String> = args.hamr_root.clone();
-                
-                match hamr_root {
-                    Some(dir) => {
-                        let hamr_model_filename = 
-                            match args.hamr_model_filename {
-                                Some (n) => {n}
-                                None => {DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME.to_string()}
-                            };
-                        //panic!("hihihihi");
-                        
-                        /*
-                        let resolute_appsumm_response: ResoluteAppraisalSummaryResponse = lib::hamrLib::generate_resolute_appsumm(dir, hamr_model_filename)?;
-
-                        let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
-                        let appsumm_resp_suffix = "appsumm_response.json".to_string();
-                        let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
-                        */
-                        
-                    }
-                    None => {
-                    }
-                };
-                */
 
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
