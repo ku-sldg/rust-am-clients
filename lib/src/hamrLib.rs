@@ -3,9 +3,11 @@
 
 // Custom package imports
 use rust_am_lib::copland::*;
+use serde_json::json;
 
 // Other packages required to perform specific ASP action.
 use std::fs;
+use std::env;
 use std::path::{self, Path};
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
@@ -56,15 +58,6 @@ pub struct HAMR_AttestationReport {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct MAESTRO_Slice {
-    hamr_slice: HAMR_Slice,
-    uri:String,
-    beginLine: usize,
-    endLine: usize, 
-    targid: String
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Resolute_Appsumm_Member {
     component:String,
     contract_id:String,
@@ -87,6 +80,9 @@ fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummRepo
 
     let appsumm_targid_string = targid.clone();
 
+    if targid.contains("::") 
+    {
+
     let (component_res_string, rest) = appsumm_targid_string.split_once(":: ").unwrap();
     let (id_res_string, rest) = rest.split_once(":: ").unwrap();
     let (uri_res_string, rest) = rest.split_once(":: ").unwrap();
@@ -94,28 +90,35 @@ fn appsumm_report_value_to_resolute_appsumm_member (targid:String, v:AppSummRepo
 
     let location_res_string = format!("{uri_res_string}::{range_res_string}");
 
-    let appsumm_result = v.result;
-
      let res : Resolute_Appsumm_Member = Resolute_Appsumm_Member {
         contract_id: id_res_string.to_string(),
         component: component_res_string.to_string(),
         location: location_res_string.to_string(),
         meta: v.meta,
-        result: appsumm_result
+        result: v.result
      };
 
      res
+    }
+    else {
+        let res : Resolute_Appsumm_Member = Resolute_Appsumm_Member {
+            contract_id: "".to_string(),
+            component: "".to_string(),
+            location: "".to_string(),
+            meta: v.meta,
+            result: v.result
+        };
+
+     res
+    }
 
 }
 
 fn appsumm_to_resolute_appsumms (appsumm:AppraisalSummary) -> Vec<Resolute_Appsumm_Member> {
 
-    let golden_evidence_appr_key = "goldenevidence_appr";
-    let targmap= appsumm.get(golden_evidence_appr_key).unwrap();
-
-    let targvec : Vec<(&String, &AppSummReportValue)> = targmap.into_iter().collect();
-
-    let resvec: Vec<Resolute_Appsumm_Member> = targvec.iter().map(|(x, y)| appsumm_report_value_to_resolute_appsumm_member((*x).clone(),(*y).clone())).collect();
+    let targmap: std::collections::hash_map::Values<'_, String, std::collections::HashMap<String, AppSummReportValue>>= appsumm.values();
+    let targvec: Vec<(&String, &AppSummReportValue)>  = targmap.flatten().collect();
+    let resvec: Vec<Resolute_Appsumm_Member> = targvec.into_iter().map(|(x, y)| appsumm_report_value_to_resolute_appsumm_member((*x).clone(),(*y).clone())).collect();
 
     resvec
 
@@ -126,8 +129,6 @@ pub fn appsumm_response_to_resolute_appsumm_response(resp:AppraisalSummaryRespon
     let appsumm = resp.PAYLOAD;
 
     let members = appsumm_to_resolute_appsumms(appsumm);
-
-    //let json_members: Vec<serde_json::Value> = members.iter().map(|x| serde_json::to_value(x).unwrap()).collect();
          
     let res : ResoluteAppraisalSummaryResponse = ResoluteAppraisalSummaryResponse {
         TYPE: resp.TYPE,
@@ -139,8 +140,7 @@ pub fn appsumm_response_to_resolute_appsumm_response(resp:AppraisalSummaryRespon
     res
 }
 
-
-fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
+fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:&Path, type_string:String) -> Result<T, serde_json::Error> {
 
      let err_string = format!("Couldn't read {type_string} JSON file");
      let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
@@ -151,30 +151,28 @@ fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(ter
                                 Ok(term)
 }
 
-pub fn get_attestation_report_json (hamr_report_fp:String) -> std::io::Result<HAMR_AttestationReport>  {
+pub fn get_attestation_report_json (hamr_report_fp:&Path) -> std::io::Result<HAMR_AttestationReport>  {
 
     let res: HAMR_AttestationReport = decode_from_file_and_print(hamr_report_fp, "HAMR_AttestationReport".to_string())?;
 
     Ok (res)
 }
 
-pub fn HAMR_attestation_report_to_MAESTRO_Slice_ASPs (hamr_report:HAMR_AttestationReport, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
+fn HAMR_attestation_report_to_File_Slices (hamr_report:HAMR_AttestationReport, project_root_fp:&Path) -> Vec<File_Slice> {
 
     let reports = hamr_report.reports;
 
-    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_report_to_MAESTRO_Slice_ASPs(x.clone(), golden_evidence_fp.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<File_Slice>> = reports.iter().map(|x| HAMR_component_report_to_File_Slices(x.clone(), project_root_fp)).collect();
 
     let res = res1.into_iter().flatten().collect();
     res
 }
 
-fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_ComponentReport, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
-
+fn HAMR_component_report_to_File_Slices (hamr_component_report:HAMR_ComponentReport, project_root_fp:&Path) -> Vec<File_Slice> {
 
     let reports = hamr_component_report.reports;
-    let idpath = hamr_component_report.idPath;
 
-    let res1 : Vec<Vec<rust_am_lib::copland::ASP>> = reports.iter().map(|x| HAMR_component_contract_report_to_MAESTRO_Slice_ASPs(x.clone(), idpath.clone(), golden_evidence_fp.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<File_Slice>> = reports.iter().map(|x| HAMR_component_contract_report_to_File_Slice(x.clone(), project_root_fp)).collect();
 
     let res = res1.into_iter().flatten().collect();
 
@@ -182,39 +180,36 @@ fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_Compo
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct ASP_ARGS_ReadfileRange {
-    filepath: String,
-    start_index: usize,
-    end_index: usize, 
-    metadata: String, 
-    meta: String,
+struct ASP_ARGS_ReadfileRangeMany {
     env_var_golden: String,
-    filepath_golden: String
+    filepath_golden: String,
+    outdir: String,
+    report_filepath: String,
+    slices: Vec<File_Slice>
 }
 
-fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice, golden_evidence_fp:String) -> rust_am_lib::copland::ASP {
+fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:&Path, outdir_in:&Path, report_fp:&Path) -> rust_am_lib::copland::ASP {
 
-        let asp_args : ASP_ARGS_ReadfileRange = ASP_ARGS_ReadfileRange 
-                { filepath: maestro_slice.uri, 
-                  start_index: maestro_slice.beginLine, 
-                  end_index: maestro_slice.endLine,
-                  metadata: maestro_slice.hamr_slice.meta.clone(), 
-                  meta: maestro_slice.hamr_slice.meta.clone(),
+        let g_fp = golden_evidence_fp.to_str().unwrap().to_string();
+        let o_fp = outdir_in.to_str().unwrap().to_string();
+        let r_fp = report_fp.to_str().unwrap().to_string();
+
+        let asp_args : ASP_ARGS_ReadfileRangeMany = ASP_ARGS_ReadfileRangeMany 
+                { 
                   env_var_golden: "".to_string(),
-                  filepath_golden: golden_evidence_fp
+                  filepath_golden: g_fp,
+                  outdir: o_fp,
+                  report_filepath: r_fp,
+                  slices: file_slices
                 };
 
         let asp_args_json = serde_json::to_value(asp_args).unwrap();
 
-        let targid_prefix = maestro_slice.targid;
-        //let targid_suffix = maestro_slice.hamr_slice.meta;
-        let targid = targid_prefix; //format!("{targid_prefix}:  {targid_suffix}");
-
         let slice_asp_params : rust_am_lib::copland::ASP_PARAMS = rust_am_lib::copland::ASP_PARAMS {
-        ASP_ID: "readfile_range".to_string(),
+        ASP_ID: "readfile_range_many".to_string(),
         ASP_ARGS: asp_args_json,
         ASP_PLC: "P0".to_string(),
-        ASP_TARG_ID: targid
+        ASP_TARG_ID: "readfile_range_many_targ".to_string()
 
     };
 
@@ -222,31 +217,18 @@ fn MAESTRO_Slice_to_ASP (maestro_slice:MAESTRO_Slice, golden_evidence_fp:String)
 
 }
 
-fn HAMR_component_contract_report_to_MAESTRO_Slice_ASPs (hamr_component_contract_report:HAMR_ComponentContractReport, idpath:Vec<String>, golden_evidence_fp: String, project_root_fp:String) -> Vec<rust_am_lib::copland::ASP> {
-
+fn HAMR_component_contract_report_to_File_Slice (hamr_component_contract_report:HAMR_ComponentContractReport, project_root_fp:&Path) -> Vec<File_Slice> {
 
     let slices = hamr_component_contract_report.slices;
-
-    let idpath_string = idpath.join("::");
-    let component_contract_id = hamr_component_contract_report.id;
-    let my_id = format!("{idpath_string}:: {component_contract_id}");
-
-    //eprintln!("\n\n\n\n\n\nMY ID: {}\n\n\n\n\n\n", my_id);
-
-    //panic!("hi");
-
-    let maestro_slices : Vec<MAESTRO_Slice> = slices.iter().map(|x| HAMR_Slice_to_MAESTRO_Slice(x, project_root_fp.clone(), my_id.clone())).collect();
-
-    let asps : Vec<rust_am_lib::copland::ASP> = maestro_slices.iter().map(|x| MAESTRO_Slice_to_ASP(x.clone(), golden_evidence_fp.clone())).collect();
-
-    asps
+    let file_slices : Vec<File_Slice> = slices.iter().map(|x| HAMR_Slice_to_File_Slice(x, project_root_fp)).collect();
+    file_slices
 
 }
 
-fn relpath_to_abspath (project_root_fp:String, relpath:String) -> String {
+fn relpath_to_abspath (project_root_fp:&Path, relpath:&Path) -> String {
 
-    let root = Path::new(&project_root_fp);
-    let relative = Path::new(&relpath);
+    let root = Path::new(project_root_fp);
+    let relative = Path::new(relpath);
 
     let combined_path = root.join(relative);
     
@@ -260,28 +242,26 @@ fn relpath_to_abspath (project_root_fp:String, relpath:String) -> String {
 
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct File_Slice {
+    filepath: String,
+    start_index: usize,
+    end_index: usize
+}
 
-fn HAMR_Slice_to_MAESTRO_Slice (hamr_slice:&HAMR_Slice, project_root_fp:String, id:String) -> MAESTRO_Slice {
+fn HAMR_Slice_to_File_Slice (hamr_slice:&HAMR_Slice, project_root_fp:&Path) -> File_Slice {
 
     let uri_relative = hamr_slice.pos.uri.clone();
-    //let hamr_kind = hamr_slice.kind.clone();
+    let uri_relative_path = Path::new(&uri_relative);
 
-    let uri_absolute = relpath_to_abspath(project_root_fp, uri_relative);
+    let uri_absolute = relpath_to_abspath(project_root_fp, uri_relative_path);
     let bline = hamr_slice.pos.beginLine;
     let eline = hamr_slice.pos.endLine;
 
-    let bline_string= bline.to_string();
-    let eline_string = eline.to_string();
-    let uri_slice_string = format!("{uri_absolute}:: {bline_string}-{eline_string}");
-
-    let new_id = format!("{id}:: {uri_slice_string}");
-
-    let res : MAESTRO_Slice = 
-        MAESTRO_Slice { hamr_slice:hamr_slice.clone(), 
-                        uri: uri_absolute, 
-                        beginLine: bline, 
-                        endLine: eline, 
-                        targid: new_id };
+    let res : File_Slice = 
+        File_Slice { filepath: uri_absolute, 
+                        start_index: bline, 
+                        end_index: eline };
     res
 }
 
@@ -290,6 +270,15 @@ fn add_asp (asp:rust_am_lib::copland::ASP, t:rust_am_lib::copland::Term) -> rust
     rust_am_lib::copland::Term::bseq(rust_am_lib::copland::Split {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL},
                                 Box::new(t),
                                 Box::new(rust_am_lib::copland::Term::asp(asp.clone())) 
+                              )
+
+}
+
+fn add_term_bseq (new_t:rust_am_lib::copland::Term, t:rust_am_lib::copland::Term) -> rust_am_lib::copland::Term {
+
+    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::Split {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL},
+                                Box::new(t),
+                                Box::new(new_t) 
                               )
 
 }
@@ -310,19 +299,111 @@ pub fn ASP_Vec_to_Term (asps:Vec<rust_am_lib::copland::ASP>) -> rust_am_lib::cop
     }
 }
 
-pub fn do_hamr_term_gen(attestation_report_root:String, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
+pub fn vec_terms_to_bseq(v:Vec<Term>) -> Term {
 
-    let default_report_filename: String = "aadl_attestation_report.json".to_string();
-    let attestation_report_fp = format!("{attestation_report_root}/{default_report_filename}");
-    let att_report = get_attestation_report_json(attestation_report_fp)?;
-    eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
+    match v.as_slice() {
+
+        [] => {rust_am_lib::copland::Term::asp(rust_am_lib::copland::ASP::NULL)}
+        [x] => {x.clone()}
+        [x, _, ..] => 
+            {
+                let terms_split = v.split_first().unwrap();
+                let rest = terms_split.1.to_vec();
+            
+                add_term_bseq(x.clone(), vec_terms_to_bseq(rest))
+            }
+    }
+}
+
+pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: &Path, default_mid_path:&Path, outstring:String) -> std::io::Result<String> {
+
+    let fp_prefix : String = match maybe_out_dir {
+        Some(fp) => {
+            fp
+        }
+        None => {
+
+            let cur_dir = env::current_dir()?;
+            let default_path = default_mid_path;
+            let default_prefix= cur_dir.join(default_path);
+            default_prefix.as_path().to_str().unwrap().to_string()
+        }
+    };
+
+    let full_req_fp_new = Path::new(&fp_prefix);
+    let full_req_fp = full_req_fp_new.join(fp_suffix);
+
+    fs::create_dir_all(fp_prefix)?;
+    fs::write(&full_req_fp, outstring)?;
+    Ok(full_req_fp.as_path().to_str().unwrap().to_string())
+}
+
+pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:&Path) -> std::io::Result<rust_am_lib::copland::Term> {
+
+    let hamr_contracts_bool = 
+        if !(hamr_contracts_bool || verus_hash_bool || verus_run_bool)
+        { true } // default to ONLY contract checks if nothing specified
+        else
+        {hamr_contracts_bool};
     
+    let mut v: Vec<Term> = Vec::new();
 
-    let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
-    eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+    if hamr_contracts_bool {
+        let attestation_report_fp = attestation_report_root.join(report_filename);
+        let att_report = get_attestation_report_json(attestation_report_fp.as_path())?;
+        eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report.clone());
+        
 
-    let term = ASP_Vec_to_Term(asps);
-    eprintln!("\nNew term: {:?} \n\n\n", term);
-    Ok(term)
+        let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, attestation_report_root);
+
+        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, attestation_report_root, report_filename);
+
+        let term : Term = Term::asp(asp);
+
+        let term_string = serde_json::to_string(&term)?;
+        let fp_suffix = Path::new("hamr_contracts_only_maestro_term.json");
+        write_string_to_output_dir(Some(attestation_report_root.to_str().unwrap().to_string()), fp_suffix, Path::new(""), term_string)?;
+
+        v.push(term)
+    }
+
+    if verus_hash_bool {
+        let verus_hash_asp_params : ASP_PARAMS = 
+                ASP_PARAMS { ASP_ID: "hashfile".to_string(), 
+                                ASP_ARGS: json!({}), 
+                                ASP_PLC: "p1".to_string(), 
+                                ASP_TARG_ID: "cargo_verus_exe_targ".to_string() };
+        let verus_hash_asp_term: Term = Term::asp(ASP::ASPC(verus_hash_asp_params));
+
+
+        let term_string = serde_json::to_string(&verus_hash_asp_term)?;
+        let fp_suffix = Path::new("hamr_verus_hash_term.json");
+        write_string_to_output_dir(Some(attestation_report_root.to_str().unwrap().to_string()), fp_suffix, Path::new(""), term_string)?;
+
+        v.push(verus_hash_asp_term);
+    }
+    
+    if verus_run_bool {
+        let verus_run_asp_params : ASP_PARAMS = 
+                        ASP_PARAMS { ASP_ID: "run_command_cargo_verus".to_string(), 
+                                    ASP_ARGS: json!({}), 
+                                    ASP_PLC: "p1".to_string(), 
+                                    ASP_TARG_ID: "run_cargo_verus_targ".to_string() };
+        let verus_run_asp_term: Term = Term::asp(ASP::ASPC(verus_run_asp_params));
+
+        let term_string = serde_json::to_string(&verus_run_asp_term)?;
+        let fp_suffix = Path::new("hamr_verus_run_term.json");
+        write_string_to_output_dir(Some(attestation_report_root.to_str().unwrap().to_string()), fp_suffix, Path::new(""), term_string)?;
+
+        v.push(verus_run_asp_term)
+    }
+
+    let contracts_hash_run_term = vec_terms_to_bseq(v.clone());
+
+    let sigparams : ASP_PARAMS = ASP_PARAMS { ASP_ID: "sig".to_string(), ASP_ARGS:json!({}), ASP_PLC: "P0".to_string(), ASP_TARG_ID: "sig_targid".to_string() };
+    let sigasp = ASP::ASPC(sigparams);
+    let sigterm = Term::lseq(Box::new(contracts_hash_run_term), Box::new(Term::asp(sigasp)));
+    eprintln!("\nNew term: {:?} \n\n\n", sigterm);
+    Ok(sigterm)
 
 }

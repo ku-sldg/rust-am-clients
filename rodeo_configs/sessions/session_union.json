@@ -84,6 +84,14 @@
                     "EvOutSig_BODY": 1
                 }
             },
+            "readfile_range_many_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
             "hashdir": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
@@ -164,6 +172,14 @@
                     "EvOutSig_BODY": 1
                 }
             },
+            "readfile_range_many": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
             "verus_compare": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
@@ -173,6 +189,22 @@
                 }
             },
             "run_command_verus": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "run_command_cargo_verus": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": 1
+                }
+            },
+            "run_command_autoverus": {
                 "FWD": "EXTEND",
                 "EvInSig": "ALL",
                 "EvOutSig": {
@@ -257,12 +289,15 @@
             "provision_goldenevidence": "magic_appr",
             "readfile": "readfile_appr",
             "readfile_range": "goldenevidence_appr",
+            "readfile_range_many": "readfile_range_many_appr",
             "selinux_pol_dump": "hashfile_appr",
             "sig": "sig_appr",
             "sig_tpm": "sig_tpm_appr",
             "uptime": "NULL",
             "run_command_verus": "run_command_verus_appr",
+            "run_command_cargo_verus": "run_command_verus_appr",
             "run_command_rocq": "run_command_rocq_appr",
+            "run_command_autoverus": "magic_appr",
             "verus_compare": "verus_compare_appr"
         }
     }

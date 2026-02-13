@@ -11,6 +11,7 @@ use lib::hamrLib::*;
 // Other packages required to perform specific ASP action.
 use std::fs;
 use std::env;
+use std::path::*;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
@@ -159,30 +160,6 @@ fn rodeo_to_am_request(rodeo_config: RodeoSessionConfig) -> std::io::Result<Prot
     Ok (vreq)
 }
 
-
-fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: String, default_mid_path:String, outstring:String) -> std::io::Result<String> {
-
-    let fp_prefix : String = match &maybe_out_dir {
-        Some(fp) => {
-            fp.to_string()
-        }
-        None => {
-
-            let cur_dir = env::current_dir()?;
-            let cur_dir_string = cur_dir.to_str().unwrap();
-            let default_path = default_mid_path;
-            let default_prefix: String = format!("{cur_dir_string}/{default_path}");
-            default_prefix
-        }
-    };
-
-    let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
-
-    fs::create_dir_all(fp_prefix)?;
-    fs::write(&full_req_fp, outstring)?;
-    Ok(full_req_fp)
-}
-
 fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, maybe_out_dir:Option<String>, am_req:ProtocolRunRequest) -> std::io::Result<ProtocolRunResponse> {
 
     eprintln!("\n\n manifest_path: {}", manifest_path);
@@ -190,10 +167,10 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
     let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
     eprintln!("\nManifest contents:\n{manifest_contents}");
 
-    let am_req_suffix = "cvm_request.json".to_string();
-    let am_req_mid_path = "testing/outputs/".to_string();
+    let am_req_suffix = Path::new("cvm_request.json");
+    let am_req_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
     let am_req_string = serde_json::to_string(&am_req)?;
-    let full_req_fp = write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
+    let full_req_fp = lib::hamrLib::write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
 
     eprintln!("\n\n\nam_req_string: {:?}\n\n\n", am_req_string);
 
@@ -219,7 +196,6 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
     let resp: Result<ProtocolRunResponse, serde_json::Error> = from_value(respval);
 
-    //let resp : Result<ProtocolRunResponse, serde_json::Error> = serde_json::from_slice(&out_res);
     match resp {
 
         Ok(v) => {return Ok(v)}
@@ -258,7 +234,7 @@ fn run_appsumm_request (appsumm_req:AppraisalSummaryRequest, appsumm_result_bool
                         TYPE: "RESPONSE".to_string(), 
                         ACTION: "APPSUMM".to_string(), 
                         SUCCESS: false,
-                        APPRAISAL_RESULT: false, // appsumm_result_bool,
+                        APPRAISAL_RESULT: false,
                         PAYLOAD: HashMap::new()
                     };
                     appsumm_resp  
@@ -281,7 +257,7 @@ fn appsumm_rawev (rev:RawEv) -> bool {
     result
 }
 
-fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
+fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:&Path, type_string:String) -> Result<T, serde_json::Error> {
 
     let err_string = format!("Couldn't read {type_string} JSON file");
     let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
@@ -309,25 +285,29 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
 
 pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
 pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
-pub const DEFAULT_HAMR_TERM_FILENAME: &'static str = "hamr_contract_term.json";
+pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
+pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
+pub const DEFAULT_OUTPUT_DIR: &'static str = "testing/outputs/";
+pub const DEFAULT_MANIFEST_DIR: &'static str = "testing/manifests/Manifest_P0.json";
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
 
-    let session_fp : String = 
+    let session_fp_string : String = 
         match args.session_filepath {
             Some(fp) => {fp}
             None => {
-                let cur_dir = env::current_dir()?;
-                let cur_dir_string = cur_dir.to_str().unwrap();
-                let default_fp: String = format!("{cur_dir_string}/{DEFAULT_SESSION_FILENAME}");
-                default_fp
+                let res_dir = env::current_dir()?;
+                let res = res_dir.join(DEFAULT_SESSION_FILENAME);
+                res.as_path().to_str().unwrap().to_string()
             }
         };
+
+    let session_fp = Path::new(&session_fp_string);
 
     let asp_args_map : HashMap<String, HashMap<String, Value>> = 
         match args.g_asp_args_filepath {
             Some(fp) => {
-                let asp_args_map: HashMap<String, HashMap<String, Value>> = decode_from_file_and_print(fp, "ASP ARGS MAP".to_string())?;
+                let asp_args_map: HashMap<String, HashMap<String, Value>> = decode_from_file_and_print(Path::new(&fp), "ASP ARGS MAP".to_string())?;
                 asp_args_map
             }
             None => {
@@ -354,44 +334,37 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                     }
                     None => { // No Term filepath passed on CLI
 
-                        match args.hamr_root {
-                            Some(vec) => {
+                        match args.hamr_report_filepath {
+                            Some(report_filename) => {
 
-                                match &vec[..] { // Borrow the Vec as a slice
-                                    [hamr_root_dir] => {
-                                        let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                                        let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
+                                let report_filename_path= Path::new(&report_filename);
+                                let hamr_root_dir = report_filename_path.parent().unwrap();
 
-                                        let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
-                                        let term_string = serde_json::to_string(&term)?;
-                                        fs::write(term_fp, term_string)?;
-                                        (term, session, asp_args_map)
-                                    },
-                                    [hamr_root_dir, golden_filename] => {
-                                        let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
-                                        let term = do_hamr_term_gen(hamr_root_dir.to_string(), golden_fp)?;
+                                let golden_fp : String  = 
+                                    match args.provisioned_evidence_filepath {
+                                        Some(fp) => {
+                                            fp
+                                        }
+                                        None => {
+                                            hamr_root_dir.join(DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME).to_str().unwrap().to_string()
+                                        }
+                                    };
+                                
+                                let golden_fp_path = Path::new(&golden_fp);
 
-                                        let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
-                                        let term_string = serde_json::to_string(&term)?;
-                                        fs::write(term_fp, term_string)?;
-                                        (term, session, asp_args_map)
-                                        
-                                    },
-                                    /*
-                                    [hamr_root_dir, golden_filename, protocol_filename] => {
-                                        //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
-                                    }
-                                    */
-                                    _ => {panic!("hamr_root CLI arg given wrong number of arguments...")}
-                                }
-            
+                                let term = do_hamr_term_gen(hamr_root_dir, report_filename_path, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp_path)?;
+                                let term_fp = hamr_root_dir.join(DEFAULT_HAMR_MAESTRO_TERM_FILENAME);
+                                let term_string = serde_json::to_string(&term)?;
+                                fs::write(term_fp.as_path(), term_string)?;
+                                (term, session, asp_args_map)
+
                             }
                             None => {
                                 panic!("Invalid arguments usage for rust-rodeo-client executable:  Must provide either (Term(-t), [Attestation_Session(-s)], [ASP_ARGS Map(-g)]) or (--hamr-root) args!")
                             }
                         } 
-                    }                          
-    };
+                    }  // end No Term filepath passed on CLI                        
+                };
 
 
     let myPlc: Plc = "TOP_PLC".to_string();
@@ -417,40 +390,8 @@ fn main() -> std::io::Result<()> {
 
     let vreq : ProtocolRunRequest = rodeo_to_am_request(rodeo_session_config.clone())?;
 
-    // Check for "provisinoing mode"
-    let maybe_provisioning_flag = 
-        match args.provisioned_evidence_filepath {
-            Some(golden_fp) => {Some(golden_fp)}
-            None => {
-
-                match args.hamr_root {
-                    Some(vec) => {
-
-                    match &vec[..] { // Borrow the Vec as a slice
-                        [hamr_root_dir] => {
-                            let golden_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                            Some(golden_fp)
-                        },
-                        [hamr_root_dir, golden_filename] => {
-                            let golden_fp = format!("{hamr_root_dir}/{golden_filename}");
-                            Some(golden_fp)
-                        },
-                        /*
-                        [hamr_root_dir, golden_filename, protocol_filename] => {
-                            //println!("The vector has at least three elements. First three are: {}, {}, {}", first, second, third);
-                        }
-                        */
-                        _ => {panic!("hamr_root CLI arg given wrong number of arguments...")} //println!("The vector has some other number of elements."),
-                    }
-                    }
-                    None => {None}
-                }
-            }
-
-        };
-
     let new_vreq = 
-        match maybe_provisioning_flag.clone() {
+        match args.provisioned_evidence_filepath.clone() {
             None => {vreq.clone()}
             Some(prov_filepath) => {
 
@@ -462,7 +403,7 @@ fn main() -> std::io::Result<()> {
                                                               &vreq.ATTESTATION_SESSION.Session_Context,
                                                                     vreq.TERM.clone());
                 let term_string = serde_json::to_string(&new_term)?;
-                print!("\n\nProvisioning Term: {}\n\n", term_string);
+                eprintln!("\n\nProvisioning Term: {}\n\n", term_string);
 
                 ProtocolRunRequest {
                     TERM: new_term,
@@ -485,11 +426,10 @@ fn main() -> std::io::Result<()> {
 
             Some(fp) => {fp}
             None => {
-                let cur_dir = env::current_dir()?;
-                let cur_dir_string = cur_dir.to_str().unwrap();
-                let default_manifest_fp: String = "testing/manifests/Manifest_P0.json".to_string();
-                let default_fp: String = format!("{cur_dir_string}/{default_manifest_fp}");
-                default_fp
+                let res_dir = env::current_dir()?;
+                let default_manifest_fp = Path::new(DEFAULT_MANIFEST_DIR);
+                let res = res_dir.join(default_manifest_fp);
+                res.as_path().to_str().unwrap().to_string()
             }
         };
     eprintln!("res_manifest_filepath arg: {}", res_manifest_filepath);
@@ -498,11 +438,10 @@ fn main() -> std::io::Result<()> {
 
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 
-
-    let am_resp_suffix = "cvm_response.json".to_string();
-    let am_resp_mid_path = "testing/outputs/".to_string();
+    let am_resp_suffix = Path::new("cvm_response.json");
+    let am_resp_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
     let am_resp_string = serde_json::to_string(&resp)?;
-    let _ = write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
+    let _ = lib::hamrLib::write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
 
     let resp_rawev = resp.PAYLOAD.clone().0;
     let success_bool: bool = appsumm_rawev(resp_rawev);
@@ -519,7 +458,7 @@ fn main() -> std::io::Result<()> {
     print!("{}",rodeo_resp_string);
 
 
-    match maybe_provisioning_flag {
+    match args.provisioned_evidence_filepath.clone() {
 
         None => {
             if args.appraisal {
@@ -531,24 +470,22 @@ fn main() -> std::io::Result<()> {
                 eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
                 eprintln!("{:?}\n", appsumm_resp);
 
-                let appsumm_resp_mid_path = "testing/outputs/".to_string();
+                let appsumm_resp_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
 
                 let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
-                let maestro_appsumm_resp_suffix = "maestro_appsumm_response.json".to_string();
-                let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
-
-                let resolute_appsumm_response = appsumm_response_to_resolute_appsumm_response(appsumm_resp.clone());
-
-                let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
-                let appsumm_resp_suffix = "appsumm_response.json".to_string();
-                let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
+                let maestro_appsumm_resp_suffix = Path::new("maestro_appsumm_response.json");
+                let _ = lib::hamrLib::write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path, appsumm_resp_string.clone())?;
 
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
             }
             else {eprintln!("\n\nProtocol completed successfully!\n\n")}
         }
-        Some(fp) => {eprintln!("\n\nProvisioned golden evidence to file:\n\t{}\n", fp)}
+        Some(fp) => {
+            let fp_path = Path::new(&fp);
+            let clean_path = fs::canonicalize(fp_path)?;
+            eprintln!("\n\nProvisioned golden evidence to file:\n\t{:?}\n", clean_path)
+        }
     };
 
     Ok (())

@@ -6,9 +6,10 @@ edition = "2021"
 [dependencies]
 anyhow = { workspace = true }
 base64 = "0.22.1"
+rust_am_lib = {workspace = true}
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_stacker = "0.1"
 byteorder = "1.5.0"
 clap = { version = "4.5.35", features = ["derive"] }
 tokio = { version = "1.44.2", features = ["full"] }
-rust_am_lib = { git = "https://github.com/ku-sldg/rust-am-lib.git", version = "0.2.0"}

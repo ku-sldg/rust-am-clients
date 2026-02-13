@@ -3,10 +3,10 @@
     "TERM_BODY": {
         "ASP_CONSTRUCTOR": "ASPC",
         "ASP_BODY": {
-            "ASP_ID": "run_command_autoverus",
+            "ASP_ID": "hashfile",
             "ASP_ARGS": {},
             "ASP_PLC": "p1",
-            "ASP_TARG_ID": "run_autoverus_targ"
+            "ASP_TARG_ID": "cargo_verus_exe_targ"
         }
     }
 }

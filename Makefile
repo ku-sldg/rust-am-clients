@@ -96,6 +96,11 @@ rodeo_client_hamr_contracts:
 rodeo_client_hamr_contracts_provision:
 	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_hamr_contracts.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/empty_args.json -o $(OUTPUTS_DIR) -p $(GOLDEN_EVIDENCE_DIR)hamr_contracts_golden_evidence.json
 
+rodeo_client_cargo_verus_workflow:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_cargo_verus_workflow.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/cargo_verus_workflow_args_concrete.json -o $(OUTPUTS_DIR) -a
+
+rodeo_client_cargo_verus_workflow_auto_provision:
+	cargo run --release --bin rust-rodeo-client -- -l $(ASP_BIN_PATH) -m $(MANIFEST_PATH) -t $(RODEO_CONFIGS_DIR)protocols/protocol_cargo_verus_workflow.json -s $(RODEO_CONFIGS_DIR)sessions/session_union.json -g $(RODEO_CONFIGS_DIR)asp_args/concrete/cargo_verus_workflow_args_concrete.json -p $(GOLDEN_EVIDENCE_DIR)cargo_verus_workflow_evidence_golden.json
 
 clean:
 	rm -rf $(BIN)
