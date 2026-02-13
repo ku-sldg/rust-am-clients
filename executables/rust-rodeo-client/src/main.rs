@@ -441,7 +441,7 @@ fn main() -> std::io::Result<()> {
     let am_resp_suffix = Path::new("cvm_response.json");
     let am_resp_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
     let am_resp_string = serde_json::to_string(&resp)?;
-    let _ = write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
+    let _ = lib::hamrLib::write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
 
     let resp_rawev = resp.PAYLOAD.clone().0;
     let success_bool: bool = appsumm_rawev(resp_rawev);
@@ -474,7 +474,7 @@ fn main() -> std::io::Result<()> {
 
                 let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
                 let maestro_appsumm_resp_suffix = Path::new("maestro_appsumm_response.json");
-                let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path, appsumm_resp_string.clone())?;
+                let _ = lib::hamrLib::write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path, appsumm_resp_string.clone())?;
 
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
