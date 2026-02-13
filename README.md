@@ -43,7 +43,7 @@ Successful output should be some JSON logging followed by something like:
 1. From the top-level directory of the `rust-am-clients` repository, run HAMR contract provisioning:
 
     ```bash
-    cargo run --release --bin rust-rodeo-client -- --hamr-root $HAMR_ATTESTATION_ROOT --hamr-model-filename sysml_attestation_report.json -p $HAMR_ATTESTATION_ROOT/hamr_maestro_golden_evidence.json
+    cargo run --release --bin rust-rodeo-client -- --hamr-report-filepath $HAMR_ATTESTATION_ROOT/sysml_attestation_report.json -p $HAMR_ATTESTATION_ROOT/hamr_maestro_golden_evidence.json
     ```
 
     Note:  the `--hamr-root` CLI arg expects the hamr attestation root directory path, `--hamr-model-filename` expects the NAME of the attestation report at `$HAMR_ATTESTATION_ROOT`, and the `-p` option (provision) expects a path for the output golden evidence file.

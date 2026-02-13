@@ -11,6 +11,7 @@ use lib::hamrLib::*;
 // Other packages required to perform specific ASP action.
 use std::fs;
 use std::env;
+use std::path::*;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
@@ -166,8 +167,8 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
     let manifest_contents = fs::read_to_string(manifest_path).expect("Couldn't read Manifest JSON file");
     eprintln!("\nManifest contents:\n{manifest_contents}");
 
-    let am_req_suffix = "cvm_request.json".to_string();
-    let am_req_mid_path = DEFAULT_OUTPUT_DIR.to_string();
+    let am_req_suffix = Path::new("cvm_request.json");
+    let am_req_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
     let am_req_string = serde_json::to_string(&am_req)?;
     let full_req_fp = lib::hamrLib::write_string_to_output_dir(maybe_out_dir, am_req_suffix, am_req_mid_path, am_req_string.clone())?;
 
@@ -195,7 +196,6 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
 
     let resp: Result<ProtocolRunResponse, serde_json::Error> = from_value(respval);
 
-    //let resp : Result<ProtocolRunResponse, serde_json::Error> = serde_json::from_slice(&out_res);
     match resp {
 
         Ok(v) => {return Ok(v)}
@@ -257,7 +257,7 @@ fn appsumm_rawev (rev:RawEv) -> bool {
     result
 }
 
-fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
+fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:&Path, type_string:String) -> Result<T, serde_json::Error> {
 
     let err_string = format!("Couldn't read {type_string} JSON file");
     let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
@@ -288,24 +288,26 @@ pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_g
 pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
 pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
 pub const DEFAULT_OUTPUT_DIR: &'static str = "testing/outputs/";
+pub const DEFAULT_MANIFEST_DIR: &'static str = "testing/manifests/Manifest_P0.json";
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
 
-    let session_fp : String = 
+    let session_fp_string : String = 
         match args.session_filepath {
             Some(fp) => {fp}
             None => {
-                let cur_dir = env::current_dir()?;
-                let cur_dir_string = cur_dir.to_str().unwrap();
-                let default_fp: String = format!("{cur_dir_string}/{DEFAULT_SESSION_FILENAME}");
-                default_fp
+                let res_dir = env::current_dir()?;
+                let res = res_dir.join(DEFAULT_SESSION_FILENAME);
+                res.as_path().to_str().unwrap().to_string()
             }
         };
+
+    let session_fp = Path::new(&session_fp_string);
 
     let asp_args_map : HashMap<String, HashMap<String, Value>> = 
         match args.g_asp_args_filepath {
             Some(fp) => {
-                let asp_args_map: HashMap<String, HashMap<String, Value>> = decode_from_file_and_print(fp, "ASP ARGS MAP".to_string())?;
+                let asp_args_map: HashMap<String, HashMap<String, Value>> = decode_from_file_and_print(Path::new(&fp), "ASP ARGS MAP".to_string())?;
                 asp_args_map
             }
             None => {
@@ -332,37 +334,28 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                     }
                     None => { // No Term filepath passed on CLI
 
-                        match args.hamr_root {
-                            Some(hamr_root_dir) => {
+                        match args.hamr_report_filepath {
+                            Some(report_filename) => {
 
-                                let golden_fp = 
+                                let report_filename_path= Path::new(&report_filename);
+                                let hamr_root_dir = report_filename_path.parent().unwrap();
 
+                                let golden_fp : String  = 
                                     match args.provisioned_evidence_filepath {
                                         Some(fp) => {
                                             fp
                                         }
                                         None => {
-                                            let golden_fp: String = format!("{hamr_root_dir}/{DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME}");
-                                            golden_fp
-                                        }
-                                    };
-
-                                let report_filename = 
-                                    match args.hamr_model_filename {
-                                        Some(fp) => {
-                                            fp
-                                        }
-                                        None => {
-                                            let default_report_filename: String = DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME.to_string();
-                                            default_report_filename
+                                            hamr_root_dir.join(DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME).to_str().unwrap().to_string()
                                         }
                                     };
                                 
+                                let golden_fp_path = Path::new(&golden_fp);
 
-                                let term = do_hamr_term_gen(hamr_root_dir.to_string(), report_filename, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp)?;
-                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_MAESTRO_TERM_FILENAME}");
+                                let term = do_hamr_term_gen(hamr_root_dir, report_filename_path, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp_path)?;
+                                let term_fp = hamr_root_dir.join(DEFAULT_HAMR_MAESTRO_TERM_FILENAME);
                                 let term_string = serde_json::to_string(&term)?;
-                                fs::write(term_fp, term_string)?;
+                                fs::write(term_fp.as_path(), term_string)?;
                                 (term, session, asp_args_map)
 
                             }
@@ -433,11 +426,10 @@ fn main() -> std::io::Result<()> {
 
             Some(fp) => {fp}
             None => {
-                let cur_dir = env::current_dir()?;
-                let cur_dir_string = cur_dir.to_str().unwrap();
-                let default_manifest_fp: String = "testing/manifests/Manifest_P0.json".to_string();
-                let default_fp: String = format!("{cur_dir_string}/{default_manifest_fp}");
-                default_fp
+                let res_dir = env::current_dir()?;
+                let default_manifest_fp = Path::new(DEFAULT_MANIFEST_DIR);
+                let res = res_dir.join(default_manifest_fp);
+                res.as_path().to_str().unwrap().to_string()
             }
         };
     eprintln!("res_manifest_filepath arg: {}", res_manifest_filepath);
@@ -446,10 +438,8 @@ fn main() -> std::io::Result<()> {
 
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 
-    
-
-    let am_resp_suffix = "cvm_response.json".to_string();
-    let am_resp_mid_path = DEFAULT_OUTPUT_DIR.to_string();
+    let am_resp_suffix = Path::new("cvm_response.json");
+    let am_resp_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
     let am_resp_string = serde_json::to_string(&resp)?;
     let _ = write_string_to_output_dir(maybe_out_dir.clone(), am_resp_suffix, am_resp_mid_path, am_resp_string.clone())?;
 
@@ -480,18 +470,22 @@ fn main() -> std::io::Result<()> {
                 eprintln!("\n\nDecoded AppraisalSummaryResponse: \n");
                 eprintln!("{:?}\n", appsumm_resp);
 
-                let appsumm_resp_mid_path = DEFAULT_OUTPUT_DIR.to_string();
+                let appsumm_resp_mid_path = Path::new(DEFAULT_OUTPUT_DIR);
 
                 let appsumm_resp_string = serde_json::to_string(&appsumm_resp)?;
-                let maestro_appsumm_resp_suffix = "maestro_appsumm_response.json".to_string();
-                let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
+                let maestro_appsumm_resp_suffix = Path::new("maestro_appsumm_response.json");
+                let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path, appsumm_resp_string.clone())?;
 
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 
             }
             else {eprintln!("\n\nProtocol completed successfully!\n\n")}
         }
-        Some(fp) => {eprintln!("\n\nProvisioned golden evidence to file:\n\t{}\n", fp)}
+        Some(fp) => {
+            let fp_path = Path::new(&fp);
+            let clean_path = fs::canonicalize(fp_path)?;
+            eprintln!("\n\nProvisioned golden evidence to file:\n\t{:?}\n", clean_path)
+        }
     };
 
     Ok (())

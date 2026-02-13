@@ -140,7 +140,7 @@ pub fn appsumm_response_to_resolute_appsumm_response(resp:AppraisalSummaryRespon
     res
 }
 
-fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:String, type_string:String) -> Result<T, serde_json::Error> {
+fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:&Path, type_string:String) -> Result<T, serde_json::Error> {
 
      let err_string = format!("Couldn't read {type_string} JSON file");
      let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
@@ -151,30 +151,28 @@ fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(ter
                                 Ok(term)
 }
 
-pub fn get_attestation_report_json (hamr_report_fp:String) -> std::io::Result<HAMR_AttestationReport>  {
+pub fn get_attestation_report_json (hamr_report_fp:&Path) -> std::io::Result<HAMR_AttestationReport>  {
 
     let res: HAMR_AttestationReport = decode_from_file_and_print(hamr_report_fp, "HAMR_AttestationReport".to_string())?;
 
     Ok (res)
 }
 
-fn HAMR_attestation_report_to_File_Slices (hamr_report:HAMR_AttestationReport, project_root_fp:String) -> Vec<File_Slice> {
+fn HAMR_attestation_report_to_File_Slices (hamr_report:HAMR_AttestationReport, project_root_fp:&Path) -> Vec<File_Slice> {
 
     let reports = hamr_report.reports;
 
-    let res1 : Vec<Vec<File_Slice>> = reports.iter().map(|x| HAMR_component_report_to_File_Slices(x.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<File_Slice>> = reports.iter().map(|x| HAMR_component_report_to_File_Slices(x.clone(), project_root_fp)).collect();
 
     let res = res1.into_iter().flatten().collect();
     res
 }
 
-fn HAMR_component_report_to_File_Slices (hamr_component_report:HAMR_ComponentReport, project_root_fp:String) -> Vec<File_Slice> {
-
+fn HAMR_component_report_to_File_Slices (hamr_component_report:HAMR_ComponentReport, project_root_fp:&Path) -> Vec<File_Slice> {
 
     let reports = hamr_component_report.reports;
-    //let idpath = hamr_component_report.idPath;
 
-    let res1 : Vec<Vec<File_Slice>> = reports.iter().map(|x| HAMR_component_contract_report_to_File_Slice(x.clone(), project_root_fp.clone())).collect();
+    let res1 : Vec<Vec<File_Slice>> = reports.iter().map(|x| HAMR_component_contract_report_to_File_Slice(x.clone(), project_root_fp)).collect();
 
     let res = res1.into_iter().flatten().collect();
 
@@ -190,14 +188,18 @@ struct ASP_ARGS_ReadfileRangeMany {
     slices: Vec<File_Slice>
 }
 
-fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:String, outdir_in:String, report_fp:String) -> rust_am_lib::copland::ASP {
+fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:&Path, outdir_in:&Path, report_fp:&Path) -> rust_am_lib::copland::ASP {
+
+        let g_fp = golden_evidence_fp.to_str().unwrap().to_string();
+        let o_fp = outdir_in.to_str().unwrap().to_string();
+        let r_fp = report_fp.to_str().unwrap().to_string();
 
         let asp_args : ASP_ARGS_ReadfileRangeMany = ASP_ARGS_ReadfileRangeMany 
                 { 
                   env_var_golden: "".to_string(),
-                  filepath_golden: golden_evidence_fp,
-                  outdir: outdir_in,
-                  report_filepath: report_fp,
+                  filepath_golden: g_fp,
+                  outdir: o_fp,
+                  report_filepath: r_fp,
                   slices: file_slices
                 };
 
@@ -215,25 +217,18 @@ fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:String, ou
 
 }
 
-fn HAMR_component_contract_report_to_File_Slice (hamr_component_contract_report:HAMR_ComponentContractReport, project_root_fp:String) -> Vec<File_Slice> {
-
+fn HAMR_component_contract_report_to_File_Slice (hamr_component_contract_report:HAMR_ComponentContractReport, project_root_fp:&Path) -> Vec<File_Slice> {
 
     let slices = hamr_component_contract_report.slices;
-
-    //let idpath_string = idpath.join("::");
-    //let component_contract_id = hamr_component_contract_report.id;
-    //let my_id = format!("{idpath_string}:: {component_contract_id}");
-
-    let file_slices : Vec<File_Slice> = slices.iter().map(|x| HAMR_Slice_to_File_Slice(x, project_root_fp.clone())).collect();
-
+    let file_slices : Vec<File_Slice> = slices.iter().map(|x| HAMR_Slice_to_File_Slice(x, project_root_fp)).collect();
     file_slices
 
 }
 
-fn relpath_to_abspath (project_root_fp:String, relpath:String) -> String {
+fn relpath_to_abspath (project_root_fp:&Path, relpath:&Path) -> String {
 
-    let root = Path::new(&project_root_fp);
-    let relative = Path::new(&relpath);
+    let root = Path::new(project_root_fp);
+    let relative = Path::new(relpath);
 
     let combined_path = root.join(relative);
     
@@ -254,11 +249,12 @@ struct File_Slice {
     end_index: usize
 }
 
-fn HAMR_Slice_to_File_Slice (hamr_slice:&HAMR_Slice, project_root_fp:String) -> File_Slice {
+fn HAMR_Slice_to_File_Slice (hamr_slice:&HAMR_Slice, project_root_fp:&Path) -> File_Slice {
 
     let uri_relative = hamr_slice.pos.uri.clone();
+    let uri_relative_path = Path::new(&uri_relative);
 
-    let uri_absolute = relpath_to_abspath(project_root_fp, uri_relative);
+    let uri_absolute = relpath_to_abspath(project_root_fp, uri_relative_path);
     let bline = hamr_slice.pos.beginLine;
     let eline = hamr_slice.pos.endLine;
 
@@ -319,30 +315,30 @@ pub fn vec_terms_to_bseq(v:Vec<Term>) -> Term {
     }
 }
 
-pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: String, default_mid_path:String, outstring:String) -> std::io::Result<String> {
+pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: &Path, default_mid_path:&Path, outstring:String) -> std::io::Result<String> {
 
-    let fp_prefix : String = match &maybe_out_dir {
+    let fp_prefix : String = match maybe_out_dir {
         Some(fp) => {
-            fp.to_string()
+            fp
         }
         None => {
 
             let cur_dir = env::current_dir()?;
-            let cur_dir_string = cur_dir.to_str().unwrap();
             let default_path = default_mid_path;
-            let default_prefix: String = format!("{cur_dir_string}/{default_path}");
-            default_prefix
+            let default_prefix= cur_dir.join(default_path);
+            default_prefix.as_path().to_str().unwrap().to_string()
         }
     };
 
-    let full_req_fp = format!("{fp_prefix}/{fp_suffix}");
+    let full_req_fp_new = Path::new(&fp_prefix);
+    let full_req_fp = full_req_fp_new.join(fp_suffix);
 
     fs::create_dir_all(fp_prefix)?;
     fs::write(&full_req_fp, outstring)?;
-    Ok(full_req_fp)
+    Ok(full_req_fp.as_path().to_str().unwrap().to_string())
 }
 
-pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
+pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:&Path) -> std::io::Result<rust_am_lib::copland::Term> {
 
     let hamr_contracts_bool = 
         if !(hamr_contracts_bool || verus_hash_bool || verus_run_bool)
@@ -353,20 +349,20 @@ pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String,
     let mut v: Vec<Term> = Vec::new();
 
     if hamr_contracts_bool {
-        let attestation_report_fp = format!("{attestation_report_root}/{report_filename}");
-        let att_report = get_attestation_report_json(attestation_report_fp.clone())?;
+        let attestation_report_fp = attestation_report_root.join(report_filename);
+        let att_report = get_attestation_report_json(attestation_report_fp.as_path())?;
         eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report.clone());
         
 
-        let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, attestation_report_root.clone());
+        let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, attestation_report_root);
 
-        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, attestation_report_root.clone(), report_filename);
+        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, attestation_report_root, report_filename);
 
         let term : Term = Term::asp(asp);
 
         let term_string = serde_json::to_string(&term)?;
-        let fp_suffix = "hamr_contracts_only_maestro_term.json".to_string();
-        write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
+        let fp_suffix = Path::new("hamr_contracts_only_maestro_term.json");
+        write_string_to_output_dir(Some(attestation_report_root.to_str().unwrap().to_string()), fp_suffix, Path::new(""), term_string)?;
 
         v.push(term)
     }
@@ -381,8 +377,8 @@ pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String,
 
 
         let term_string = serde_json::to_string(&verus_hash_asp_term)?;
-        let fp_suffix = "hamr_verus_hash_term.json".to_string();
-        write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
+        let fp_suffix = Path::new("hamr_verus_hash_term.json");
+        write_string_to_output_dir(Some(attestation_report_root.to_str().unwrap().to_string()), fp_suffix, Path::new(""), term_string)?;
 
         v.push(verus_hash_asp_term);
     }
@@ -396,8 +392,8 @@ pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String,
         let verus_run_asp_term: Term = Term::asp(ASP::ASPC(verus_run_asp_params));
 
         let term_string = serde_json::to_string(&verus_run_asp_term)?;
-        let fp_suffix = "hamr_verus_run_term.json".to_string();
-        write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
+        let fp_suffix = Path::new("hamr_verus_run_term.json");
+        write_string_to_output_dir(Some(attestation_report_root.to_str().unwrap().to_string()), fp_suffix, Path::new(""), term_string)?;
 
         v.push(verus_run_asp_term)
     }

@@ -10,25 +10,15 @@ fn main() -> std::io::Result<()> {
 
     let args = get_rodeo_hamr_client_args()?;
 
-    
     let attestation_report_root = args.attestation_root;
-    //let attestation_report_fp = format!("{attestation_report_root}/aadl_attestation_report.json");
-    let golden_evidence_fp = args.golden_evidence_filepath;
+    let golden_evidence_fp_string = args.golden_evidence_filepath;
 
-    /*
-    let att_report = get_attestation_report_json(attestation_report_fp)?;
-    eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report);
-    
+    let golden_evidence_fp = std::path::Path::new(&golden_evidence_fp_string);
 
-    let asps = HAMR_attestation_report_to_MAESTRO_Slice_ASPs(att_report, golden_evidence_fp, attestation_report_root);
-    eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
+    let attestation_report_root_fp = std::path::Path::new(&attestation_report_root);
 
-    let term = ASP_Vec_to_Term(asps);
-    eprintln!("\nNew term: {:?} \n\n\n", term);
-    */
-
-    let default_report_filename: String = "aadl_attestation_report.json".to_string();
-    let term = do_hamr_term_gen(attestation_report_root, default_report_filename, false, false, false, golden_evidence_fp)?;
+    let default_report_fp = std::path::Path::new("aadl_attestation_report.json");
+    let term = do_hamr_term_gen(attestation_report_root_fp, default_report_fp, false, false, false, golden_evidence_fp)?;
 
     let term_string = serde_json::to_string(&term)?;
 
