@@ -3,7 +3,6 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use clap::builder::Str;
 // Custom package imports
 use rust_am_lib::copland::*;
 use lib::clientArgs::*;
@@ -286,7 +285,8 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
 
 pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
 pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
-pub const DEFAULT_HAMR_TERM_FILENAME: &'static str = "hamr_contract_term.json";
+//pub const DEFAULT_HAMR_TERM_FILENAME: &'static str = "hamr_contract_term.json";
+pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
 pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
@@ -360,7 +360,7 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                 
 
                                 let term = do_hamr_term_gen(hamr_root_dir.to_string(), report_filename, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp)?;
-                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_TERM_FILENAME}");
+                                let term_fp = format!("{hamr_root_dir}/{DEFAULT_HAMR_MAESTRO_TERM_FILENAME}");
                                 let term_string = serde_json::to_string(&term)?;
                                 fs::write(term_fp, term_string)?;
                                 (term, session, asp_args_map)
@@ -504,6 +504,7 @@ fn main() -> std::io::Result<()> {
                 let _ = write_string_to_output_dir(maybe_out_dir.clone(), maestro_appsumm_resp_suffix, appsumm_resp_mid_path.clone(), appsumm_resp_string.clone())?;
 
 
+                /*
                 let hamr_root: Option<String> = args.hamr_root.clone();
                 
                 match hamr_root {
@@ -515,16 +516,19 @@ fn main() -> std::io::Result<()> {
                             };
                         //panic!("hihihihi");
                         
+                        /*
                         let resolute_appsumm_response: ResoluteAppraisalSummaryResponse = lib::hamrLib::generate_resolute_appsumm(dir, hamr_model_filename)?;
 
                         let resolute_appsumm_resp_string = serde_json::to_string(&resolute_appsumm_response)?;
                         let appsumm_resp_suffix = "appsumm_response.json".to_string();
                         let _ = write_string_to_output_dir(maybe_out_dir.clone(), appsumm_resp_suffix, appsumm_resp_mid_path.clone(), resolute_appsumm_resp_string.clone())?;
+                        */
                         
                     }
                     None => {
                     }
                 };
+                */
 
                 eprint_appsumm(appsumm_resp.PAYLOAD.clone(), appraisal_valid);
 

@@ -237,31 +237,22 @@ fn HAMR_component_report_to_MAESTRO_Slice_ASPs (hamr_component_report:HAMR_Compo
     */
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct ASP_ARGS_ReadfileRange {
-    filepath: String,
-    start_index: usize,
-    end_index: usize, 
-    metadata: String, 
-    meta: String,
-    env_var_golden: String,
-    filepath_golden: String
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
 struct ASP_ARGS_ReadfileRangeMany {
     env_var_golden: String,
     filepath_golden: String,
     outdir: String,
+    report_filepath: String,
     slices: Vec<File_Slice>
 }
 
-fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:String, outdir_in:String) -> rust_am_lib::copland::ASP {
+fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:String, outdir_in:String, report_fp:String) -> rust_am_lib::copland::ASP {
 
         let asp_args : ASP_ARGS_ReadfileRangeMany = ASP_ARGS_ReadfileRangeMany 
                 { 
                   env_var_golden: "".to_string(),
                   filepath_golden: golden_evidence_fp,
                   outdir: outdir_in,
+                  report_filepath: report_fp,
                   slices: file_slices
                 };
 
@@ -513,10 +504,12 @@ pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: Stri
     Ok(full_req_fp)
 }
 
-pub const DEFAULT_TEMP_COMP_MAP_FILENAME: &'static str = "comp_map_temp.json";
-type Slices_Comp_Map = std::collections::HashMap<String, bool>;
+//pub const DEFAULT_TEMP_COMP_MAP_FILENAME: &'static str = "comp_map_temp.json";
+//pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
 
+//type Slices_Comp_Map = std::collections::HashMap<String, bool>;
 
+/*
 fn merge_resolute_slice (root_fp:String, c:HAMR_Slice, m:Slices_Comp_Map, component_id:String, contract_id:String, hm: &mut std::collections::HashMap<String, Resolute_Appsumm_Member>) -> () {
 
     let pos: HAMR_Pos = c.pos.clone();
@@ -582,7 +575,9 @@ fn merge_resolute_appsumm (root_fp:String, r:HAMR_AttestationReport, m:&Slices_C
             { TYPE: "".to_string(), ACTION: "".to_string(), SUCCESS: true, APPRAISAL_RESULT: res_bool, PAYLOAD: targvec };
     res
 }
+*/
 
+/*
 pub fn generate_resolute_appsumm(hamr_root_dir: String, report_filename: String) -> std::io::Result<ResoluteAppraisalSummaryResponse>  {
 
     let attestation_report_fp = format!("{hamr_root_dir}/{report_filename}");
@@ -599,17 +594,8 @@ pub fn generate_resolute_appsumm(hamr_root_dir: String, report_filename: String)
 
     Ok(resolute_appsumm)
 
-/*
-    let fp_suffix = 
-    write_string_to_output_dir(Some(hamr_root_dir.clone()), fp_suffix, "".to_string(), term_string)?;
-    
-
-
-
-    Ok(())
-    */
-
 }
+*/
 
 pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:String) -> std::io::Result<rust_am_lib::copland::Term> {
 
@@ -630,15 +616,12 @@ pub fn do_hamr_term_gen(attestation_report_root:String, report_filename: String,
         let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, "".to_string(), attestation_report_root.clone());
         //eprintln!("\nDecoded ASPs vector with size {}: {:?} \n\n\n", asps.len(), asps);
 
-
-        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, attestation_report_root.clone());
-
-
+        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, attestation_report_root.clone(), report_filename);
 
         let term : Term = Term::asp(asp); //ASP_Vec_to_Term(asps);
 
         let term_string = serde_json::to_string(&term)?;
-        let fp_suffix = "hamr_contracts_term.json".to_string();
+        let fp_suffix = "hamr_contracts_only_maestro_term.json".to_string();
         write_string_to_output_dir(Some(attestation_report_root.clone()), fp_suffix, "".to_string(), term_string)?;
 
         v.push(term)
