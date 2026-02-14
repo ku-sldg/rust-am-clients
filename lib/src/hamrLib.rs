@@ -10,7 +10,7 @@ use std::fs;
 use std::env;
 use std::path::{self, Path};
 use serde::{Deserialize, Serialize};
-use serde::de::DeserializeOwned;
+//use serde::de::DeserializeOwned;
 
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -140,6 +140,7 @@ pub fn appsumm_response_to_resolute_appsumm_response(resp:AppraisalSummaryRespon
     res
 }
 
+/*
 fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(term_fp:&Path, type_string:String) -> Result<T, serde_json::Error> {
 
      let err_string = format!("Couldn't read {type_string} JSON file");
@@ -150,12 +151,21 @@ fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(ter
                                 eprintln!("{:?}", term);
                                 Ok(term)
 }
+                                */
 
 pub fn get_attestation_report_json (hamr_report_fp:&Path) -> std::io::Result<HAMR_AttestationReport>  {
 
-    let res: HAMR_AttestationReport = decode_from_file_and_print(hamr_report_fp, "HAMR_AttestationReport".to_string())?;
+    //let res: HAMR_AttestationReport = decode_from_file_and_print(hamr_report_fp, "HAMR_AttestationReport".to_string())?;
+    let type_string = "HAMR_AttestationReport".to_string();
+    let err_string = format!("Couldn't read {type_string} JSON file");
+    let term_contents = fs::read_to_string(hamr_report_fp).expect(err_string.as_str());
+                            //eprintln!("\n{type_string} contents:\n{term_contents}");
+                            let term : HAMR_AttestationReport = serde_json::from_str(&term_contents)?;
+                            //eprintln!("\nDecoded Term as:");
+                            //eprintln!("{:?}", term);
+                            Ok(term)
 
-    Ok (res)
+    //Ok (res)
 }
 
 fn HAMR_attestation_report_to_File_Slices (hamr_report:HAMR_AttestationReport, project_root_fp:&Path) -> Vec<File_Slice> {
@@ -185,7 +195,7 @@ struct ASP_ARGS_ReadfileRangeMany {
     filepath_golden: String,
     outdir: String,
     report_filepath: String,
-    slices: Vec<File_Slice>
+    slices_file: String//Vec<File_Slice>
 }
 
 fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:&Path, outdir_in:&Path, report_fp:&Path) -> rust_am_lib::copland::ASP {
@@ -194,13 +204,21 @@ fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:&Path, out
         let o_fp = outdir_in.to_str().unwrap().to_string();
         let r_fp = report_fp.to_str().unwrap().to_string();
 
+        let o_fp_path = Path::new(&o_fp);
+        let slices_fp = o_fp_path.join("temp_slices.json");
+        let slices_fp_string = slices_fp.to_str().unwrap().to_string();
+
+
+        let slices_json_string = serde_json::to_string(&file_slices).unwrap();
+        fs::write(&slices_fp_string, slices_json_string).unwrap();
+
         let asp_args : ASP_ARGS_ReadfileRangeMany = ASP_ARGS_ReadfileRangeMany 
                 { 
                   env_var_golden: "".to_string(),
                   filepath_golden: g_fp,
                   outdir: o_fp,
                   report_filepath: r_fp,
-                  slices: file_slices
+                  slices_file: slices_fp_string
                 };
 
         let asp_args_json = serde_json::to_value(asp_args).unwrap();
@@ -351,7 +369,7 @@ pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, h
     if hamr_contracts_bool {
         let attestation_report_fp = attestation_report_root.join(report_filename);
         let att_report = get_attestation_report_json(attestation_report_fp.as_path())?;
-        eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report.clone());
+        //eprintln!("\nDecoded HAMR_AttestationReport: {:?} \n\n\n", att_report.clone());
         
 
         let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, attestation_report_root);
