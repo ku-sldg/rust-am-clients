@@ -352,7 +352,14 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                 
                                 let golden_fp_path = Path::new(&golden_fp);
 
-                                let term = do_hamr_term_gen(hamr_root_dir, report_filename_path, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp_path)?;
+                                let output_fp = match args.output_dir {
+                                    Some(fp) => {fp}
+                                    None => {hamr_root_dir.to_str().unwrap().to_string()}
+
+                                };
+                                let output_fp_path= Path::new(&output_fp);
+
+                                let term = do_hamr_term_gen(hamr_root_dir, report_filename_path, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp_path, output_fp_path)?;
                                 let term_fp = hamr_root_dir.join(DEFAULT_HAMR_MAESTRO_TERM_FILENAME);
                                 let term_string = serde_json::to_string(&term)?;
                                 fs::write(term_fp.as_path(), term_string)?;

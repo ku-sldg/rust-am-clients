@@ -173,7 +173,6 @@ fn HAMR_component_report_to_File_Slices (hamr_component_report:HAMR_ComponentRep
 struct ASP_ARGS_ReadfileRangeMany {
     env_var_golden: String,
     filepath_golden: String,
-    outdir: String,
     report_filepath: String,
     slices_file: String
 }
@@ -185,18 +184,17 @@ fn File_Slice_to_ASP (file_slices:Vec<File_Slice>, golden_evidence_fp:&Path, out
         let r_fp = report_fp.to_str().unwrap().to_string();
 
         let o_fp_path = Path::new(&o_fp);
-        let slices_fp = o_fp_path.join("temp_slices.json");
-        let slices_fp_string = slices_fp.to_str().unwrap().to_string();
-
+        let slices_fp_suffix = Path::new("temp_slices.json");
+        let midpath = Path::new("");
 
         let slices_json_string = serde_json::to_string(&file_slices).unwrap();
-        fs::write(&slices_fp_string, slices_json_string).unwrap();
+
+        let slices_fp_string = write_string_to_output_dir(Some(o_fp_path.to_str().unwrap().to_string()), slices_fp_suffix, midpath, slices_json_string).unwrap();
 
         let asp_args : ASP_ARGS_ReadfileRangeMany = ASP_ARGS_ReadfileRangeMany 
                 { 
                   env_var_golden: "".to_string(),
                   filepath_golden: g_fp,
-                  outdir: o_fp,
                   report_filepath: r_fp,
                   slices_file: slices_fp_string
                 };
@@ -336,7 +334,7 @@ pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: &Pat
     Ok(full_req_fp.as_path().to_str().unwrap().to_string())
 }
 
-pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:&Path) -> std::io::Result<rust_am_lib::copland::Term> {
+pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:&Path, output_fp:&Path) -> std::io::Result<rust_am_lib::copland::Term> {
 
     let hamr_contracts_bool = 
         if !(hamr_contracts_bool || verus_hash_bool || verus_run_bool)
@@ -352,7 +350,7 @@ pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, h
 
         let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, attestation_report_root);
 
-        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, attestation_report_root, report_filename);
+        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, output_fp, report_filename);
 
         let term : Term = Term::asp(asp);
 

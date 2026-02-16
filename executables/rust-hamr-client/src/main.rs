@@ -18,7 +18,7 @@ fn main() -> std::io::Result<()> {
     let attestation_report_root_fp = std::path::Path::new(&attestation_report_root);
 
     let default_report_fp = std::path::Path::new("aadl_attestation_report.json");
-    let term = do_hamr_term_gen(attestation_report_root_fp, default_report_fp, false, false, false, golden_evidence_fp)?;
+    let term = do_hamr_term_gen(attestation_report_root_fp, default_report_fp, false, false, false, golden_evidence_fp, attestation_report_root_fp)?;
 
     let term_string = serde_json::to_string(&term)?;
 
