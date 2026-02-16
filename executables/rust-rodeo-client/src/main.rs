@@ -395,13 +395,26 @@ fn main() -> std::io::Result<()> {
             None => {vreq.clone()}
             Some(prov_filepath) => {
 
+                let output_dir = match args.output_dir.clone() {
+                    Some(fp) => {fp}
+                    None => {
+                        let res_dir = env::current_dir()?;
+                        let default_fp = Path::new("testing/outputs/");
+                        let res = res_dir.join(default_fp);
+                        res.as_path().to_str().unwrap().to_string()}
+
+                };
+
                 let new_term: Term = 
+
+                  
                     rust_am_lib::copland::append_provisioning_term(&prov_filepath, 
                                                                     &vreq.REQ_PLC, 
                                                               &vreq.EVIDENCE.1, 
                                                              &vreq.TERM, 
                                                               &vreq.ATTESTATION_SESSION.Session_Context,
-                                                                    vreq.TERM.clone());
+                                                                    vreq.TERM.clone(),
+                                                                &output_dir);
                 let term_string = serde_json::to_string(&new_term)?;
                 eprintln!("\n\nProvisioning Term: {}\n\n", term_string);
 
@@ -434,7 +447,7 @@ fn main() -> std::io::Result<()> {
         };
     eprintln!("res_manifest_filepath arg: {}", res_manifest_filepath);
 
-    let maybe_out_dir = args.output_dir;
+    let maybe_out_dir = args.output_dir.clone();
 
     let resp : ProtocolRunResponse = run_cvm_request(res_cvm_filepath, res_asp_libs_filepath, res_manifest_filepath, maybe_out_dir.clone(), new_vreq)?;
 

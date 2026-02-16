@@ -55,5 +55,22 @@ Successful output should be some JSON logging followed by something like:
     cargo run --release --bin rust-rodeo-client -- -t $HAMR_ATTESTATION_ROOT/hamr_maestro_term.json -a
     ```
     Note:  the `-t` CLI arg points to the MAESTRO protocol term (generated during provisioning above).  `-a` tells the MAESTRO tools to perform evidence appraisal against the golden evidence file generated during provisioning above (the path to this golden evidence file is automatically embedded into the protocol term during provisioning).  
-1. Check the `rust-am-clients/testing/outputs/` directory for the newly-generated file called `appsumm_response.json`.  This is an AppraisalSummary Response JSON structure (tailored for parsing by tools like Resolute).  The crucial field of this JSON object is `"APPRAISAL_RESULT"` which captures the overall appraisal judgement for the HAMR contract file slices as a boolean.  The JSON schema for the AppraisalSummary Response can be found [here](https://github.com/ku-sldg/rust-am-clients/blob/main/json_schemas/appsumm_response_schema.json).
+1. Check the `$HAMR_ATTESTATION_ROOT` directory for the newly-generated file called `appsumm_response.json`.  This is an AppraisalSummary Response JSON structure (tailored for parsing by tools like Resolute).  The crucial field of this JSON object is `"APPRAISAL_RESULT"` which captures the overall appraisal judgement for the HAMR contract file slices as a boolean.  The JSON schema for the AppraisalSummary Response can be found [here](https://github.com/ku-sldg/rust-am-clients/blob/main/json_schemas/appsumm_response_schema.json).
+
+### Invoking rust-rodeo-client from a directory other than the rust-am-clients root
+
+The following commands assume the environment variable `$RODEO_ROOT` is set to point to the top-level of your locally-cloned rust-am-clients repo:
+
+For provisioning:
+```bash
+$RODEO_ROOT/target/release/rust-rodeo-client --hamr-report-filepath $HAMR_ATTESTATION_ROOT/sysml_attestation_report.json -s $RODEO_ROOT/rodeo_configs/sessions/session_union.json -m $RODEO_ROOT/testing/manifests/Manifest_P0.json -o $RODEO_ROOT/testing/outputs/ -p $HAMR_ATTESTATION_ROOT/hamr_maestro_golden_evidence.json
+```
+
+
+For appraisal:
+```bash
+ $RODEO_ROOT/target/release/rust-rodeo-client -t $HAMR_ATTESTATION_ROOT/hamr_maestro_term.json -s $RODEO_ROOT/rodeo_configs/sessions/session_union.json -m $RODEO_ROOT/testing/manifests/Manifest_P0.json -o $RODEO_ROOT/testing/outputs/ -a
+ ```
+
+ NOTE:  After the above appraisal, the resulting Appraisal Summary file will be generated at `$HAMR_ATTESTATION_ROOT/appsumm_response.json`.
 
