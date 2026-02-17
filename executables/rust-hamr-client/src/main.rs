@@ -13,12 +13,17 @@ fn main() -> std::io::Result<()> {
     let attestation_report_root = args.attestation_root;
     let golden_evidence_fp_string = args.golden_evidence_filepath;
 
-    let golden_evidence_fp = std::path::Path::new(&golden_evidence_fp_string);
-
     let attestation_report_root_fp = std::path::Path::new(&attestation_report_root);
 
-    let default_report_fp = std::path::Path::new("aadl_attestation_report.json");
-    let term = do_hamr_term_gen(attestation_report_root_fp, default_report_fp, false, false, false, golden_evidence_fp, attestation_report_root_fp)?;
+    let default_report_fp = attestation_report_root_fp.join("aadl_attestation_report.json");
+    let report_fp = default_report_fp.as_path();
+    let term = do_hamr_term_gen(
+        Some(golden_evidence_fp_string),
+                 Some(args.output_term_filepath.clone()), 
+            report_fp, 
+             false, 
+                 false, 
+                  false)?;
 
     let term_string = serde_json::to_string(&term)?;
 

@@ -11,6 +11,7 @@ use std::env;
 use std::path::{self, Path};
 use serde::{Deserialize, Serialize};
 
+pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct HAMR_Pos {
@@ -334,7 +335,7 @@ pub fn write_string_to_output_dir (maybe_out_dir:Option<String>, fp_suffix: &Pat
     Ok(full_req_fp.as_path().to_str().unwrap().to_string())
 }
 
-pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool, golden_evidence_fp:&Path, output_fp:&Path) -> std::io::Result<rust_am_lib::copland::Term> {
+pub fn do_hamr_term_gen(maybe_golden_evidence_fp:Option<String>, maybe_output_fp:Option<String>, hamr_report_filepath: &Path, hamr_contracts_bool:bool, verus_hash_bool:bool, verus_run_bool:bool) -> std::io::Result<rust_am_lib::copland::Term> {
 
     let hamr_contracts_bool = 
         if !(hamr_contracts_bool || verus_hash_bool || verus_run_bool)
@@ -344,13 +345,34 @@ pub fn do_hamr_term_gen(attestation_report_root:&Path, report_filename: &Path, h
     
     let mut v: Vec<Term> = Vec::new();
 
+    let attestation_report_root = hamr_report_filepath.parent().unwrap();
+
     if hamr_contracts_bool {
-        let attestation_report_fp = attestation_report_root.join(report_filename);
-        let att_report = get_attestation_report_json(attestation_report_fp.as_path())?;
+        let att_report = get_attestation_report_json(hamr_report_filepath)?;
 
         let slice_vec = HAMR_attestation_report_to_File_Slices(att_report, attestation_report_root);
 
-        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, output_fp, report_filename);
+        let golden_fp : String  = 
+            match maybe_golden_evidence_fp {
+                Some(fp) => {
+                    fp
+                }
+                None => {
+                    let golden_filepath = attestation_report_root.join(DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME);
+                    golden_filepath.to_str().unwrap().to_string()
+                }
+            };
+        
+        let golden_evidence_fp = Path::new(&golden_fp);
+
+         let output_fp = 
+            match maybe_output_fp {
+                Some(fp) => {fp}
+                None => {attestation_report_root.to_str().unwrap().to_string()}
+            };
+            let output_fp= Path::new(&output_fp);
+
+        let asp = File_Slice_to_ASP (slice_vec, golden_evidence_fp, output_fp, hamr_report_filepath);
 
         let term : Term = Term::asp(asp);
 

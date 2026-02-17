@@ -21,6 +21,12 @@ use serde_stacker::Deserializer;
 
 use std::process::{Command};
 
+pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
+pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
+pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
+pub const DEFAULT_OUTPUT_DIR: &'static str = "testing/outputs/";
+pub const DEFAULT_MANIFEST_FILENAME_PATH: &'static str = "testing/manifests/Manifest_P0.json";
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RodeoClientRequest {
     pub RodeoClientRequest_attest_id: String,
@@ -283,13 +289,6 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
     Ok(value)
 }
 
-pub const DEFAULT_SESSION_FILENAME: &'static str = "rodeo_configs/sessions/session_union.json";
-pub const DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME: &'static str = "hamr_contract_golden_evidence.json";
-pub const DEFAULT_HAMR_MAESTRO_TERM_FILENAME: &'static str = "hamr_maestro_term.json";
-pub const DEFAULT_HAMR_ATTESTATION_REPORT_FILENAME: &'static str = "aadl_attestation_report.json";
-pub const DEFAULT_OUTPUT_DIR: &'static str = "testing/outputs/";
-pub const DEFAULT_MANIFEST_DIR: &'static str = "testing/manifests/Manifest_P0.json";
-
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
 
     let session_fp_string : String = 
@@ -340,26 +339,13 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                 let report_filename_path= Path::new(&report_filename);
                                 let hamr_root_dir = report_filename_path.parent().unwrap();
 
-                                let golden_fp : String  = 
-                                    match args.provisioned_evidence_filepath {
-                                        Some(fp) => {
-                                            fp
-                                        }
-                                        None => {
-                                            hamr_root_dir.join(DEFAULT_HAMR_GOLDEN_EVIDENCE_FILENAME).to_str().unwrap().to_string()
-                                        }
-                                    };
-                                
-                                let golden_fp_path = Path::new(&golden_fp);
-
-                                let output_fp = match args.output_dir {
-                                    Some(fp) => {fp}
-                                    None => {hamr_root_dir.to_str().unwrap().to_string()}
-
-                                };
-                                let output_fp_path= Path::new(&output_fp);
-
-                                let term = do_hamr_term_gen(hamr_root_dir, report_filename_path, args.hamr_contracts, args.verus_hash, args.verus_run, golden_fp_path, output_fp_path)?;
+                                let term = do_hamr_term_gen(
+                            args.provisioned_evidence_filepath, 
+                                     args.output_dir, 
+                                report_filename_path, 
+                                 args.hamr_contracts, 
+                                     args.verus_hash, 
+                                      args.verus_run)?;
                                 let term_fp = hamr_root_dir.join(DEFAULT_HAMR_MAESTRO_TERM_FILENAME);
                                 let term_string = serde_json::to_string(&term)?;
                                 fs::write(term_fp.as_path(), term_string)?;
@@ -402,26 +388,14 @@ fn main() -> std::io::Result<()> {
             None => {vreq.clone()}
             Some(prov_filepath) => {
 
-                let output_dir = match args.output_dir.clone() {
-                    Some(fp) => {fp}
-                    None => {
-                        let res_dir = env::current_dir()?;
-                        let default_fp = Path::new("testing/outputs/");
-                        let res = res_dir.join(default_fp);
-                        res.as_path().to_str().unwrap().to_string()}
-
-                };
-
                 let new_term: Term = 
 
-                  
                     rust_am_lib::copland::append_provisioning_term(&prov_filepath, 
                                                                     &vreq.REQ_PLC, 
                                                               &vreq.EVIDENCE.1, 
                                                              &vreq.TERM, 
                                                               &vreq.ATTESTATION_SESSION.Session_Context,
-                                                                    vreq.TERM.clone(),
-                                                                &output_dir);
+                                                                    vreq.TERM.clone());
                 let term_string = serde_json::to_string(&new_term)?;
                 eprintln!("\n\nProvisioning Term: {}\n\n", term_string);
 
@@ -447,7 +421,7 @@ fn main() -> std::io::Result<()> {
             Some(fp) => {fp}
             None => {
                 let res_dir = env::current_dir()?;
-                let default_manifest_fp = Path::new(DEFAULT_MANIFEST_DIR);
+                let default_manifest_fp = Path::new(DEFAULT_MANIFEST_FILENAME_PATH);
                 let res = res_dir.join(default_manifest_fp);
                 res.as_path().to_str().unwrap().to_string()
             }

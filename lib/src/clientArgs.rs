@@ -179,6 +179,10 @@ pub struct RodeoClientArgs {
     #[arg(short, long)]
     pub hamr_report_filepath: Option<String>,
 
+    /// Path pointing to the root directory for the rust-rodeo-client local repository
+    #[arg(short, long)]
+    pub rodeo_root: Option<String>,
+
     /// Boolean to indicate adding the hash of (invariant) HAMR contract file slices to the HAMR workflow protocol (NOTE: you must have the --hamr_root option active for this to flag to matter)
     #[arg(short, long, default_value_t = false)]
     pub hamr_contracts: bool,
