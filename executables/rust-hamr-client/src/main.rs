@@ -19,7 +19,6 @@ fn main() -> std::io::Result<()> {
     let report_fp = default_report_fp.as_path();
     let term = do_hamr_term_gen(
         Some(golden_evidence_fp_string),
-                 Some(args.output_term_filepath.clone()), 
             report_fp, 
              false, 
                  false, 

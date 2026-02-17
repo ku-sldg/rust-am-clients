@@ -340,8 +340,7 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                                 let hamr_root_dir = report_filename_path.parent().unwrap();
 
                                 let term = do_hamr_term_gen(
-                            args.provisioned_evidence_filepath, 
-                                     args.output_dir, 
+                            args.provisioned_evidence_filepath,
                                 report_filename_path, 
                                  args.hamr_contracts, 
                                      args.verus_hash, 
