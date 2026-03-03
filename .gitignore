@@ -17,3 +17,5 @@ testing/outputs/*
 rodeo_configs/asp_args/concrete/*
 
 goldenFiles/*
+
+.cargo/*
