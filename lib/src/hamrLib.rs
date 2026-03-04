@@ -18,7 +18,7 @@ struct ASP_ARGS_ReadfileRangeMany {
     env_var_golden: String,
     filepath_golden: String,
     report_filepath: String,
-    attestation_report_filepath: String
+    //attestation_report_filepath: String
 }
 
 fn File_Slice_to_ASP (golden_evidence_fp:&Path, report_fp:&Path) -> rust_am_lib::copland::ASP {
@@ -31,7 +31,7 @@ fn File_Slice_to_ASP (golden_evidence_fp:&Path, report_fp:&Path) -> rust_am_lib:
                   env_var_golden: "".to_string(),
                   filepath_golden: g_fp,
                   report_filepath: r_fp.clone(),
-                  attestation_report_filepath: r_fp
+                  //attestation_report_filepath: r_fp
                 };
 
         let asp_args_json = serde_json::to_value(asp_args).unwrap();
@@ -39,8 +39,9 @@ fn File_Slice_to_ASP (golden_evidence_fp:&Path, report_fp:&Path) -> rust_am_lib:
         let slice_asp_params : rust_am_lib::copland::ASP_PARAMS = rust_am_lib::copland::ASP_PARAMS {
         ASP_ID: "hamr_readfile_range_many".to_string(),
         ASP_ARGS: asp_args_json,
+        /*
         ASP_PLC: "P0".to_string(),
-        ASP_TARG_ID: "hamr_readfile_range_many_targ".to_string()
+        ASP_TARG_ID: "hamr_readfile_range_many_targ".to_string() */
 
     };
 
@@ -50,7 +51,7 @@ fn File_Slice_to_ASP (golden_evidence_fp:&Path, report_fp:&Path) -> rust_am_lib:
 
 fn add_asp (asp:rust_am_lib::copland::ASP, t:rust_am_lib::copland::Term) -> rust_am_lib::copland::Term {
 
-    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::Split {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL},
+    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::EvPath::both_paths /* {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL} */,
                                 Box::new(t),
                                 Box::new(rust_am_lib::copland::Term::asp(asp.clone())) 
                               )
@@ -59,7 +60,7 @@ fn add_asp (asp:rust_am_lib::copland::ASP, t:rust_am_lib::copland::Term) -> rust
 
 fn add_term_bseq (new_t:rust_am_lib::copland::Term, t:rust_am_lib::copland::Term) -> rust_am_lib::copland::Term {
 
-    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::Split {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL},
+    rust_am_lib::copland::Term::bseq(rust_am_lib::copland::EvPath::both_paths /* {split1:rust_am_lib::copland::SP::ALL, split2:rust_am_lib::copland::SP::ALL} */,
                                 Box::new(t),
                                 Box::new(new_t) 
                               )
@@ -162,9 +163,10 @@ pub fn do_hamr_term_gen(maybe_golden_evidence_fp:Option<String>, hamr_report_fil
     if verus_hash_bool {
         let verus_hash_asp_params : ASP_PARAMS = 
                 ASP_PARAMS { ASP_ID: "hashfile".to_string(), 
-                                ASP_ARGS: json!({}), 
+                                ASP_ARGS: json!({"targ_id":"verus_exe_targ"}),
+                                /* 
                                 ASP_PLC: "p1".to_string(), 
-                                ASP_TARG_ID: "cargo_verus_exe_targ".to_string() };
+                                ASP_TARG_ID: "cargo_verus_exe_targ".to_string() */ };
         let verus_hash_asp_term: Term = Term::asp(ASP::ASPC(verus_hash_asp_params));
 
 
@@ -179,8 +181,9 @@ pub fn do_hamr_term_gen(maybe_golden_evidence_fp:Option<String>, hamr_report_fil
         let verus_run_asp_params : ASP_PARAMS = 
                         ASP_PARAMS { ASP_ID: "run_command_cargo_verus".to_string(), 
                                     ASP_ARGS: json!({}), 
+                                    /*
                                     ASP_PLC: "p1".to_string(), 
-                                    ASP_TARG_ID: "run_cargo_verus_targ".to_string() };
+                                    ASP_TARG_ID: "run_cargo_verus_targ".to_string() */ };
         let verus_run_asp_term: Term = Term::asp(ASP::ASPC(verus_run_asp_params));
 
         let term_string = serde_json::to_string(&verus_run_asp_term)?;
@@ -192,7 +195,7 @@ pub fn do_hamr_term_gen(maybe_golden_evidence_fp:Option<String>, hamr_report_fil
 
     let contracts_hash_run_term = vec_terms_to_bseq(v.clone());
 
-    let sigparams : ASP_PARAMS = ASP_PARAMS { ASP_ID: "sig".to_string(), ASP_ARGS:json!({}), ASP_PLC: "P0".to_string(), ASP_TARG_ID: "sig_targid".to_string() };
+    let sigparams : ASP_PARAMS = ASP_PARAMS { ASP_ID: "sig".to_string(), ASP_ARGS:json!({}), /* ASP_PLC: "P0".to_string(), ASP_TARG_ID: "sig_targid".to_string() */ };
     let sigasp = ASP::ASPC(sigparams);
     let sigterm = Term::lseq(Box::new(contracts_hash_run_term), Box::new(Term::asp(sigasp)));
     eprintln!("\nNew term: {:?} \n\n\n", sigterm);

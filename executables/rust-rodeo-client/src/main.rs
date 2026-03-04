@@ -43,42 +43,77 @@ pub struct RodeoClientResponse {
 
 fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>, keep_orig:bool) -> ASP_PARAMS {
 
+    
     let id : ASP_ID = params.ASP_ID.clone();
-    let targid : TARG_ID = params.ASP_TARG_ID.clone();
-    let new_args: serde_json::Value = 
-      match args_map.get(&id) {
-        Some (targs_map) => {
 
-            match targs_map.get(&targid) {
-                Some (val) => {
-                    val.clone()
-                }
+    let args = params.ASP_ARGS.clone();
+    let maybe_targid = args.get("targ_id");
 
-                None => {
-                    if keep_orig 
-                    {params.ASP_ARGS} 
-                else 
-                    {serde_json::json!({})}
+    match maybe_targid {
+        Some(tid) => {
+                //panic!("\n\nGOT HERE\n\n");
+                let is_string = tid.is_string();
+                if is_string {
+                    //panic!("\n\nGOT HERE\n\n");
+                    let targid = tid.as_str().unwrap();
+                    let new_args: serde_json::Value = 
+                        match args_map.get(&id) {
+                            Some (targs_map) => {
 
-                }
-            }
-        }
-        None => {
-            if keep_orig 
-                {params.ASP_ARGS} 
-            else 
-                {serde_json::json!({})}
-        }
+                                /*
+                                eprintln!("targs_map: {:?}", targs_map);
+                                eprintln!("targs_map keys: {:?}", targs_map.keys());
+                                let keys = targs_map.keys();
+                                let keyvec : Vec<&String> = keys.collect();
+                                let keyvec_val = keyvec.first().unwrap();
+                                eprintln!("keyvecval: {:?}", keyvec_val);
+                                eprintln!("eq: {:?}", (*keyvec_val).eq(&targid));
+                                eprintln!("keyvec: {:?}", keyvec);
+                                eprintln!("targs_map.contains_key(): {:?}", targs_map.contains_key(targid));
+                                eprintln!("keyvals: {:?}", targs_map.get(targid));
+                                eprintln!("targid: {}", targid);
+                                eprintln!("targs_map.get(): {:?}", (*targs_map).get(targid));
+                                eprintln!("targs_map.get_key_value(): {:?}", targs_map.get_key_value(targid));
+                                panic!("hihi");
+                                */
+                                
+                                match targs_map.get(targid) {
+                                    Some (val) => {
+                                        //panic!("\n\nGOT HERE\n\n");
+                                        let v = serde_json::to_value(val).unwrap();
+                                        v
+                                    }
+
+                                    None => {
+                                        if keep_orig 
+                                        {params.ASP_ARGS} 
+                                        else 
+                                        {serde_json::json!({})}
+
+                                    }
+                                }
+                            }
+                            None => {
+                                if keep_orig 
+                                    {params.ASP_ARGS} 
+                                else 
+                                    {serde_json::json!({})}
+                            }
+                            
+                        };
         
-      };
-      
-    ASP_PARAMS { 
-        ASP_ARGS: new_args,
-        ASP_ID: params.ASP_ID,
-        ASP_PLC: params.ASP_PLC,
-        ASP_TARG_ID: params.ASP_TARG_ID,
+                        ASP_PARAMS { 
+                            ASP_ARGS: new_args,
+                            ASP_ID: params.ASP_ID,
+                        }
+                }
+                else {panic!("\nError in aspc_args_swap:  targ_id field of ASP_ARGS is NOT a JSON String\n")}
+        }
+        _ => {
+                // Leave params unchanged if no 'targ_id' field of original ASP_ARGS
+                params
+            }
     }
-
 }
 
 fn term_swap_args(t:Term, args_map:HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>, keep_orig:bool) -> Term {
@@ -198,7 +233,7 @@ fn run_cvm_request (cvm_path:String, asp_bin_path:String, manifest_path:String, 
     let resp_string = String::from_utf8(out_res.clone()).unwrap();
 
 
-    let respval = deserialize_deep_json(&resp_string)?;
+    let respval = deserialize_deep_json(&resp_string, &"ProtocolRunResponsse".to_string())?;
 
     let resp: Result<ProtocolRunResponse, serde_json::Error> = from_value(respval);
 
@@ -267,16 +302,23 @@ fn decode_from_file_and_print<T: DeserializeOwned + std::fmt::Debug + Clone>(ter
 
     let err_string = format!("Couldn't read {type_string} JSON file");
     let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
-                                
-    let termval = deserialize_deep_json(&term_contents)?;
-    let term : T = from_value(termval)?;
-    
-    eprintln!("\nDecoded term as:");
-    eprintln!("{:?}", term);
-    Ok(term)
+               
+    let termval = deserialize_deep_json(&term_contents, &err_string)?;
+    let maybe_term: Result<T, serde_json::Error> = from_value(termval);
+
+    match maybe_term {
+        Ok(term) => {
+            eprintln!("\nDecoded term as:");
+            eprintln!("{:?}", term);
+            Ok(term)
+        }
+        Err(e) => {
+            eprintln!("Error decoding term of type: {}", type_string);
+            Err(e)}
+    }
 }
 
-fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
+fn deserialize_deep_json(json_data: &str, type_string:&String) -> serde_json::Result<Value> {
     let mut de = serde_json::de::Deserializer::from_str(json_data);
     de.disable_recursion_limit(); // This method is only available with the feature
     
@@ -284,9 +326,13 @@ fn deserialize_deep_json(json_data: &str) -> serde_json::Result<Value> {
     let stacker_de = Deserializer::new(&mut de);
     
     // Deserialize the data
-    let value = Value::deserialize(stacker_de)?;
+    let value = Value::deserialize(stacker_de);
+    match value {
+        Ok(v) => {Ok(v)}
+        _ => {panic!("Couldn't deserialize to serde Value for type: {} ", type_string)}
+    }
     
-    Ok(value)
+    //Ok(value)
 }
 
 pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Result<RodeoSessionConfig > {
@@ -316,7 +362,6 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
 
     let session = decode_from_file_and_print(session_fp, "Attestation Session".to_string())?;
 
-
     let (my_term, my_session, my_asp_args)
             :(Term, Attestation_Session, HashMap<ASP_ID, HashMap<TARG_ID, serde_json::Value>>) 
                 = match args.term_filepath {
@@ -324,7 +369,7 @@ pub fn rodeo_client_args_to_rodeo_config(args: RodeoClientArgs) -> std::io::Resu
                         let err_string = format!("Couldn't read Term JSON file");
                         let term_contents = fs::read_to_string(term_fp).expect(err_string.as_str());
 
-                        let termval = deserialize_deep_json(&term_contents)?;
+                        let termval = deserialize_deep_json(&term_contents, &"Term".to_string())?;
                         let term : Term = from_value(termval)?;
                         eprintln!("\nDecoded term as:");
                         eprintln!("{:?}", term);

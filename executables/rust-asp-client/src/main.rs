@@ -35,8 +35,10 @@ fn main() {
                     ACTION: "ASP_RUN".to_string(),
                     ASP_ID: aspid, 
                     ASP_ARGS: asp_args,
+                    /*
                     ASP_PLC: aspplc,
                     ASP_TARG_ID: asptargid,
+                    */
                     RAWEV: aspinitrawev
                 };
 

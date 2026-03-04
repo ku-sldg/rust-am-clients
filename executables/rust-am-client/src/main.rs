@@ -91,6 +91,7 @@ fn get_session_from_am_client_args (args:&AmClientArgs) -> std::io::Result<Attes
 
 fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, Value>>, keep_orig:bool) -> ASP_PARAMS {
 
+    /*
     let id : ASP_ID = params.ASP_ID.clone();
     let targid : TARG_ID = params.ASP_TARG_ID.clone();
     let new_args: Value = 
@@ -126,6 +127,8 @@ fn aspc_args_swap(params:ASP_PARAMS, args_map:HashMap<ASP_ID, HashMap<TARG_ID, V
         ASP_PLC: params.ASP_PLC,
         ASP_TARG_ID: params.ASP_TARG_ID,
     }
+    */
+    params
 
 }
 
