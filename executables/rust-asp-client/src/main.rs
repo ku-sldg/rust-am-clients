@@ -26,8 +26,8 @@ fn main() {
 
 
      //let aspargs: Value = json!(null);
-     let aspplc: String = "".to_string();
-     let asptargid: String = "".to_string();
+     let _aspplc: String = "".to_string();
+     let _asptargid: String = "".to_string();
      let aspinitrawev: RawEv = rust_am_lib::copland::EMPTY_EVIDENCE.0.clone();
      let asp_req : ASPRunRequest = 
                 ASPRunRequest {
